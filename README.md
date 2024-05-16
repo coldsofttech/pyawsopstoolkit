@@ -6,7 +6,7 @@ set of features and enhancements to streamline your AWS interactions.
 
 ## Features
 
-Stay tuned!
+- **Validator Functions**: Ensure the correctness of AWS ARNs, IAM policy formats, and more with ease.
 
 ## What's Next?
 
@@ -40,6 +40,10 @@ Now you're all set to harness the power of **pyawsopstoolkit** in your AWS workf
 ## pyawsopstoolkit.exceptions
 
 For detailed information and usage examples, please refer to [EXCEPTIONS](readme/EXCEPTIONS.md).
+
+## pyawsopstoolkit.validators
+
+For detailed information and usage examples, please refer to [VALIDATORS](readme/VALIDATORS.md).
 
 # License
 
