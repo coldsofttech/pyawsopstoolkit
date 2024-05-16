@@ -1,14 +1,11 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 import pyawsopstoolkit
 
 setup(
     name=pyawsopstoolkit.__name__,
     version=pyawsopstoolkit.__version__,
-    packages=[
-        pyawsopstoolkit.__name__,
-        pyawsopstoolkit.exceptions.__name__
-    ],
+    packages=find_packages(),
     url='https://github.com/coldsofttech/pyawsopstoolkit.git',
     license='MIT',
     author='coldsofttech',
