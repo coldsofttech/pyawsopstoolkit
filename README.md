@@ -157,6 +157,10 @@ print(
 
 For detailed information and usage examples, please refer to [EXCEPTIONS](readme/EXCEPTIONS.md).
 
+## pyawsopstoolkit.models
+
+For detailed information and usage examples, please refer to [MODELS](readme/MODELS.md).
+
 ## pyawsopstoolkit.validators
 
 For detailed information and usage examples, please refer to [VALIDATORS](readme/VALIDATORS.md).
