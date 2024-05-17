@@ -11,6 +11,10 @@ setup(
     author='coldsofttech',
     description=pyawsopstoolkit.__description__,
     requires_python=">=3.10",
+    install_requires=[
+        "boto3",
+        "botocore"
+    ],
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     keywords=[
