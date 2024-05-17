@@ -3,6 +3,7 @@ __all__ = [
     "Credentials",
     "Session",
     "exceptions",
+    "models",
     "validators"
 ]
 __name__ = "pyawsopstoolkit"
