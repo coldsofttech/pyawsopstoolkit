@@ -83,6 +83,14 @@ class IAccount(ABC):
     def number(self, value: str) -> None:
         raise NotImplementedError(_property_message)
 
+    @abstractmethod
+    def __str__(self) -> str:
+        raise NotImplementedError(_method_message)
+
+    @abstractmethod
+    def __dict__(self) -> dict:
+        raise NotImplementedError(_method_message)
+
 
 class ISession(ABC):
     """

@@ -202,7 +202,7 @@ class IAMRole:
             description: Optional[str] = None,
             permissions_boundary: Optional[IAMRolePermissionsBoundary] = None,
             last_used: Optional[IAMRoleLastUsed] = None,
-            tags: Optional[dict] = None
+            tags: Optional[list] = None
     ) -> None:
         """
         Initialize a new IAMRole instance.
@@ -245,7 +245,7 @@ class IAMRole:
                                  'permissions_boundary should be of IAMRolePermissionsBoundary type.')
         Validation.validate_type(last_used, Union[IAMRoleLastUsed, None],
                                  'last_used should be of IAMRoleLastUsed type.')
-        Validation.validate_type(tags, Union[dict, None], 'tags should be a dictionary.')
+        Validation.validate_type(tags, Union[list, None], 'tags should be a list.')
 
         self._account = account
         self._name = name
@@ -471,22 +471,22 @@ class IAMRole:
         self._permissions_boundary = value
 
     @property
-    def tags(self) -> Optional[dict]:
+    def tags(self) -> Optional[list]:
         """
         Gets the tags associated with the IAM role.
         :return: The tags associated with the IAM role.
-        :rtype: dict
+        :rtype: list
         """
         return self._tags
 
     @tags.setter
-    def tags(self, value: Optional[dict] = None) -> None:
+    def tags(self, value: Optional[list] = None) -> None:
         """
         Sets the tags associated with the IAM role.
         :param value: The tags associated with the IAM role.
-        :type value: dict
+        :type value: list
         """
-        Validation.validate_type(value, Union[dict, None], 'tags should be a dictionary.')
+        Validation.validate_type(value, Union[list, None], 'tags should be a list.')
         self._tags = value
 
     def __str__(self) -> str:
@@ -495,6 +495,7 @@ class IAMRole:
         :return: String representation of the IAMRole object.
         :rtype: str
         """
+        account = self.account if self.account else None
         created_date = self.created_date.isoformat() if self.created_date else None
         assume_role_policy_document = self.assume_role_policy_document if self.assume_role_policy_document else None
         description = self.description if self.description else None
@@ -504,7 +505,7 @@ class IAMRole:
 
         return (
             f'IAMRole('
-            f'account={self.account},'
+            f'account={account},'
             f'path="{self.path}",'
             f'name="{self.name}",'
             f'id="{self.id}",'
@@ -525,15 +526,16 @@ class IAMRole:
         :return: Dictionary representation of the IAMRole object.
         :rtype: dict
         """
+        account = self.account.__dict__() if self.account else None
         created_date = self.created_date.isoformat() if self.created_date else None
         assume_role_policy_document = self.assume_role_policy_document if self.assume_role_policy_document else None
         description = self.description if self.description else None
-        last_used = self.last_used if self.last_used else None
-        permissions_boundary = self.permissions_boundary if self.permissions_boundary else None
+        last_used = self.last_used.__dict__() if self.last_used else None
+        permissions_boundary = self.permissions_boundary.__dict__() if self.permissions_boundary else None
         tags = self.tags if self.tags else None
 
         return {
-            "account": self.account,
+            "account": account,
             "path": self.path,
             "name": self.name,
             "id": self.id,
