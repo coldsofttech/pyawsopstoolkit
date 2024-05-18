@@ -6,11 +6,14 @@ set of features and enhancements to streamline your AWS interactions.
 
 ## Features
 
-- **Session Management**: Seamlessly integrate session management classes into your application ecosystem for improved
-  workflow control.
-- **Assume Role Function**: Gain access to a versatile function for assuming roles, enhancing security and flexibility
-  in your AWS operations.
-- **Validator Functions**: Ensure the correctness of AWS ARNs, IAM policy formats, and more with ease.
+- **Session Management**: Seamlessly integrate session management classes into your application ecosystem, empowering
+  refined control over workflow dynamics.
+- **Assume Role Function**: Access a versatile function for assuming roles, augmenting security and flexibility within
+  your AWS operations.
+- **Validator Functions**: Validate AWS ARNs, IAM policy formats, and more with ease, ensuring the correctness of
+  crucial parameters.
+- **Advance Search**: Harness advanced search capabilities to efficiently navigate and filter AWS resources,
+  streamlining resource discovery and management.
 
 ## What's Next?
 
@@ -92,6 +95,9 @@ interface, providing basic functionality for managing an AWS account.
 #### Methods
 
 - `__init__(self, number: str) -> None`: Initializes an **Account** object with the provided account number.
+-
+    - `__str__(self) -> str`: Returns a string representation of the **Account** object.
+- `__dict__(self) -> dict`: Returns a dictionary representation of the **Account** object.
 
 #### Usage
 
@@ -123,8 +129,8 @@ offering functionality to manage sessions. Additionally, it provides the option 
   within the class object.
 - `get_credentials_for_profile(self) -> ICredentials`: Returns the AWS credentials (access key, secret access key, and
   token) based on the **get_session** with specified parameters within the class object.
-- `assume_role(self, role_arn: str, role_session_name: Optional[str] = 'AssumeSession', policy_arns: Optional[list] = None, policy: Optional[Union[str, dict]] = None, duration_seconds: Optional[int] = 3600, tags: Optional[list] = None) -> boto3.Session`:
-  Returns the **boto3.Session** object for the assumed role based on the specified parameters.
+- `assume_role(self, role_arn: str, role_session_name: Optional[str] = 'AssumeSession', policy_arns: Optional[list] = None, policy: Optional[Union[str, dict]] = None, duration_seconds: Optional[int] = 3600, tags: Optional[list] = None) -> ISession`:
+  Returns the **ISession** object for the assumed role based on the specified parameters.
 
 #### Usage
 
@@ -152,6 +158,10 @@ creds = session.get_credentials_for_profile()
 print(
     creds)  # Output: Credentials(access_key="access_key",secret_access_key="secret_access_key",token=None,expiry=None)
 ```
+
+## pyawsopstoolkit.advsearch
+
+For detailed information and usage examples, please refer to [ADVANCE_SEARCH](readme/ADVANCE_SEARCH.md).
 
 ## pyawsopstoolkit.exceptions
 

@@ -193,6 +193,28 @@ class Account(IAccount):
         AccountValidator.number(value)
         self._number = value
 
+    def __str__(self) -> str:
+        """
+        Return a string representation of the Account object.
+        :return: String representation of the IAMRole object.
+        :rtype: str
+        """
+        return (
+            f'Account('
+            f'number="{self.number}"'
+            f')'
+        )
+
+    def __dict__(self) -> dict:
+        """
+        Return a dictionary representation of the Account object.
+        :return: Dictionary representation of the Account object.
+        :rtype: dict
+        """
+        return {
+            "number": self.number
+        }
+
 
 class Session(ISession):
     """
@@ -405,8 +427,8 @@ class Session(ISession):
         :type duration_seconds: int
         :param tags: Optional, The tags to be applied to the assumed role session.
         :type tags: dict
-        :return: The boto3 Session object of the assumed role session.
-        :rtype: boto3.Session
+        :return: The Session object of the assumed role session.
+        :rtype: ISession
         """
         from botocore.exceptions import ClientError
 

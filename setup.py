@@ -19,7 +19,8 @@ setup(
     long_description_content_type='text/markdown',
     keywords=[
         "aws", "toolkit", "operations", "tools", "development", "python", "validation", "session-management",
-        "utilities", "enhancements", "integration", "amazon-web-services", "models"
+        "utilities", "enhancements", "integration", "amazon-web-services", "models", "search", "advance-search",
+        "filtering"
     ],
     classifiers=[
         "Development Status :: 4 - Beta",

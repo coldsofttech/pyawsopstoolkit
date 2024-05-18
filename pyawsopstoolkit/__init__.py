@@ -2,12 +2,13 @@ __all__ = [
     "Account",
     "Credentials",
     "Session",
+    "advsearch",
     "exceptions",
     "models",
     "validators"
 ]
 __name__ = "pyawsopstoolkit"
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 __description__ = """
 This extensive package, AWS Ops Toolkit, offers a wide range of features and enhancements designed to streamline
 and optimize interactions with Amazon Web Services (AWS). As of now, the toolkit includes a robust set of
