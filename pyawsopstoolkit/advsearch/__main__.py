@@ -1,10 +1,13 @@
 import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from typing import Any
 
 import pyawsopstoolkit.models
 from pyawsopstoolkit.__interfaces__ import IAccount, ISession
 from pyawsopstoolkit.__validations__ import Validation
+
+MAX_WORKERS = 10
 
 # This module supports various conditions for advanced searches, outlined below as global constants.
 OR: str = 'OR'  # Represents the "or" condition
@@ -257,85 +260,132 @@ class IAM:
 
         return iam_role
 
-    def search_roles(self, condition: str = OR, **kwargs) -> list[pyawsopstoolkit.models.IAMRole]:
+    def search_roles(
+            self,
+            condition: str = OR,
+            include_details: bool = False,
+            **kwargs
+    ) -> list[pyawsopstoolkit.models.IAMRole]:
         """
         Returns a list of IAM roles using advanced search features supported by the specified arguments.
         For details on supported kwargs, please refer to the readme document.
         :param condition: The condition to be applied: 'OR' or 'AND'.
         :type condition: str
+        :param include_details: Flag to indicate to include additional details of the IAM role.
+        This includes information about permissions boundary, last used, and tags. Default is False.
+        :type include_details: bool
         :param kwargs: Key-based arguments defining search criteria.
-        :type kwargs: dict
         :return: A list of IAM roles.
         :rtype: list
         """
-        roles_to_return = []
 
-        from botocore.exceptions import ClientError
-        try:
-            roles_to_process = self._list_roles()
+        def _process_role(role_detail):
+            if include_details:
+                role_detail = self._get_role(role_detail.get('RoleName', '')).get('Role', {})
 
-            for role in roles_to_process:
-                if role:
-                    matched = False if condition == OR else True
-                    for key, value in kwargs.items():
-                        if value is not None:
-                            role_field = ''
-                            if key.lower() == 'path':
-                                role_field = role.get('Path', '')
-                            elif key.lower() == 'name':
-                                role_field = role.get('RoleName', '')
-                            elif key.lower() == 'id':
-                                role_field = role.get('RoleId', '')
-                            elif key.lower() == 'arn':
-                                role_field = role.get('Arn', '')
-                            elif key.lower() == 'description':
-                                role_field = role.get('Description', '')
-                            elif key.lower() == 'permissions_boundary_type':
-                                role = self._get_role(role.get('RoleName', '')).get('Role', {})
-                                _permissions_boundary = role.get('PermissionsBoundary', {})
+            return self._convert_to_iam_role(self.session.get_account(), role_detail)
+
+        def _match_role(role_detail):
+            if role_detail:
+                matched = False if condition == OR else True
+                for key, value in kwargs.items():
+                    if value is not None:
+                        role_field = ''
+                        if key.lower() == 'path':
+                            role_field = role_detail.get('Path', '')
+                        elif key.lower() == 'name':
+                            role_field = role_detail.get('RoleName', '')
+                        elif key.lower() == 'id':
+                            role_field = role_detail.get('RoleId', '')
+                        elif key.lower() == 'arn':
+                            role_field = role_detail.get('Arn', '')
+                        elif key.lower() == 'description':
+                            role_field = role_detail.get('Description', '')
+                        elif key.lower() == 'permissions_boundary_type':
+                            if include_details:
+                                role_detail = self._get_role(role_detail.get('RoleName', '')).get('Role', {})
+                                _permissions_boundary = role_detail.get('PermissionsBoundary', {})
                                 role_field = _permissions_boundary.get('PermissionsBoundaryType', '')
-                            elif key.lower() == 'permissions_boundary_arn':
-                                role = self._get_role(role.get('RoleName', '')).get('Role', {})
-                                _permissions_boundary = role.get('PermissionsBoundary', {})
+                        elif key.lower() == 'permissions_boundary_arn':
+                            if include_details:
+                                role_detail = self._get_role(role_detail.get('RoleName', '')).get('Role', {})
+                                _permissions_boundary = role_detail.get('PermissionsBoundary', {})
                                 role_field = _permissions_boundary.get('PermissionsBoundaryArn', '')
-                            elif key.lower() == 'max_session_duration':
-                                role_field = role.get('MaxSessionDuration', 0)
+                        elif key.lower() == 'max_session_duration':
+                            role_field = role_detail.get('MaxSessionDuration', 0)
+                            matched = _match_compare_condition(value, role_field, condition, matched)
+                        elif key.lower() == 'created_date':
+                            role_field = role_detail.get('CreateDate', None)
+                            if isinstance(role_field, datetime):
+                                role_field = role_field.replace(tzinfo=None)
                                 matched = _match_compare_condition(value, role_field, condition, matched)
-                            elif key.lower() == 'created_date':
-                                role_field = role.get('CreateDate', None)
-                                if isinstance(role_field, datetime):
-                                    role_field = role_field.replace(tzinfo=None)
-                                    matched = _match_compare_condition(value, role_field, condition, matched)
-                            elif key.lower() == 'last_used_date':
-                                role = self._get_role(role.get('RoleName', '')).get('Role', {})
-                                _last_used = role.get('RoleLastUsed', {})
+                        elif key.lower() == 'last_used_date':
+                            if include_details:
+                                role_detail = self._get_role(role_detail.get('RoleName', '')).get('Role', {})
+                                _last_used = role_detail.get('RoleLastUsed', {})
                                 role_field = _last_used.get('LastUsedDate', None)
                                 if isinstance(role_field, datetime):
                                     role_field = role_field.replace(tzinfo=None)
                                     matched = _match_compare_condition(value, role_field, condition, matched)
-                            elif key.lower() == 'last_used_region':
-                                role = self._get_role(role.get('RoleName', '')).get('Role', {})
-                                _last_used = role.get('RoleLastUsed', {})
+                        elif key.lower() == 'last_used_region':
+                            if include_details:
+                                role_detail = self._get_role(role_detail.get('RoleName', '')).get('Role', {})
+                                _last_used = role_detail.get('RoleLastUsed', {})
                                 role_field = _last_used.get('Region', '')
-                            elif key.lower() == 'tag_key':
-                                role = self._get_role(role.get('RoleName', '')).get('Role', {})
-                                tags = {tag['Key']: tag['Value'] for tag in role.get('Tags', [])}
+                        elif key.lower() == 'tag_key':
+                            if include_details:
+                                role_detail = self._get_role(role_detail.get('RoleName', '')).get('Role', {})
+                                tags = {tag['Key']: tag['Value'] for tag in role_detail.get('Tags', [])}
                                 matched = _match_tag_condition(value, tags, condition, matched, key_only=True)
-                            elif key.lower() == 'tag':
-                                role = self._get_role(role.get('RoleName', '')).get('Role', {})
-                                tags = {tag['Key']: tag['Value'] for tag in role.get('Tags', [])}
+                        elif key.lower() == 'tag':
+                            if include_details:
+                                role_detail = self._get_role(role_detail.get('RoleName', '')).get('Role', {})
+                                tags = {tag['Key']: tag['Value'] for tag in role_detail.get('Tags', [])}
                                 matched = _match_tag_condition(value, tags, condition, matched, key_only=False)
 
-                            if key.lower() not in ['max_session_duration', 'created_date', 'last_used_date', 'tag_key',
-                                                   'tag']:
-                                matched = _match_condition(value, role_field, condition, matched)
+                        if key.lower() not in [
+                            'max_session_duration', 'created_date', 'last_used_date', 'tag_key', 'tag'
+                        ]:
+                            matched = _match_condition(value, role_field, condition, matched)
 
-                            if (condition == OR and matched) or (condition == AND and not matched):
-                                break
+                        if (condition == OR and matched) or (condition == AND and not matched):
+                            break
 
-                    if matched:
-                        role_detail = self._get_role(role.get('RoleName', '')).get('Role', {})
-                        roles_to_return.append(self._convert_to_iam_role(self.session.get_account(), role_detail))
+                if matched:
+                    return _process_role(role_detail)
+
+        roles_to_return = []
+
+        from botocore.exceptions import ClientError
+        try:
+            include_details_keys = {
+                'permissions_boundary_type', 'permissions_boundary_arn', 'last_used_date', 'last_used_region',
+                'tag', 'tag_key'
+            }
+
+            if not include_details and any(k in include_details_keys for k in kwargs):
+                from pyawsopstoolkit.exceptions import SearchAttributeError
+                raise SearchAttributeError(
+                    'include_details is required for below keys: permissions_boundary_type, '
+                    'permissions_boundary_arn, last_used_date, last_used_region, tag, tag_key.'
+                )
+
+            roles_to_process = self._list_roles()
+
+            if len(kwargs) == 0:
+                with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                    future_to_role = {executor.submit(_process_role, role): role for role in roles_to_process}
+                    for future in as_completed(future_to_role):
+                        role_result = future.result()
+                        if role_result is not None:
+                            roles_to_return.append(role_result)
+
+            with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                future_to_role = {executor.submit(_match_role, role): role for role in roles_to_process}
+                for future in as_completed(future_to_role):
+                    role_result = future.result()
+                    if role_result is not None:
+                        roles_to_return.append(role_result)
         except ClientError as e:
             raise e
 

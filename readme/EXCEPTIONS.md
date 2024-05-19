@@ -16,6 +16,16 @@ the assumption of a role session.
 - `__init__(self, role_arn: str, exception: Optional[Exception] = None) -> None`: Constructor for the AssumeRoleError
   class.
 
+## SearchAttributeError
+
+Custom exception class for AWS Ops Toolkit. This exception is typically raised when either invalid attributes are
+provided or key attributes are missing.
+
+### Methods
+
+- `__init__(self, role_arn: str, exception: Optional[Exception] = None) -> None`: Constructor for the
+  SearchAttributeError class.
+
 ## ValidationError
 
 Custom exception class for AWS Ops Toolkit. This exception is typically raised when validation fails.

@@ -171,6 +171,10 @@ For detailed information and usage examples, please refer to [EXCEPTIONS](readme
 
 For detailed information and usage examples, please refer to [MODELS](readme/MODELS.md).
 
+## pyawsopstoolkit.security
+
+For detailed information and usage examples, please refer to [SECURITY](readme/SECURITY.md).
+
 ## pyawsopstoolkit.validators
 
 For detailed information and usage examples, please refer to [VALIDATORS](readme/VALIDATORS.md).
