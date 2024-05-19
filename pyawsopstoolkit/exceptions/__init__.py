@@ -1,5 +1,6 @@
 __all__ = [
     "AssumeRoleError",
+    "SearchAttributeError",
     "ValidationError"
 ]
 __name__ = "pyawsopstoolkit.exceptions"
@@ -10,4 +11,4 @@ execution of pyawsopstoolkit operations, providing comprehensive support for err
 the toolkit.
 """
 
-from pyawsopstoolkit.exceptions.__main__ import AssumeRoleError, ValidationError
+from pyawsopstoolkit.exceptions.__main__ import AssumeRoleError, ValidationError, SearchAttributeError

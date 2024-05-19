@@ -5,6 +5,7 @@ from unittest.mock import patch, MagicMock
 
 from pyawsopstoolkit import Session, Account
 from pyawsopstoolkit.advsearch import IAM, OR
+from pyawsopstoolkit.exceptions import SearchAttributeError
 from pyawsopstoolkit.models import IAMRole, IAMRolePermissionsBoundary, IAMRoleLastUsed
 
 
@@ -46,8 +47,9 @@ class TestIAM(unittest.TestCase):
     @patch('pyawsopstoolkit.__validations__.Validation.validate_type', return_value=None)
     @patch('pyawsopstoolkit.validators.ArnValidator.arn', return_value=True)
     @patch('pyawsopstoolkit.validators.Validator.region', return_value=True)
-    def test_search_roles_basic(self, mock_region, mock_arn, mock_validation, mock_list_roles, mock_get_session,
-                                mock_session):
+    def test_search_roles_basic(
+            self, mock_region, mock_arn, mock_validation, mock_list_roles, mock_get_session, mock_session
+    ):
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -73,11 +75,14 @@ class TestIAM(unittest.TestCase):
             description=role_data.get('Description'),
             permissions_boundary=None,
             last_used=None,
-            tags=role_data.get('Tags')
+            tags=None
         ) for role_data in roles_data]
         iam_object.search_roles = mock.Mock(return_value=roles)
         result = iam_object.search_roles(condition='OR', name='test_role', id='123456789012')
         self.assertEqual(result[0].name, 'test_role')
+        self.assertIsNone(result[0].permissions_boundary)
+        self.assertIsNone(result[0].last_used)
+        self.assertIsNone(result[0].tags)
 
     @patch('boto3.Session')
     @patch('pyawsopstoolkit.Session.get_session')
@@ -106,8 +111,9 @@ class TestIAM(unittest.TestCase):
     @patch('pyawsopstoolkit.__validations__.Validation.validate_type', return_value=None)
     @patch('pyawsopstoolkit.validators.ArnValidator.arn', return_value=True)
     @patch('pyawsopstoolkit.validators.Validator.region', return_value=True)
-    def test_search_roles_with_permissions_boundary(self, mock_region, mock_arn, mock_validation, mock_get_role,
-                                                    mock_list_roles, mock_get_session, mock_session):
+    def test_search_roles_with_permissions_boundary(
+            self, mock_region, mock_arn, mock_validation, mock_get_role, mock_list_roles, mock_get_session, mock_session
+    ):
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -139,9 +145,38 @@ class TestIAM(unittest.TestCase):
             tags=role_data.get('Tags')
         ) for role_data in [roles_data]]
         iam_object.search_roles = mock.Mock(return_value=roles)
-        result = iam_object.search_roles(condition='OR', name='test_role', id='123456789012')
+        result = iam_object.search_roles(
+            condition='OR',
+            include_details=True,
+            name='test_role',
+            id='123456789012',
+            permissions_boundary_arn='arn:aws:iam::123456789012:policy/ManagedPolicy'
+        )
         self.assertEqual(result[0].name, 'test_role')
         self.assertEqual(result[0].permissions_boundary.arn, 'arn:aws:iam::123456789012:policy/ManagedPolicy')
+
+    @patch('boto3.Session')
+    @patch('pyawsopstoolkit.Session.get_session')
+    def test_search_roles_with_permissions_boundary_without_details(self, mock_get_session, mock_session):
+        mock_client = MagicMock()
+        mock_caller_identity = MagicMock()
+
+        mock_caller_identity.get.return_value = '123456789012'
+        mock_client.get_caller_identity.return_value = mock_caller_identity
+        mock_get_session.return_value.client.return_value = mock_client
+
+        session_instance = mock_session.return_value
+        session_instance.client.return_value.list_buckets.return_value = {}
+
+        session = Session(profile_name=self.profile_name)
+        iam_object = IAM(session)
+        with self.assertRaises(SearchAttributeError):
+            iam_object.search_roles(
+                condition='OR',
+                name='test_role',
+                id='123456789012',
+                permissions_boundary_arn='arn:aws:iam::123456789012:policy/ManagedPolicy'
+            )
 
     @patch('boto3.Session')
     @patch('pyawsopstoolkit.Session.get_session')
@@ -174,8 +209,9 @@ class TestIAM(unittest.TestCase):
     @patch('pyawsopstoolkit.__validations__.Validation.validate_type', return_value=None)
     @patch('pyawsopstoolkit.validators.ArnValidator.arn', return_value=True)
     @patch('pyawsopstoolkit.validators.Validator.region', return_value=True)
-    def test_search_roles_with_last_used(self, mock_region, mock_arn, mock_validation, mock_get_role, mock_list_roles,
-                                         mock_get_session, mock_session):
+    def test_search_roles_with_last_used(
+            self, mock_region, mock_arn, mock_validation, mock_get_role, mock_list_roles, mock_get_session, mock_session
+    ):
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -210,9 +246,29 @@ class TestIAM(unittest.TestCase):
             tags=role_data.get('Tags')
         ) for role_data in [roles_data]]
         iam_object.search_roles = mock.Mock(return_value=roles)
-        result = iam_object.search_roles(condition='OR', name='test_role', id='123456789012')
+        result = iam_object.search_roles(
+            condition='OR', include_details=True, name='test_role', id='123456789012', last_used_region='us-west-2'
+        )
         self.assertEqual(result[0].name, 'test_role')
         self.assertEqual(result[0].last_used.region, 'us-west-2')
+
+    @patch('boto3.Session')
+    @patch('pyawsopstoolkit.Session.get_session')
+    def test_search_roles_with_last_used_without_include(self, mock_get_session, mock_session):
+        mock_client = MagicMock()
+        mock_caller_identity = MagicMock()
+
+        mock_caller_identity.get.return_value = '123456789012'
+        mock_client.get_caller_identity.return_value = mock_caller_identity
+        mock_get_session.return_value.client.return_value = mock_client
+
+        session_instance = mock_session.return_value
+        session_instance.client.return_value.list_buckets.return_value = {}
+
+        session = Session(profile_name=self.profile_name)
+        iam_object = IAM(session)
+        with self.assertRaises(SearchAttributeError):
+            iam_object.search_roles(condition='OR', name='test_role', id='123456789012', last_used_region='us-west-2')
 
     @patch('boto3.Session')
     @patch('pyawsopstoolkit.Session.get_session')
@@ -246,8 +302,9 @@ class TestIAM(unittest.TestCase):
     @patch('pyawsopstoolkit.__validations__.Validation.validate_type', return_value=None)
     @patch('pyawsopstoolkit.validators.ArnValidator.arn', return_value=True)
     @patch('pyawsopstoolkit.validators.Validator.region', return_value=True)
-    def test_search_roles_with_tags(self, mock_region, mock_arn, mock_validation, mock_get_role, mock_list_roles,
-                                    mock_get_session, mock_session):
+    def test_search_roles_with_tags(
+            self, mock_region, mock_arn, mock_validation, mock_get_role, mock_list_roles, mock_get_session, mock_session
+    ):
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -282,9 +339,29 @@ class TestIAM(unittest.TestCase):
             tags=role_data.get('Tags')
         ) for role_data in [roles_data]]
         iam_object.search_roles = mock.Mock(return_value=roles)
-        result = iam_object.search_roles(condition='OR', name='test_role', id='123456789012')
+        result = iam_object.search_roles(
+            condition='OR', include_details=True, name='test_role', id='123456789012', tag_key='test_key'
+        )
         self.assertEqual(result[0].name, 'test_role')
         self.assertEqual(result[0].tags[0].get('Key'), 'test_key')
+
+    @patch('boto3.Session')
+    @patch('pyawsopstoolkit.Session.get_session')
+    def test_search_roles_with_tags_without_include(self, mock_get_session, mock_session):
+        mock_client = MagicMock()
+        mock_caller_identity = MagicMock()
+
+        mock_caller_identity.get.return_value = '123456789012'
+        mock_client.get_caller_identity.return_value = mock_caller_identity
+        mock_get_session.return_value.client.return_value = mock_client
+
+        session_instance = mock_session.return_value
+        session_instance.client.return_value.list_buckets.return_value = {}
+
+        session = Session(profile_name=self.profile_name)
+        iam_object = IAM(session)
+        with self.assertRaises(SearchAttributeError):
+            iam_object.search_roles(condition='OR', name='test_role', id='123456789012', tag_key='test_key')
 
 
 if __name__ == "__main__":

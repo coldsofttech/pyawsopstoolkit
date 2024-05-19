@@ -11,8 +11,7 @@ A class representing an IAM role permissions boundary.
 ### Methods
 
 - `__init__(self, type: str, arn: str) -> None`: Initialize the IAMRolePermissionsBoundary object.
--
-    - `__str__(self) -> str`: Returns a string representation of the **IAMRolePermissionsBoundary** object.
+- `__str__(self) -> str`: Returns a string representation of the **IAMRolePermissionsBoundary** object.
 - `__dict__(self) -> dict`: Returns a dictionary representation of the **IAMRolePermissionsBoundary** object.
 
 ### Properties
@@ -28,9 +27,7 @@ A class representing the last used information of an IAM role.
 
 - `__init__(self, used_date: Optional[datetime] = None, region: Optional[str] = None) -> None`: Initializes the
   IAMRoleLastUsed instance with optional used_date and region.
--
-    -
-        - `__str__(self) -> str`: Returns a string representation of the **IAMRoleLastUsed** object.
+- `__str__(self) -> str`: Returns a string representation of the **IAMRoleLastUsed** object.
 - `__dict__(self) -> dict`: Returns a dictionary representation of the **IAMRoleLastUsed** object.
 
 ### Properties
@@ -46,9 +43,7 @@ A class representing an IAM role.
 
 - `__init__(self, account: IAccount, name: str, id: str, arn: str, max_session_duration: int, path: str = '/', created_date: Optional[datetime] = None, assume_role_policy_document: Optional[dict] = None, description: Optional[str] = None, permissions_boundary: Optional[IAMRolePermissionsBoundary] = None, last_used: Optional[IAMRoleLastUsed] = None, tags: Optional[list] = None) -> None`:
   Initialize a new IAMRole instance.
--
-    -
-        - `__str__(self) -> str`: Returns a string representation of the **IAMRole** object.
+- `__str__(self) -> str`: Returns a string representation of the **IAMRole** object.
 - `__dict__(self) -> dict`: Returns a dictionary representation of the **IAMRole** object.
 
 ### Properties

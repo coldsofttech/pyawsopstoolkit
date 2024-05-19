@@ -29,7 +29,8 @@ more.
 ### Methods
 
 - `__init__(self, session: ISession) -> None`: Initializes the constructor of the IAM class.
-- `search_roles(self, condition: str = OR, **kwargs) -> list[pyawsopstoolkit.models.IAMRole]`: Returns a list of IAM
+- `search_roles(self, condition: str = OR, include_details: bool = False, **kwargs) -> list[pyawsopstoolkit.models.IAMRole]`:
+  Returns a list of IAM
   roles using advanced search features supported by the specified arguments. For details on supported kwargs, please
   refer to the section below.
 
@@ -66,8 +67,7 @@ supported keyword arguments:
 ```python
 from datetime import datetime
 from pyawsopstoolkit import Session
-from pyawsopstoolkit.advsearch import IAM, OR, AND, LESS_THAN, LESS_THAN_OR_EQUAL_TO, GREATER_THAN, \
-    GREATER_THAN_OR_EQUAL_TO, EQUAL_TO, NOT_EQUAL_TO, BETWEEN
+from pyawsopstoolkit.advsearch import IAM, OR, AND, LESS_THAN, BETWEEN
 
 # Create a session using the 'default' profile
 session = Session(profile_name='default')
@@ -76,24 +76,27 @@ session = Session(profile_name='default')
 iam_object = IAM(session=session)
 
 # Example searches:
-# 1. Search for IAM roles with the name matching 'test_role'
+# 1. Search for all IAM roles
+print(iam_object.search_roles())
+
+# 2. Search for IAM roles with the name matching 'test_role'
 print(iam_object.search_roles(condition=OR, name=r'test_role'))
 
-# 2. Search for IAM roles with the name matching 'test_role' or description matching 'test'
+# 3. Search for IAM roles with the name matching 'test_role' or description matching 'test'
 print(iam_object.search_roles(condition=OR, name=r'test_role', description=r'test'))
 
-# 3. Search for IAM roles with both path matching '/service-role/' and name matching 'test'
+# 4. Search for IAM roles with both path matching '/service-role/' and name matching 'test'
 print(iam_object.search_roles(condition=AND, path='/service-role/', name='test'))
 
-# 4. Search for IAM roles with a maximum session duration less than 4 hours (14400 seconds)
+# 5. Search for IAM roles with a maximum session duration less than 4 hours (14400 seconds)
 print(iam_object.search_roles(max_session_duration={LESS_THAN: 14400}))
 
-# 5. Search for IAM roles last used between October 15, 2023, and October 15, 2024
+# 6. Search for IAM roles last used between October 15, 2023, and October 15, 2024
 print(iam_object.search_roles(last_used_date={BETWEEN: [datetime(2023, 10, 15), datetime(2024, 10, 15)]}))
 
-# 6. Search for IAM roles that contain the tag key 'test_key'
+# 7. Search for IAM roles that contain the tag key 'test_key'
 print(iam_object.search_roles(tag_key='test_key'))
 
-# 7. Search for IAM roles that contain a tag with key 'test_key' and value 'test_value'
+# 8. Search for IAM roles that contain a tag with key 'test_key' and value 'test_value'
 print(iam_object.search_roles(tag={'key': 'test_key', 'value': 'test_value'}))
 ```

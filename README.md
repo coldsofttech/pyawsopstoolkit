@@ -14,6 +14,10 @@ set of features and enhancements to streamline your AWS interactions.
   crucial parameters.
 - **Advance Search**: Harness advanced search capabilities to efficiently navigate and filter AWS resources,
   streamlining resource discovery and management.
+- **Security Risks/Vulnerabilities**: Safeguard your AWS infrastructure by proactively identifying and addressing
+  security threats and vulnerabilities. Leverage dedicated tools to detect misconfigurations, insecure permissions, and
+  potential entry points for cyber attacks. Stay vigilant with continuous monitoring and auditing to maintain a robust
+  security posture and mitigate risks effectively.
 
 ## What's Next?
 
@@ -170,6 +174,10 @@ For detailed information and usage examples, please refer to [EXCEPTIONS](readme
 ## pyawsopstoolkit.models
 
 For detailed information and usage examples, please refer to [MODELS](readme/MODELS.md).
+
+## pyawsopstoolkit.security
+
+For detailed information and usage examples, please refer to [SECURITY](readme/SECURITY.md).
 
 ## pyawsopstoolkit.validators
 
