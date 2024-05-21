@@ -1,7 +1,8 @@
 __all__ = [
     "IAMRole",
+    "IAMUser",
     "IAMRoleLastUsed",
-    "IAMRolePermissionsBoundary"
+    "IAMPermissionsBoundary"
 ]
 __name__ = "pyawsopstoolkit.models"
 __description__ = """
@@ -11,4 +12,4 @@ closely with AWS services and their respective properties, ensuring seamless int
 performance.
 """
 
-from pyawsopstoolkit.models.__main__ import IAMRole, IAMRoleLastUsed, IAMRolePermissionsBoundary
+from pyawsopstoolkit.models.__main__ import IAMRole, IAMRoleLastUsed, IAMPermissionsBoundary, IAMUser

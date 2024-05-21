@@ -33,6 +33,9 @@ more.
   Returns a list of IAM
   roles using advanced search features supported by the specified arguments. For details on supported kwargs, please
   refer to the section below.
+- `search_users(self, condition: str = OR, include_details: bool = False, **kwargs) -> list[pyawsopstoolkit.models.IAMUser]`:
+  Returns a list of IAM users using advanced search features supported by the specified arguments. For details on
+  supported kwargs, please refer to the section below.
 
 #### `search_roles` Supported Keyword Arguments
 
@@ -62,7 +65,7 @@ supported keyword arguments:
   max_session_duration, created_date, and last_used_date arguments support conditions such as less than, greater than,
   and between. For more details, please refer to the constants above.
 
-### Usage
+##### Usage
 
 ```python
 from datetime import datetime
@@ -99,4 +102,61 @@ print(iam_object.search_roles(tag_key='test_key'))
 
 # 8. Search for IAM roles that contain a tag with key 'test_key' and value 'test_value'
 print(iam_object.search_roles(tag={'key': 'test_key', 'value': 'test_value'}))
+```
+
+#### `search_users` Supported Keyword Arguments
+
+The **search_users** function allows you to search for IAM users using various keyword arguments. Below are the
+supported keyword arguments:
+
+- `path`: Specifies the path of the IAM user. Example: `path='/'`.
+- `name`: Specifies the name of the IAM user. Example: `name='test_user'`.
+- `id`: Specifies the ID of the IAM user. Example: `id='AIDACKCEVSQ6C2EXAMPLE'`.
+- `arn`: Specifies the ARN of the IAM user. Example: `arn='arn:aws:iam::111122223333:user/test_user'`.
+- `permissions_boundary_type`: Specifies the type of permissions boundary for the IAM user.
+  Example: `permissions_boundary_type='Policy'`.
+- `permissions_boundary_arn`: Specifies the arn of the permissions boundary for the IAM user.
+  Example: `permissions_boundary_arn='arn:aws:iam::111122223333:policy/policy-name'`.
+- `tag_key`: Specifies the tag key associated with the IAM user. Example: `tag_key='test_key'`.
+- `tag`: Specifies the tag key and value combination associated with the IAM user (dictionary format).
+  Example: `tag={'Key': 'test_key', 'Value': 'test_value'}`.
+- `created_date`: Specifies the created date of the IAM user (datetime format).
+  Example: `created_date={GREATER_THAN: datetime(2024, 10, 15)}`.
+- `password_last_used_date`: Specifies the password last used date of the IAM user (datetime format).
+  Example: `password_last_used_date={BETWEEN: [datetime(2023, 10, 15), datetime(2024, 10, 15)]}`.
+  All the above arguments supports string types and accept regular expression patterns. Additionally, the created_date
+  and password_last_used_date arguments support conditions such as less than, greater than, and between. For more
+  details, please refer to the constants above.
+
+##### Usage
+
+```python
+from datetime import datetime
+from pyawsopstoolkit import Session
+from pyawsopstoolkit.advsearch import IAM, OR, AND, LESS_THAN, BETWEEN
+
+# Create a session using the 'default' profile
+session = Session(profile_name='default')
+
+# Initialize the IAM object with the session
+iam_object = IAM(session=session)
+
+# Example searches:
+# 1. Search for all IAM users
+print(iam_object.search_users())
+
+# 2. Search for IAM users with the name matching 'test_user'
+print(iam_object.search_users(condition=OR, name=r'test_user'))
+
+# 3. Search for IAM users with both path matching '/' and name matching 'test'
+print(iam_object.search_users(condition=AND, path='/', name='test'))
+
+# 4. Search for IAM users password last used between October 15, 2023, and October 15, 2024
+print(iam_object.search_users(password_last_used_date={BETWEEN: [datetime(2023, 10, 15), datetime(2024, 10, 15)]}))
+
+# 5. Search for IAM roles that contain the tag key 'test_key'
+print(iam_object.search_users(tag_key='test_key'))
+
+# 6. Search for IAM roles that contain a tag with key 'test_key' and value 'test_value'
+print(iam_object.search_users(tag={'key': 'test_key', 'value': 'test_value'}))
 ```

@@ -14,6 +14,8 @@ service.
 - `__init__(self, session: ISession) -> None`: Constructor method initializing the IAM class.
 - `roles_without_permissions_boundary(self) -> list[pyawsopstoolkit.models.IAMRole]`: Retrieves a list of IAM roles
   lacking associated permissions boundaries, facilitating targeted risk assessment and mitigation.
+- `users_without_permissions_boundary(self) -> list[pyawsopstoolkit.models.IAMUser]`: Retrieves a list of IAM users
+  lacking associated permissions boundaries, facilitating targeted risk assessment and mitigation.
 
 ### Usage
 
@@ -32,6 +34,12 @@ roles_without_boundaries = iam_object.roles_without_permissions_boundary()
 
 # Print the list of roles without permissions boundaries
 print(roles_without_boundaries)
+
+# Retrieve IAM users without permissions boundaries
+users_without_boundaries = iam_object.users_without_permissions_boundary()
+
+# Print the list of users without permissions boundaries
+print(users_without_boundaries)
 ```
 
 ### References

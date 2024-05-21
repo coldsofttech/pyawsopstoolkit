@@ -58,3 +58,21 @@ class IAM:
             role for role in iam_roles
             if role.permissions_boundary is None and role.path != '/aws-service-role/'
         ]
+
+    def users_without_permissions_boundary(self) -> list[pyawsopstoolkit.models.IAMUser]:
+        """
+        Returns a list of IAM users that do not have an associated permissions boundary.
+        :return: A list of IAM users without an associated permissions boundary.
+        :rtype: list
+        """
+        from pyawsopstoolkit import advsearch
+        iam_object = advsearch.IAM(self.session)
+        iam_users = iam_object.search_users(include_details=True)
+
+        if iam_users is None:
+            return []
+
+        return [
+            user for user in iam_users
+            if user.permissions_boundary is None
+        ]
