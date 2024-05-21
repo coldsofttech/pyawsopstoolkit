@@ -199,6 +199,28 @@ class IAM:
 
         return roles_to_process
 
+    def _list_users(self) -> list:
+        """
+        Utilizing boto3 IAM, this method retrieves a list of all users leveraging the provided ISession object.
+        Note: The returned dictionary excludes PermissionsBoundary and Tags. For further details,
+        https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/client/list_users.html.
+        :return: A list containing IAM users.
+        :rtype: list
+        """
+        users_to_process = []
+
+        from botocore.exceptions import ClientError
+        try:
+            iam_client = self.session.get_session().client('iam')
+            iam_paginator = iam_client.get_paginator('list_users')
+
+            for page in iam_paginator.paginate():
+                users_to_process.extend(page.get('Users', []))
+        except ClientError as e:
+            raise e
+
+        return users_to_process
+
     def _get_role(self, role_name: str) -> dict:
         """
         Utilizing boto3 IAM, this method retrieves comprehensive details of an IAM role identified by the
@@ -210,6 +232,20 @@ class IAM:
         try:
             iam_client = self.session.get_session().client('iam')
             return iam_client.get_role(RoleName=role_name)
+        except ClientError as e:
+            raise e
+
+    def _get_user(self, user_name: str) -> dict:
+        """
+        Utilizing boto3 IAM, this method retrieves comprehensive details of an IAM user identified by the
+        specified user name.
+        :return: Details of the IAM user.
+        :rtype: dict
+        """
+        from botocore.exceptions import ClientError
+        try:
+            iam_client = self.session.get_session().client('iam')
+            return iam_client.get_user(UserName=user_name)
         except ClientError as e:
             raise e
 
@@ -240,7 +276,7 @@ class IAM:
 
         _permissions_boundary = role.get('PermissionsBoundary', {})
         if _permissions_boundary:
-            boundary = pyawsopstoolkit.models.IAMRolePermissionsBoundary(
+            boundary = pyawsopstoolkit.models.IAMPermissionsBoundary(
                 type=_permissions_boundary.get('PermissionsBoundaryType', ''),
                 arn=_permissions_boundary.get('PermissionsBoundaryArn', '')
             )
@@ -259,6 +295,43 @@ class IAM:
             iam_role.tags = _tags
 
         return iam_role
+
+    @staticmethod
+    def _convert_to_iam_user(account: IAccount, user: dict) -> pyawsopstoolkit.models.IAMUser:
+        """
+        This function transforms the dictionary response from boto3 IAM into a format compatible with the
+        AWS Ops Toolkit, adhering to the pyawsopstoolkit.models structure. Additionally, it incorporates
+        account-related summary information into the IAM user details.
+        :param account: An IAccount object containing AWS account information.
+        :type account: IAccount
+        :param user: The boto3 IAM service response for an IAM user.
+        :type user: dict
+        :return: An AWS Ops Toolkit compatible object containing all IAM user details.
+        :rtype: IAMUser
+        """
+        iam_user = pyawsopstoolkit.models.IAMUser(
+            account=account,
+            name=user.get('UserName', ''),
+            id=user.get('UserId', ''),
+            arn=user.get('Arn', ''),
+            path=user.get('Path', ''),
+            created_date=user.get('CreateDate', None),
+            password_last_used_date=user.get('PasswordLastUsed', None)
+        )
+
+        _permissions_boundary = user.get('PermissionsBoundary', {})
+        if _permissions_boundary:
+            boundary = pyawsopstoolkit.models.IAMPermissionsBoundary(
+                type=_permissions_boundary.get('PermissionsBoundaryType', ''),
+                arn=_permissions_boundary.get('PermissionsBoundaryArn', '')
+            )
+            iam_user.permissions_boundary = boundary
+
+        _tags = user.get('Tags', [])
+        if _tags:
+            iam_user.tags = _tags
+
+        return iam_user
 
     def search_roles(
             self,
@@ -379,14 +452,131 @@ class IAM:
                         role_result = future.result()
                         if role_result is not None:
                             roles_to_return.append(role_result)
-
-            with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-                future_to_role = {executor.submit(_match_role, role): role for role in roles_to_process}
-                for future in as_completed(future_to_role):
-                    role_result = future.result()
-                    if role_result is not None:
-                        roles_to_return.append(role_result)
+            else:
+                with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                    future_to_role = {executor.submit(_match_role, role): role for role in roles_to_process}
+                    for future in as_completed(future_to_role):
+                        role_result = future.result()
+                        if role_result is not None:
+                            roles_to_return.append(role_result)
         except ClientError as e:
             raise e
 
         return roles_to_return
+
+    def search_users(
+            self,
+            condition: str = OR,
+            include_details: bool = False,
+            **kwargs
+    ) -> list[pyawsopstoolkit.models.IAMUser]:
+        """
+        Returns a list of IAM users using advanced search feature supported by the specified arguments.
+        For details on supported kwargs, please refer to the readme document.
+        :param condition: The condition to be applied: 'OR' or 'AND'.
+        :type condition: str
+        :param include_details: Flag to indicate to include additional details of the IAM user.
+        This includes information about permissions boundary and tags. Default is False.
+        :type include_details: bool
+        :param kwargs: Key-based arguments defining search criteria.
+        :return: A list of IAM users.
+        :rtype: list
+        """
+
+        def _process_user(user_detail):
+            if include_details:
+                user_detail = self._get_user(user_detail.get('UserName', '')).get('User', {})
+
+            return self._convert_to_iam_user(self.session.get_account(), user_detail)
+
+        def _match_user(user_detail):
+            if user_detail:
+                matched = False if condition == OR else True
+                for key, value in kwargs.items():
+                    if value is not None:
+                        user_field = ''
+                        if key.lower() == 'path':
+                            user_field = user_detail.get('Path', '')
+                        elif key.lower() == 'name':
+                            user_field = user_detail.get('UserName', '')
+                        elif key.lower() == 'id':
+                            user_field = user_detail.get('UserId', '')
+                        elif key.lower() == 'arn':
+                            user_field = user_detail.get('Arn', '')
+                        elif key.lower() == 'created_date':
+                            user_field = user_detail.get('CreateDate', None)
+                            if isinstance(user_field, datetime):
+                                user_field = user_field.replace(tzinfo=None)
+                                matched = _match_compare_condition(value, user_field, condition, matched)
+                        elif key.lower() == 'password_last_used_date':
+                            user_field = user_detail.get('PasswordLastUsed', None)
+                            if isinstance(user_field, datetime):
+                                user_field = user_field.replace(tzinfo=None)
+                                matched = _match_compare_condition(value, user_field, condition, matched)
+                        elif key.lower() == 'permissions_boundary_type':
+                            if include_details:
+                                user_detail = self._get_role(user_detail.get('UserName', '')).get('User', {})
+                                _permissions_boundary = user_detail.get('PermissionsBoundary', {})
+                                user_field = _permissions_boundary.get('PermissionsBoundaryType', '')
+                        elif key.lower() == 'permissions_boundary_arn':
+                            if include_details:
+                                user_detail = self._get_user(user_detail.get('UserName', '')).get('User', {})
+                                _permissions_boundary = user_detail.get('PermissionsBoundary', {})
+                                user_field = _permissions_boundary.get('PermissionsBoundaryArn', '')
+                        elif key.lower() == 'tag_key':
+                            if include_details:
+                                user_detail = self._get_user(user_detail.get('UserName', '')).get('User', {})
+                                tags = {tag['Key']: tag['Value'] for tag in user_detail.get('Tags', [])}
+                                matched = _match_tag_condition(value, tags, condition, matched, key_only=True)
+                        elif key.lower() == 'tag':
+                            if include_details:
+                                user_detail = self._get_user(user_detail.get('UserName', '')).get('User', {})
+                                tags = {tag['Key']: tag['Value'] for tag in user_detail.get('Tags', [])}
+                                matched = _match_tag_condition(value, tags, condition, matched, key_only=False)
+
+                        if key.lower() not in [
+                            'created_date', 'password_last_used_date', 'tag_key', 'tag'
+                        ]:
+                            matched = _match_condition(value, user_field, condition, matched)
+
+                        if (condition == OR and matched) or (condition == AND and not matched):
+                            break
+
+                if matched:
+                    return _process_user(user_detail)
+
+        users_to_return = []
+
+        from botocore.exceptions import ClientError
+        try:
+            include_details_keys = {
+                'permissions_boundary_type', 'permissions_boundary_arn', 'tag', 'tag_key'
+            }
+
+            if not include_details and any(k in include_details_keys for k in kwargs):
+                from pyawsopstoolkit.exceptions import SearchAttributeError
+                raise SearchAttributeError(
+                    'include_details is required for below keys: permissions_boundary_type, '
+                    'permissions_boundary_arn, tag, tag_key.'
+                )
+
+            users_to_process = self._list_users()
+
+            if len(kwargs) == 0:
+                with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                    future_to_user = {executor.submit(_process_user, user): user for user in users_to_process}
+                    for future in as_completed(future_to_user):
+                        user_result = future.result()
+                        if user_result is not None:
+                            users_to_return.append(user_result)
+            else:
+                with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+                    future_to_user = {executor.submit(_match_user, user): user for user in users_to_process}
+                    for future in as_completed(future_to_user):
+                        user_result = future.result()
+                        if user_result is not None:
+                            users_to_return.append(user_result)
+        except ClientError as e:
+            raise e
+
+        return users_to_return

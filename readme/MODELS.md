@@ -4,15 +4,15 @@ This package provides a comprehensive collection of data model classes specifica
 packages, such as finops and advsearch. These models are meticulously crafted to align closely with AWS services and
 their respective properties, ensuring seamless integration and optimal performance.
 
-## IAMRolePermissionsBoundary
+## IAMPermissionsBoundary
 
 A class representing an IAM role permissions boundary.
 
 ### Methods
 
-- `__init__(self, type: str, arn: str) -> None`: Initialize the IAMRolePermissionsBoundary object.
-- `__str__(self) -> str`: Returns a string representation of the **IAMRolePermissionsBoundary** object.
-- `__dict__(self) -> dict`: Returns a dictionary representation of the **IAMRolePermissionsBoundary** object.
+- `__init__(self, type: str, arn: str) -> None`: Initialize the IAMPermissionsBoundary object.
+- `__str__(self) -> str`: Returns a string representation of the **IAMPermissionsBoundary** object.
+- `__dict__(self) -> dict`: Returns a dictionary representation of the **IAMPermissionsBoundary** object.
 
 ### Properties
 
@@ -41,7 +41,7 @@ A class representing an IAM role.
 
 ### Methods
 
-- `__init__(self, account: IAccount, name: str, id: str, arn: str, max_session_duration: int, path: str = '/', created_date: Optional[datetime] = None, assume_role_policy_document: Optional[dict] = None, description: Optional[str] = None, permissions_boundary: Optional[IAMRolePermissionsBoundary] = None, last_used: Optional[IAMRoleLastUsed] = None, tags: Optional[list] = None) -> None`:
+- `__init__(self, account: IAccount, name: str, id: str, arn: str, max_session_duration: int, path: str = '/', created_date: Optional[datetime] = None, assume_role_policy_document: Optional[dict] = None, description: Optional[str] = None, permissions_boundary: Optional[IAMPermissionsBoundary] = None, last_used: Optional[IAMRoleLastUsed] = None, tags: Optional[list] = None) -> None`:
   Initialize a new IAMRole instance.
 - `__str__(self) -> str`: Returns a string representation of the **IAMRole** object.
 - `__dict__(self) -> dict`: Returns a dictionary representation of the **IAMRole** object.
@@ -60,3 +60,27 @@ A class representing an IAM role.
 - `path`: The path of the IAM role.
 - `permissions_boundary`: The permissions boundary associated with the IAM role.
 - `tags`: The tags associated with the IAM role.
+
+## IAMUser
+
+A class representing an IAM user.
+
+### Methods
+
+- `__init__(self, account: IAccount, name: str, id: str, arn: str, path: str = '/', created_date: Optional[datetime] = None, password_last_used_date: Optional[datetime] = None, permissions_boundary: Optional[IAMPermissionsBoundary] = None, tags: Optional[list] = None) -> None`:
+  Initialize a new IAMUser instance.
+- `__str__(self) -> str`: Returns a string representation of the **IAMUser** object.
+- `__dict__(self) -> dict`: Returns a dictionary representation of the **IAMUser** object.
+
+### Properties
+
+- `account`: The account associated with the IAM user.
+- `arn`: The ARN of the IAM user.
+- `created_date`: The created date of the IAM user.
+- `id`: The ID of the IAM user.
+- `name`: The name of the IAM user.
+- `path`: The path of the IAM user.
+- `password_last_used_date`: The password last used date of the IAM user.
+- `permissions_boundary`: The permissions boundary associated with the IAM user.
+- `tags`: The tags associated with the IAM user.
+
