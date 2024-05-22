@@ -1,3 +1,5 @@
+import re
+
 import pyawsopstoolkit.models
 from pyawsopstoolkit.__interfaces__ import ISession
 from pyawsopstoolkit.__validations__ import Validation
@@ -54,10 +56,14 @@ class IAM:
         if iam_roles is None:
             return []
 
-        return [
-            role for role in iam_roles
-            if role.permissions_boundary is None and role.path != '/aws-service-role/'
-        ]
+        roles_without_permissions_boundary = []
+
+        for role in iam_roles:
+            if not re.search(r'/aws-service-role/', role.path, re.IGNORECASE):
+                if role.permissions_boundary is None:
+                    roles_without_permissions_boundary.append(role)
+
+        return roles_without_permissions_boundary
 
     def users_without_permissions_boundary(self) -> list[pyawsopstoolkit.models.IAMUser]:
         """

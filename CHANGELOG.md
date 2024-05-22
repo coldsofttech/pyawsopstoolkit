@@ -1,6 +1,8 @@
 # Version History
 
-- 0.1.6: Added support for IAM Users within pyawsopstoolkit.advsearch and pyawsopstoolkit.security packages. (latest)
+- 0.1.7: Added [pyawsopstoolkit.insights](pyawsopstoolkit/insights) package. (latest)
+- 0.1.6: Added support for IAM Users within [pyawsopstoolkit.advsearch](pyawsopstoolkit/advsearch)
+  and [pyawsopstoolkit.security](pyawsopstoolkit/security) packages.
 - 0.1.5: Added [pyawsopstoolkit.security](pyawsopstoolkit/security) package.
 - 0.1.4: Added [pyawsopstoolkit.advsearch](pyawsopstoolkit/advsearch) package.
 - 0.1.3: Added [pyawsopstoolkit.models](pyawsopstoolkit/models) package.

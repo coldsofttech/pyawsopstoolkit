@@ -238,7 +238,7 @@ class IAM:
     def _get_user(self, user_name: str) -> dict:
         """
         Utilizing boto3 IAM, this method retrieves comprehensive details of an IAM user identified by the
-        specified user name.
+        specified username.
         :return: Details of the IAM user.
         :rtype: dict
         """
@@ -351,6 +351,8 @@ class IAM:
         :return: A list of IAM roles.
         :rtype: list
         """
+        Validation.validate_type(condition, str, 'condition should be a string and should be either "OR" or "AND".')
+        Validation.validate_type(include_details, bool, 'include_details should be a boolean.')
 
         def _process_role(role_detail):
             if include_details:
@@ -482,6 +484,8 @@ class IAM:
         :return: A list of IAM users.
         :rtype: list
         """
+        Validation.validate_type(condition, str, 'condition should be a string and should be either "OR" or "AND".')
+        Validation.validate_type(include_details, bool, 'include_details should be a boolean.')
 
         def _process_user(user_detail):
             if include_details:

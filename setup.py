@@ -20,7 +20,7 @@ setup(
     keywords=[
         "aws", "toolkit", "operations", "tools", "development", "python", "validation", "session-management",
         "utilities", "enhancements", "integration", "amazon-web-services", "models", "search", "advance-search",
-        "filtering", "security-risks", "risks", "vulnerabilities"
+        "filtering", "security-risks", "risks", "vulnerabilities", "insights", "hygiene"
     ],
     classifiers=[
         "Development Status :: 4 - Beta",

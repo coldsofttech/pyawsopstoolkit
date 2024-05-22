@@ -16,7 +16,7 @@ set of features and enhancements to streamline your AWS interactions.
   streamlining resource discovery and management.
 - **Security Risks/Vulnerabilities**: Safeguard your AWS infrastructure by proactively identifying and addressing
   security threats and vulnerabilities. Leverage dedicated tools to detect misconfigurations, insecure permissions, and
-  potential entry points for cyber attacks. Stay vigilant with continuous monitoring and auditing to maintain a robust
+  potential entry points for cyberattacks. Stay vigilant with continuous monitoring and auditing to maintain a robust
   security posture and mitigate risks effectively.
 
 ## What's Next?
@@ -170,6 +170,10 @@ For detailed information and usage examples, please refer to [ADVANCE_SEARCH](re
 ## pyawsopstoolkit.exceptions
 
 For detailed information and usage examples, please refer to [EXCEPTIONS](readme/EXCEPTIONS.md).
+
+## pyawsopstoolkit.insights
+
+For detailed information and usage examples, please refer to [INSIGHTS](readme/INSIGHTS.md).
 
 ## pyawsopstoolkit.models
 
