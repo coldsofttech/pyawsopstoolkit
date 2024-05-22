@@ -18,6 +18,8 @@ set of features and enhancements to streamline your AWS interactions.
   security threats and vulnerabilities. Leverage dedicated tools to detect misconfigurations, insecure permissions, and
   potential entry points for cyberattacks. Stay vigilant with continuous monitoring and auditing to maintain a robust
   security posture and mitigate risks effectively.
+- **Insights**: Gain comprehensive insights into various aspects of your AWS infrastructure to maintain optimal hygiene
+  and clean up unused or obsolete resources.
 
 ## What's Next?
 
