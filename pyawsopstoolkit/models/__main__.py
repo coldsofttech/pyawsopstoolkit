@@ -109,8 +109,11 @@ class IAMRoleLastUsed:
         :param region: The AWS region where the IAM role was last used.
         :type region: str
         """
-        Validation.validate_type(used_date, Union[datetime, None], 'used_date should be a datetime.')
-        Validator.region(region, True)
+        if used_date is not None:
+            Validation.validate_type(used_date, Union[datetime, None], 'used_date should be a datetime.')
+
+        if region is not None:
+            Validator.region(region, True)
 
         self._used_date = used_date
         self._region = region
@@ -238,13 +241,18 @@ class IAMRole:
         Validation.validate_type(max_session_duration, int, 'max_session_duration should be an integer.')
         Validation.validate_type(path, str, 'path should be a string.')
         Validation.validate_type(created_date, Union[datetime, None], 'created_date should be a datetime.')
-        Validation.validate_type(assume_role_policy_document, Union[dict, None],
-                                 'assume_role_policy_document should be a dictionary.')
+        Validation.validate_type(
+            assume_role_policy_document, Union[dict, None], 'assume_role_policy_document should be a dictionary.'
+        )
         Validation.validate_type(description, Union[str, None], 'description should be a string.')
-        Validation.validate_type(permissions_boundary, Union[IAMPermissionsBoundary, None],
-                                 'permissions_boundary should be of IAMPermissionsBoundary type.')
-        Validation.validate_type(last_used, Union[IAMRoleLastUsed, None],
-                                 'last_used should be of IAMRoleLastUsed type.')
+        Validation.validate_type(
+            permissions_boundary,
+            Union[IAMPermissionsBoundary, None],
+            'permissions_boundary should be of IAMPermissionsBoundary type.'
+        )
+        Validation.validate_type(
+            last_used, Union[IAMRoleLastUsed, None], 'last_used should be of IAMRoleLastUsed type.'
+        )
         Validation.validate_type(tags, Union[list, None], 'tags should be a list.')
 
         self._account = account
@@ -595,10 +603,14 @@ class IAMUser:
         ArnValidator.arn(arn, True)
         Validation.validate_type(path, str, 'path should be a string.')
         Validation.validate_type(created_date, Union[datetime, None], 'created_date should be a datetime.')
-        Validation.validate_type(password_last_used_date, Union[datetime, None],
-                                 'password_last_used_date should be a datetime.')
-        Validation.validate_type(permissions_boundary, Union[IAMPermissionsBoundary, None],
-                                 'permissions_boundary should be of IAMPermissionsBoundary type.')
+        Validation.validate_type(
+            password_last_used_date, Union[datetime, None], 'password_last_used_date should be a datetime.'
+        )
+        Validation.validate_type(
+            permissions_boundary,
+            Union[IAMPermissionsBoundary, None],
+            'permissions_boundary should be of IAMPermissionsBoundary type.'
+        )
         Validation.validate_type(tags, Union[list, None], 'tags should be a list.')
 
         self._account = account
