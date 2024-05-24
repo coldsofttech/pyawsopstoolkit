@@ -61,19 +61,56 @@ A class representing an IAM role.
 - `permissions_boundary`: The permissions boundary associated with the IAM role.
 - `tags`: The tags associated with the IAM role.
 
+## IAMUserLoginProfile
+
+A class representing the login profile information of an IAM user.
+
+### Methods
+
+- `__init__(self, created_date: Optional[datetime] = None, password_reset_required: Optional[bool] = False) -> None`:
+  Initialize a new **IAMUserLoginProfile** object.
+- `__str__(self) -> str`: Returns a string representation of the **IAMUserLoginProfile** object.
+- `__dict__(self) -> dict`: Returns a dictionary representation of the **IAMUserLoginProfile** object.
+
+### Properties
+
+- `created_date`: The created date of the IAM user login profile.
+- `password_reset_required`: The flag to indicate if password reset required for the IAM user.
+
+## IAMUserAccessKey
+
+A class representing the access key information of an IAM user.
+
+### Methods
+
+- `__init__(self, id: str, status: str, created_date: Optional[datetime] = None, last_used_date: Optional[datetime] = None, last_used_service: Optional[str] = None, last_used_region: Optional[str] = None) -> None`:
+  Initialize a new **IAMUserAccessKey** object.
+- `__str__(self) -> str`: Returns a string representation of the **IAMUserAccessKey** object.
+- `__dict__(self) -> dict`: Returns a dictionary representation of the **IAMUserAccessKey** object.
+
+### Properties
+
+- `created_date`: The created date of the IAM user access key.
+- `id`: The ID of the IAM user access key.
+- `last_used_date`: The last used date of the IAM user access key.
+- `last_used_region`: The last used region of the IAM user access key.
+- `last_used_service`: The last used service of the IAM user access key.
+- `status`: The status of the IAM user access key.
+
 ## IAMUser
 
 A class representing an IAM user.
 
 ### Methods
 
-- `__init__(self, account: IAccount, name: str, id: str, arn: str, path: str = '/', created_date: Optional[datetime] = None, password_last_used_date: Optional[datetime] = None, permissions_boundary: Optional[IAMPermissionsBoundary] = None, tags: Optional[list] = None) -> None`:
-  Initialize a new IAMUser instance.
+- `__init__(self, account: IAccount, name: str, id: str, arn: str, path: str = '/', created_date: Optional[datetime] = None, password_last_used_date: Optional[datetime] = None, permissions_boundary: Optional[IAMPermissionsBoundary] = None, login_profile: Optional[IAMUserLoginProfile] = None, access_keys: Optional[list[IAMUserAccessKey]] = None, tags: Optional[list] = None) -> None`:
+  Initialize a new **IAMUser** instance.
 - `__str__(self) -> str`: Returns a string representation of the **IAMUser** object.
 - `__dict__(self) -> dict`: Returns a dictionary representation of the **IAMUser** object.
 
 ### Properties
 
+- `access_keys`: The list of access keys associated with the IAM user.
 - `account`: The account associated with the IAM user.
 - `arn`: The ARN of the IAM user.
 - `created_date`: The created date of the IAM user.
@@ -82,5 +119,6 @@ A class representing an IAM user.
 - `path`: The path of the IAM user.
 - `password_last_used_date`: The password last used date of the IAM user.
 - `permissions_boundary`: The permissions boundary associated with the IAM user.
+- `login_profile`: The login profile associated with the IAM user.
 - `tags`: The tags associated with the IAM user.
 

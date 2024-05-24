@@ -30,9 +30,8 @@ more.
 
 - `__init__(self, session: ISession) -> None`: Initializes the constructor of the IAM class.
 - `search_roles(self, condition: str = OR, include_details: bool = False, **kwargs) -> list[pyawsopstoolkit.models.IAMRole]`:
-  Returns a list of IAM
-  roles using advanced search features supported by the specified arguments. For details on supported kwargs, please
-  refer to the section below.
+  Returns a list of IAM roles using advanced search features supported by the specified arguments. For details on
+  supported kwargs, please refer to the section below.
 - `search_users(self, condition: str = OR, include_details: bool = False, **kwargs) -> list[pyawsopstoolkit.models.IAMUser]`:
   Returns a list of IAM users using advanced search features supported by the specified arguments. For details on
   supported kwargs, please refer to the section below.
@@ -124,6 +123,16 @@ supported keyword arguments:
   Example: `created_date={GREATER_THAN: datetime(2024, 10, 15)}`.
 - `password_last_used_date`: Specifies the password last used date of the IAM user (datetime format).
   Example: `password_last_used_date={BETWEEN: [datetime(2023, 10, 15), datetime(2024, 10, 15)]}`.
+- `login_profile_created_date`: Specifies the login profile created date of the IAM user (datetime format).
+  Example: `login_profile_created_date={GREATER_THAN: datetime(2024, 10, 15)}`.
+- `login_profile_password_reset_required`: Specifies the flag of login profile to check if password reset required for
+  the IAM user (boolean format). Example: `login_profile_password_reset_required=False`.
+- `access_key_id`: Specifies the ID of the IAM user access key. Example: `access_key_id='ABCD'`.
+- `access_key_status`: Specifies the status of the IAM user access key. Example: `access_key_status='Active'`.
+- `access_key_service`: Specifies the last used service of the IAM user access key.
+  Example: `access_key_service='ec2.amazonaws.com'`.
+- `access_key_region`: Specifies the last used region of the IAM user access key.
+  Example: `access_key_region='eu-west-1'`.
   All the above arguments supports string types and accept regular expression patterns. Additionally, the created_date
   and password_last_used_date arguments support conditions such as less than, greater than, and between. For more
   details, please refer to the constants above.

@@ -1,11 +1,12 @@
 import re
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 import pyawsopstoolkit.models
 from pyawsopstoolkit.__interfaces__ import IAccount, ISession
 from pyawsopstoolkit.__validations__ import Validation
+from pyawsopstoolkit.models import IAMUserLoginProfile, IAMUserAccessKey
 
 MAX_WORKERS = 10
 
@@ -22,13 +23,13 @@ NOT_EQUAL_TO: str = 'ne'  # Represents the not equal to ("!=") value
 BETWEEN: str = 'between'  # Represents the between range ("< x <") value
 
 
-def _match_condition(value: str, role_field: str, condition: str, matched: bool) -> bool:
+def _match_condition(value: str, role_field: str | list, condition: str, matched: bool) -> bool:
     """
     Matches the condition based on the specified parameters.
     :param value: The value to be evaluated.
     :type value: str
-    :param role_field: The value to compare against.
-    :type role_field: str
+    :param role_field: The value or list of values to compare against.
+    :type role_field: str | list
     :param condition: The condition to be applied: 'OR' or 'AND'.
     :type condition: str
     :param matched: The current matching status.
@@ -39,11 +40,15 @@ def _match_condition(value: str, role_field: str, condition: str, matched: bool)
     if not value or not role_field:
         return False
 
-    if re.search(value, role_field, re.IGNORECASE):
-        if condition == OR:
-            return True
+    if isinstance(role_field, str):
+        role_field = [role_field]
+
+    found_match = any(re.search(value, field, re.IGNORECASE) for field in role_field)
+
+    if condition == OR:
+        return matched or found_match
     elif condition == AND:
-        return False
+        return matched and found_match if matched else found_match
 
     return matched
 
@@ -221,6 +226,28 @@ class IAM:
 
         return users_to_process
 
+    def _list_access_keys(self, user_name: str) -> list:
+        """
+        Utilizing boto3 IAM, this method retrieves a list of all access keys associated with IAM user leveraging the
+        provided ISession object. For further details,
+        https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/iam/paginator/ListAccessKeys.html
+        :return: A list containing IAM user access keys.
+        :rtype: list
+        """
+        access_keys_to_process = []
+
+        from botocore.exceptions import ClientError
+        try:
+            iam_client = self.session.get_session().client('iam')
+            iam_paginator = iam_client.get_paginator('list_access_keys')
+
+            for page in iam_paginator.paginate(UserName=user_name):
+                access_keys_to_process.extend(page.get('AccessKeyMetadata', []))
+        except ClientError as e:
+            raise e
+
+        return access_keys_to_process
+
     def _get_role(self, role_name: str) -> dict:
         """
         Utilizing boto3 IAM, this method retrieves comprehensive details of an IAM role identified by the
@@ -246,6 +273,34 @@ class IAM:
         try:
             iam_client = self.session.get_session().client('iam')
             return iam_client.get_user(UserName=user_name)
+        except ClientError as e:
+            raise e
+
+    def _get_login_profile(self, user_name: str) -> dict:
+        """
+        Utilizing boto3 IAM, this method retrieves comprehensive details of an IAM user login profile identified
+        by the specified username.
+        :return: Details of the IAM user login profile.
+        :rtype: dict
+        """
+        from botocore.exceptions import ClientError
+        try:
+            iam_client = self.session.get_session().client('iam')
+            return iam_client.get_login_profile(UserName=user_name)
+        except ClientError as e:
+            raise e
+
+    def _get_access_key_last_used(self, access_key_id: str) -> dict:
+        """
+        Utilizing boto3 IAM, this method retrieves comprehensive details of IAM user access key last used information
+        identified by the specified username.
+        :return: Details of the IAM user access key last used.
+        :rtype: dict
+        """
+        from botocore.exceptions import ClientError
+        try:
+            iam_client = self.session.get_session().client('iam')
+            return iam_client.get_access_key_last_used(AccessKeyId=access_key_id)
         except ClientError as e:
             raise e
 
@@ -297,7 +352,12 @@ class IAM:
         return iam_role
 
     @staticmethod
-    def _convert_to_iam_user(account: IAccount, user: dict) -> pyawsopstoolkit.models.IAMUser:
+    def _convert_to_iam_user(
+            account: IAccount,
+            user: dict,
+            login_profile: Optional[dict] = None,
+            access_keys: Optional[list] = None
+    ) -> pyawsopstoolkit.models.IAMUser:
         """
         This function transforms the dictionary response from boto3 IAM into a format compatible with the
         AWS Ops Toolkit, adhering to the pyawsopstoolkit.models structure. Additionally, it incorporates
@@ -306,6 +366,10 @@ class IAM:
         :type account: IAccount
         :param user: The boto3 IAM service response for an IAM user.
         :type user: dict
+        :param login_profile: The boto3 IAM login profile service response for an IAM user.
+        :type login_profile: dict
+        :param access_keys: The boto3 IAM access keys service response for an IAM user.
+        :type access_keys: list
         :return: An AWS Ops Toolkit compatible object containing all IAM user details.
         :rtype: IAMUser
         """
@@ -326,6 +390,28 @@ class IAM:
                 arn=_permissions_boundary.get('PermissionsBoundaryArn', '')
             )
             iam_user.permissions_boundary = boundary
+
+        if login_profile is not None:
+            _login_profile = IAMUserLoginProfile(
+                created_date=login_profile.get('CreateDate', None),
+                password_reset_required=login_profile.get('PasswordResetRequired', False)
+            )
+            iam_user.login_profile = _login_profile
+
+        if access_keys is not None:
+            for a_key in access_keys:
+                _access_key = IAMUserAccessKey(
+                    id=a_key.get('access_key', {}).get('AccessKeyId', ''),
+                    status=a_key.get('access_key', {}).get('Status', ''),
+                    created_date=a_key.get('access_key', {}).get('CreateDate', None),
+                    last_used_date=a_key.get('last_used', {}).get('AccessKeyLastUsed', {}).get('LastUsedDate', None),
+                    last_used_service=a_key.get('last_used', {}).get('AccessKeyLastUsed', {}).get('ServiceName', None),
+                    last_used_region=a_key.get('last_used', {}).get('AccessKeyLastUsed', {}).get('Region', None)
+                )
+                if iam_user.access_keys is None:
+                    iam_user.access_keys = [_access_key]
+                else:
+                    iam_user.access_keys.append(_access_key)
 
         _tags = user.get('Tags', [])
         if _tags:
@@ -434,15 +520,18 @@ class IAM:
         from botocore.exceptions import ClientError
         try:
             include_details_keys = {
-                'permissions_boundary_type', 'permissions_boundary_arn', 'last_used_date', 'last_used_region',
-                'tag', 'tag_key'
+                'permissions_boundary_type',
+                'permissions_boundary_arn',
+                'last_used_date',
+                'last_used_region',
+                'tag',
+                'tag_key'
             }
 
             if not include_details and any(k in include_details_keys for k in kwargs):
                 from pyawsopstoolkit.exceptions import SearchAttributeError
                 raise SearchAttributeError(
-                    'include_details is required for below keys: permissions_boundary_type, '
-                    'permissions_boundary_arn, last_used_date, last_used_region, tag, tag_key.'
+                    f'include_details is required for below keys: {", ".join(sorted(include_details_keys))}'
                 )
 
             roles_to_process = self._list_roles()
@@ -488,10 +577,22 @@ class IAM:
         Validation.validate_type(include_details, bool, 'include_details should be a boolean.')
 
         def _process_user(user_detail):
+            login_profile_detail = None
+            access_keys_detail = []
+
             if include_details:
                 user_detail = self._get_user(user_detail.get('UserName', '')).get('User', {})
+                login_profile_detail = self._get_login_profile(user_detail.get('UserName', '')).get('LoginProfile', {})
+                for a_key in self._list_access_keys(user_detail.get('UserName', '')):
+                    a_key_last_used = self._get_access_key_last_used(a_key.get('AccessKeyId', ''))
+                    access_keys_detail.append({
+                        'access_key': a_key,
+                        'last_used': a_key_last_used
+                    })
 
-            return self._convert_to_iam_user(self.session.get_account(), user_detail)
+            return self._convert_to_iam_user(
+                self.session.get_account(), user_detail, login_profile_detail, access_keys_detail
+            )
 
         def _match_user(user_detail):
             if user_detail:
@@ -537,9 +638,48 @@ class IAM:
                                 user_detail = self._get_user(user_detail.get('UserName', '')).get('User', {})
                                 tags = {tag['Key']: tag['Value'] for tag in user_detail.get('Tags', [])}
                                 matched = _match_tag_condition(value, tags, condition, matched, key_only=False)
+                        elif key.lower() == 'login_profile_created_date':
+                            if include_details:
+                                login_profile_detail = (
+                                    self._get_login_profile(user_detail.get('UserName', '')).get('LoginProfile', {})
+                                )
+                                user_field = login_profile_detail.get('CreateDate', None)
+                                if isinstance(user_field, datetime):
+                                    user_field = user_field.replace(tzinfo=None)
+                                    matched = _match_compare_condition(value, user_field, condition, matched)
+                        elif key.lower() == 'login_profile_password_reset_required':
+                            if include_details:
+                                login_profile_detail = (
+                                    self._get_login_profile(user_detail.get('UserName', '')).get('LoginProfile', {})
+                                )
+                                user_field = login_profile_detail.get('PasswordResetRequired', False)
+                        elif key.lower() == 'access_key_id':
+                            if include_details:
+                                user_field = []
+                                for access_key in self._list_access_keys(user_detail.get('UserName', '')):
+                                    user_field.append(access_key.get('AccessKeyId', ''))
+                        elif key.lower() == 'access_key_status':
+                            if include_details:
+                                user_field = []
+                                for access_key in self._list_access_keys(user_detail.get('UserName', '')):
+                                    user_field.append(access_key.get('Status', ''))
+                        elif key.lower() == 'access_key_service':
+                            if include_details:
+                                user_field = []
+                                for access_key in self._list_access_keys(user_detail.get('UserName', '')):
+                                    detail = self._get_access_key_last_used(access_key.get('AccessKeyId', ''))
+                                    if detail is not None:
+                                        user_field.append(detail.get('AccessKeyLastUsed', {}).get('ServiceName', ''))
+                        elif key.lower() == 'access_key_region':
+                            if include_details:
+                                user_field = []
+                                for access_key in self._list_access_keys(user_detail.get('UserName', '')):
+                                    detail = self._get_access_key_last_used(access_key.get('AccessKeyId', ''))
+                                    if detail is not None:
+                                        user_field.append(detail.get('AccessKeyLastUsed', {}).get('Region', ''))
 
                         if key.lower() not in [
-                            'created_date', 'password_last_used_date', 'tag_key', 'tag'
+                            'created_date', 'password_last_used_date', 'tag_key', 'tag', 'login_profile_created_date'
                         ]:
                             matched = _match_condition(value, user_field, condition, matched)
 
@@ -554,14 +694,22 @@ class IAM:
         from botocore.exceptions import ClientError
         try:
             include_details_keys = {
-                'permissions_boundary_type', 'permissions_boundary_arn', 'tag', 'tag_key'
+                'permissions_boundary_type',
+                'permissions_boundary_arn',
+                'tag',
+                'tag_key',
+                'login_profile_created_date',
+                'login_profile_password_reset_required',
+                'access_key_id',
+                'access_key_status',
+                'access_key_service',
+                'access_key_region'
             }
 
             if not include_details and any(k in include_details_keys for k in kwargs):
                 from pyawsopstoolkit.exceptions import SearchAttributeError
                 raise SearchAttributeError(
-                    'include_details is required for below keys: permissions_boundary_type, '
-                    'permissions_boundary_arn, tag, tag_key.'
+                    f'include_details is required for below keys: {", ".join(sorted(include_details_keys))}'
                 )
 
             users_to_process = self._list_users()

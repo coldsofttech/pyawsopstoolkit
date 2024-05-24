@@ -109,8 +109,7 @@ class IAMRoleLastUsed:
         :param region: The AWS region where the IAM role was last used.
         :type region: str
         """
-        if used_date is not None:
-            Validation.validate_type(used_date, Union[datetime, None], 'used_date should be a datetime.')
+        Validation.validate_type(used_date, Union[datetime, None], 'used_date should be a datetime.')
 
         if region is not None:
             Validator.region(region, True)
@@ -184,6 +183,302 @@ class IAMRoleLastUsed:
         return {
             "used_date": used_date,
             "region": region
+        }
+
+
+class IAMUserLoginProfile:
+    """
+    A class representing the login profile information of an IAM user.
+    """
+
+    def __init__(
+            self,
+            created_date: Optional[datetime] = None,
+            password_reset_required: Optional[bool] = False
+    ) -> None:
+        """
+        Initialize the IAMUserLoginProfile object.
+        :param created_date: The created date of the IAM user login profile.
+        :type created_date: datetime
+        :param password_reset_required: Flag to indicate if password reset required for the IAM user. Defaults to False.
+        :type password_reset_required: bool
+        """
+        Validation.validate_type(created_date, Union[datetime, None], 'created_date should be a datetime.')
+        Validation.validate_type(password_reset_required, bool, 'password_reset_required should be a boolean.')
+
+        self._created_date = created_date
+        self._password_reset_required = password_reset_required
+
+    @property
+    def created_date(self) -> Optional[datetime]:
+        """
+        Gets the created date of the IAM user login profile.
+        :return: The created date of the IAM user login profile.
+        :rtype: datetime
+        """
+        return self._created_date
+
+    @created_date.setter
+    def created_date(self, value: Optional[datetime]) -> None:
+        """
+        Sets the created date of the IAM user login profile.
+        :param value: The created date of the IAM user login profile.
+        :type value: datetime
+        """
+        Validation.validate_type(value, Union[datetime, None], 'created_date should be a datetime.')
+
+        self._created_date = value
+
+    @property
+    def password_reset_required(self) -> Optional[bool]:
+        """
+        Gets the flag to indicate if password reset required for the IAM user.
+        :return: Flag to indicate if password reset required for the IAM user.
+        :rtype: bool
+        """
+        return self._password_reset_required
+
+    @password_reset_required.setter
+    def password_reset_required(self, value: Optional[bool] = False) -> None:
+        """
+        Sets the flag to indicate if password reset required for the IAM user.
+        :param value: The flag to indicate if password reset required for the IAM user. Defaults to False.
+        :type value: bool
+        """
+        Validation.validate_type(value, bool, 'password_reset_required should be a boolean.')
+
+        self._password_reset_required = value
+
+    def __str__(self) -> str:
+        """
+        Return a string representation of the IAMUserLoginProfile object.
+        :return: String representation of the IAMUserLoginProfile object.
+        :rtype: str
+        """
+        created_date = self.created_date.isoformat() if self.created_date else None
+
+        return (
+            f'IAMUserLoginProfile('
+            f'created_date={created_date},'
+            f'password_reset_required={self.password_reset_required}'
+            f')'
+        )
+
+    def __dict__(self) -> dict:
+        """
+        Return a dictionary representation of the IAMUserLoginProfile object.
+        :return: Dictionary representation of the IAMUserLoginProfile object.
+        :rtype: dict
+        """
+        created_date = self.created_date.isoformat() if self.created_date else None
+
+        return {
+            "created_date": created_date,
+            "password_reset_required": self.password_reset_required
+        }
+
+
+class IAMUserAccessKey:
+    """
+    A class representing the access key information of an IAM user.
+    """
+
+    def __init__(
+            self,
+            id: str,
+            status: str,
+            created_date: Optional[datetime] = None,
+            last_used_date: Optional[datetime] = None,
+            last_used_service: Optional[str] = None,
+            last_used_region: Optional[str] = None
+    ) -> None:
+        """
+        Initializes the IAMUserAccessKey instance.
+        :param id: The ID of the IAM user access key.
+        :type id: str
+        :param status: The status of the IAM user access key.
+        :type status: str
+        :param created_date: The created date of the IAM user access key. Defaults to None.
+        :type created_date: datetime
+        :param last_used_date: The last used date of the IAM user access key. Defaults to None.
+        :type last_used_date: datetime
+        :param last_used_service: The last used service of the IAM user access key. Defaults to None.
+        :type last_used_service: str
+        :param last_used_region: The last used region of the IAM user access key. Defaults to None.
+        :type last_used_region: str
+        """
+        Validation.validate_type(id, str, 'id should be a string.')
+        Validation.validate_type(status, str, 'status should be a string.')
+        Validation.validate_type(created_date, Union[datetime, None], 'created_date should be a datetime.')
+        Validation.validate_type(last_used_date, Union[datetime, None], 'last_used_date should be a datetime.')
+        Validation.validate_type(last_used_service, Union[str, None], 'last_used_service should be a string.')
+        if last_used_region is not None:
+            Validator.region(last_used_region)
+
+        self._id = id
+        self._status = status
+        self._created_date = created_date
+        self._last_used_date = last_used_date
+        self._last_used_service = last_used_service
+        self._last_used_region = last_used_region
+
+    @property
+    def created_date(self) -> Optional[datetime]:
+        """
+        Gets the created date of the IAM user access key.
+        :return: The created date of the IAM user access key.
+        :rtype: datetime
+        """
+        return self._created_date
+
+    @created_date.setter
+    def created_date(self, value: Optional[datetime]) -> None:
+        """
+        Sets the created date of the IAM user access key.
+        :param value: The created date of the IAM user access key.
+        :type value: datetime
+        """
+        Validation.validate_type(value, Union[datetime, None], 'created_date should be a datetime.')
+
+        self._created_date = value
+
+    @property
+    def id(self) -> str:
+        """
+        Gets the ID of the IAM user access key.
+        :return: The ID of the IAM user access key.
+        :rtype: str
+        """
+        return self._id
+
+    @id.setter
+    def id(self, value: str) -> None:
+        """
+        Sets the ID of the IAM user access key.
+        :param value: The ID of the IAM user access key.
+        :type value: str
+        """
+        Validation.validate_type(value, str, 'id should be a string.')
+
+        self._id = value
+
+    @property
+    def last_used_date(self) -> Optional[datetime]:
+        """
+        Gets the last used date of the IAM user access key.
+        :return: The last used date of the IAM user access key.
+        :rtype: datetime
+        """
+        return self._last_used_date
+
+    @last_used_date.setter
+    def last_used_date(self, value: Optional[datetime]) -> None:
+        """
+        Sets the last used date of the IAM user access key.
+        :param value: The last used date of the IAM user access key.
+        :type value: datetime
+        """
+        Validation.validate_type(value, Union[datetime, None], 'last_used_date should be a datetime.')
+
+        self._last_used_date = value
+
+    @property
+    def last_used_region(self) -> Optional[str]:
+        """
+        Gets the last used region of the IAM user access key.
+        :return: The last used region of the IAM user access key.
+        :rtype: str
+        """
+        return self._last_used_region
+
+    @last_used_region.setter
+    def last_used_region(self, value: Optional[str]) -> None:
+        """
+        Sets the last used region of the IAM user access key.
+        :param value: The last used region of the IAM user access key.
+        :type value: str
+        """
+        if value is not None:
+            Validator.region(value)
+
+        self._last_used_region = value
+
+    @property
+    def last_used_service(self) -> Optional[str]:
+        """
+        Gets the last used service of the IAM user access key.
+        :return: The last used service of the IAM user access key.
+        :rtype: str
+        """
+        return self._last_used_service
+
+    @last_used_service.setter
+    def last_used_service(self, value: Optional[str]) -> None:
+        """
+        Sets the last used service of the IAM user access key.
+        :param value: The last used service of the IAM user access key.
+        :type value: str
+        """
+        Validation.validate_type(value, Union[str, None], 'last_used_service should be a string.')
+
+        self._last_used_service = value
+
+    @property
+    def status(self) -> str:
+        """
+        Gets the status of the IAM user access key.
+        :return: The status of the IAM user access key.
+        :rtype: str
+        """
+        return self._status
+
+    @status.setter
+    def status(self, value: str) -> None:
+        """
+        Sets the status of the IAM user access key.
+        :param value: The status of the IAM user access key.
+        :type value: str
+        """
+        Validation.validate_type(value, str, 'status should be a string.')
+
+        self._status = value
+
+    def __str__(self) -> str:
+        """
+        Return a string representation of the IAMUserAccessKey object.
+        :return: String representation of the IAMUserAccessKey object.
+        :rtype: str
+        """
+        created_date = self.created_date.isoformat() if self.created_date else None
+        last_used_date = self.last_used_date.isoformat() if self._last_used_date else None
+
+        return (
+            f'IAMUserAccessKey('
+            f'id={self.id},'
+            f'status={self.status},'
+            f'created_date={created_date},'
+            f'last_used_date={last_used_date},'
+            f'last_used_service={self.last_used_service},'
+            f'last_used_region={self.last_used_region}'
+            f')'
+        )
+
+    def __dict__(self) -> dict:
+        """
+        Return a dictionary representation of the IAMUserAccessKey object.
+        :return: Dictionary representation of the IAMUserAccessKey object.
+        :rtype: dict
+        """
+        created_date = self.created_date.isoformat() if self.created_date else None
+        last_used_date = self.last_used_date.isoformat() if self._last_used_date else None
+
+        return {
+            "id": self.id,
+            "status": self.status,
+            "created_date": created_date,
+            "last_used_date": last_used_date,
+            "last_used_service": self.last_used_service,
+            "last_used_region": self.last_used_region
         }
 
 
@@ -474,8 +769,9 @@ class IAMRole:
         :param value: The permissions boundary asociated with the IAM role.
         :type value: IAMPermissionsBoundary
         """
-        Validation.validate_type(value, Union[IAMPermissionsBoundary, None],
-                                 'permissions_boundary should be of IAMPermissionsBoundary type.')
+        Validation.validate_type(
+            value, Union[IAMPermissionsBoundary, None], 'permissions_boundary should be of IAMPermissionsBoundary type.'
+        )
         self._permissions_boundary = value
 
     @property
@@ -573,6 +869,8 @@ class IAMUser:
             created_date: Optional[datetime] = None,
             password_last_used_date: Optional[datetime] = None,
             permissions_boundary: Optional[IAMPermissionsBoundary] = None,
+            login_profile: Optional[IAMUserLoginProfile] = None,
+            access_keys: Optional[list[IAMUserAccessKey]] = None,
             tags: Optional[list] = None
     ) -> None:
         """
@@ -594,6 +892,10 @@ class IAMUser:
         :type password_last_used_date: datetime
         :param permissions_boundary: The permissions boundary for the IAM user. Defaults to None.
         :type permissions_boundary: IAMPermissionsBoundary
+        :param login_profile: The login profile of the IAM user. Defaults to None.
+        :type login_profile: IAMUserLoginProfile
+        :param access_keys: A list of access keys associated with the IAM user. Defaults to None.
+        :type access_keys: list
         :param tags: A list of tags associated with the IAM user. Defaults to None.
         :type tags: list
         """
@@ -611,6 +913,16 @@ class IAMUser:
             Union[IAMPermissionsBoundary, None],
             'permissions_boundary should be of IAMPermissionsBoundary type.'
         )
+        Validation.validate_type(
+            login_profile, Union[IAMUserLoginProfile, None], 'login_profile should be of IAMUserLoginProfile type.'
+        )
+        Validation.validate_type(access_keys, Union[list, None], 'access_keys should be a list of IAMUserAccessKey.')
+        if access_keys is not None and len(access_keys) > 0:
+            all(
+                Validation.validate_type(
+                    access_key, IAMUserAccessKey, 'access_keys should be a list of IAMUserAccessKey.'
+                ) for access_key in access_keys
+            )
         Validation.validate_type(tags, Union[list, None], 'tags should be a list.')
 
         self._account = account
@@ -621,7 +933,35 @@ class IAMUser:
         self._created_date = created_date
         self._password_last_used_date = password_last_used_date
         self._permissions_boundary = permissions_boundary
+        self._login_profile = login_profile
+        self._access_keys = access_keys
         self._tags = tags
+
+    @property
+    def access_keys(self) -> Optional[list[IAMUserAccessKey]]:
+        """
+        Gets the list of access keys associated with the IAM user.
+        :return: The list of access keys associated with the IAM user.
+        :rtype: list
+        """
+        return self._access_keys
+
+    @access_keys.setter
+    def access_keys(self, value: Optional[list[IAMUserAccessKey]]) -> None:
+        """
+        Sets the list of access keys associated with the IAM user.
+        :param value: The list of access keys associated with the IAM user.
+        :type value: list
+        """
+        Validation.validate_type(value, Union[list, None], 'access_keys should be a list of IAMUserAccessKey.')
+        if value is not None and len(value) > 0:
+            all(
+                Validation.validate_type(
+                    access_key, IAMUserAccessKey, 'access_keys should be a list of IAMUserAccessKey.'
+                ) for access_key in value
+            )
+
+        self._access_keys = value
 
     @property
     def account(self) -> IAccount:
@@ -698,6 +1038,28 @@ class IAMUser:
         """
         Validation.validate_type(value, str, 'id should be a string.')
         self._id = value
+
+    @property
+    def login_profile(self) -> Optional[IAMUserLoginProfile]:
+        """
+        Gets the login profile of the IAM user.
+        :return: The login profile of the IAM user.
+        :rtype: IAMUserLoginProfile
+        """
+        return self._login_profile
+
+    @login_profile.setter
+    def login_profile(self, value: Optional[IAMUserLoginProfile]) -> None:
+        """
+        Sets the login profile of the IAM user.
+        :param value: The login profile of the IAM user.
+        :type value: IAMUserLoginProfile
+        """
+        Validation.validate_type(
+            value, Union[IAMUserLoginProfile, None], 'login_profile should be of IAMUserLoginProfile type.'
+        )
+
+        self._login_profile = value
 
     @property
     def name(self) -> str:
@@ -806,6 +1168,8 @@ class IAMUser:
         password_last_used_date = self.password_last_used_date.isoformat() if self.password_last_used_date else None
         permissions_boundary = self.permissions_boundary if self.permissions_boundary else None
         tags = self.tags if self.tags else None
+        login_profile = self.login_profile if self.login_profile else None
+        access_keys = self.access_keys if self.access_keys and len(self.access_keys) > 0 else None
 
         return (
             f'IAMUser('
@@ -817,6 +1181,8 @@ class IAMUser:
             f'created_date={created_date},'
             f'password_last_used_date={password_last_used_date},'
             f'permissions_boundary={permissions_boundary},'
+            f'login_profile={login_profile},'
+            f'access_keys={access_keys},'
             f'tags={tags}'
             f')'
         )
@@ -832,6 +1198,8 @@ class IAMUser:
         password_last_used_date = self.password_last_used_date.isoformat() if self.password_last_used_date else None
         permissions_boundary = self.permissions_boundary.__dict__() if self.permissions_boundary else None
         tags = self.tags if self.tags else None
+        login_profile = self.login_profile.__dict__() if self.login_profile else None
+        access_keys = self.access_keys if self.access_keys and len(self.access_keys) > 0 else None
 
         return {
             "account": account,
@@ -842,5 +1210,7 @@ class IAMUser:
             "created_date": created_date,
             "password_last_used_date": password_last_used_date,
             "permissions_boundary": permissions_boundary,
+            "login_profile": login_profile,
+            "access_keys": access_keys,
             "tags": tags
         }
