@@ -14,6 +14,8 @@ A class that encapsulates insights related to the IAM service, including roles, 
 - `__init__(self, session: ISession) -> None`: Initializes the IAM class with the provided session.
 - `unused_roles(self, no_of_days: Optional[int] = 90, include_newly_created: Optional[bool] = False) -> list[pyawsopstoolkit.models.IAMRole]`:
   Returns a list of unused IAM roles based on the specified parameters.
+- `unused_users(self, no_of_days: Optional[int] = 90, include_newly_created: Optional[bool] = False) -> list[pyawsopstoolkit.models.IAMUser]`:
+  Returns a list of unused IAM users based on the specified parameters.
 
 ### Usage
 
@@ -32,4 +34,10 @@ unused_roles = iam_object.unused_roles()
 
 # Print the list of unused roles
 print(unused_roles)
+
+# Retrieve IAM users unused for the last 90 days
+unused_users = iam_object.unused_users()
+
+# Print the list of unused users
+print(unused_users)
 ```

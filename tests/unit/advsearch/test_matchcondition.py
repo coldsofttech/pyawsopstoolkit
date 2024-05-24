@@ -38,6 +38,18 @@ class TestMatchCondition(unittest.TestCase):
     def test_match_condition_none_condition(self):
         self.assertFalse(_match_condition("admin", "Administrator", None, False))
 
+    def test_match_condition_list_none_condition(self):
+        self.assertFalse(_match_condition("admin", [], None, False))
+
+    def test_match_condition_list_empty_value_and_role_field(self):
+        self.assertFalse(_match_condition("", [], OR, False))
+
+    def test_match_condition_list_valid(self):
+        self.assertTrue(_match_condition("admin", ["admin", "sample"], OR, False))
+
+    def test_match_condition_list_invalid(self):
+        self.assertFalse(_match_condition("admin", ["sample", "test"], OR, False))
+
 
 if __name__ == '__main__':
     unittest.main()
