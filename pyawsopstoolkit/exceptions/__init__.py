@@ -1,4 +1,5 @@
 __all__ = [
+    "AdvanceSearchError",
     "AssumeRoleError",
     "SearchAttributeError",
     "ValidationError"
@@ -11,4 +12,5 @@ execution of pyawsopstoolkit operations, providing comprehensive support for err
 the toolkit.
 """
 
-from pyawsopstoolkit.exceptions.__main__ import AssumeRoleError, ValidationError, SearchAttributeError
+from pyawsopstoolkit.exceptions.__main__ import AssumeRoleError, ValidationError, SearchAttributeError, \
+    AdvanceSearchError

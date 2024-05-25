@@ -1,6 +1,7 @@
 # Version History
 
-- 0.1.8: Added unused_users within [pyawsopstoolkit.insights](pyawsopstoolkit/insights) package. (latest)
+- 0.1.9: Added AdvanceSearchError within [pyawsopstoolkit.exceptions](pyawsopstoolkit/exceptions) package. (latest)
+- 0.1.8: Added unused_users within [pyawsopstoolkit.insights](pyawsopstoolkit/insights) package.
 - 0.1.7: Added [pyawsopstoolkit.insights](pyawsopstoolkit/insights) package.
 - 0.1.6: Added support for IAM Users within [pyawsopstoolkit.advsearch](pyawsopstoolkit/advsearch)
   and [pyawsopstoolkit.security](pyawsopstoolkit/security) packages.
