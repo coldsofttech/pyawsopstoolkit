@@ -8,7 +8,7 @@ __all__ = [
     "EQUAL_TO",
     "NOT_EQUAL_TO",
     "BETWEEN",
-    "IAM"
+    "iam"
 ]
 __name__ = "pyawsopstoolkit.advsearch"
 __description__ = """
@@ -19,4 +19,4 @@ spectrum of facets.
 """
 
 from pyawsopstoolkit.advsearch.__main__ import AND, OR, LESS_THAN, LESS_THAN_OR_EQUAL_TO, GREATER_THAN, \
-    GREATER_THAN_OR_EQUAL_TO, EQUAL_TO, NOT_EQUAL_TO, BETWEEN, IAM
+    GREATER_THAN_OR_EQUAL_TO, EQUAL_TO, NOT_EQUAL_TO, BETWEEN

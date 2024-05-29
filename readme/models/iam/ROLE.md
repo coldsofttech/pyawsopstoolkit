@@ -1,6 +1,6 @@
 # pyawsopstoolkit.models.iam.role
 
-This subpackage within `pyawsopstoolkit.models.iam` (AWS Ops Toolkit Models) provides specialized data model classes
+This subpackage within **pyawsopstoolkit.models.iam** (AWS Ops Toolkit Models) provides specialized data model classes
 designed for managing Identity and Access Management (IAM) roles in Amazon Web Services (AWS). These models are crafted
 to facilitate the efficient handling, manipulation, and integration of IAM roles, ensuring seamless interaction with AWS
 services.

@@ -1,6 +1,9 @@
 # Version History
 
-- 0.1.10: Enhanced [pyawsopstoolkit.models](pyawsopstoolkit/models) to support sub-packages based on AWS services. (latest)
+- 0.1.11:
+  Enhanced [pyawsopstoolkit.advsearch](pyawsopstoolkit/advsearch), [pyawsopstoolkit.insights](pyawsopstoolkit/insights),
+  and [pyawsopstoolkit.security](pyawsopstoolkit/security) to support sub-packages based on AWS services. (latest)
+- 0.1.10: Enhanced [pyawsopstoolkit.models](pyawsopstoolkit/models) to support sub-packages based on AWS services.
 - 0.1.9: Added AdvanceSearchError within [pyawsopstoolkit.exceptions](pyawsopstoolkit/exceptions) package.
 - 0.1.8: Added unused_users within [pyawsopstoolkit.insights](pyawsopstoolkit/insights) package.
 - 0.1.7: Added [pyawsopstoolkit.insights](pyawsopstoolkit/insights) package.

@@ -41,10 +41,13 @@ class TestMatchCompareCondition(unittest.TestCase):
     def test_datetime_comparison(self):
         self.assertTrue(_match_compare_condition({LESS_THAN: "2024-01-01T00:00:00"}, datetime(2023, 12, 31), AND, True))
         self.assertFalse(
-            _match_compare_condition({LESS_THAN: "2023-01-01T00:00:00"}, datetime(2023, 12, 31), AND, True))
+            _match_compare_condition({LESS_THAN: "2023-01-01T00:00:00"}, datetime(2023, 12, 31), AND, True)
+        )
         self.assertTrue(
-            _match_compare_condition({BETWEEN: ["2023-01-01T00:00:00", "2024-01-01T00:00:00"]}, datetime(2023, 6, 1),
-                                     AND, True))
+            _match_compare_condition(
+                {BETWEEN: ["2023-01-01T00:00:00", "2024-01-01T00:00:00"]}, datetime(2023, 6, 1), AND, True
+            )
+        )
 
     def test_invalid_value_dict(self):
         self.assertRaises(ValueError, _match_compare_condition, "invalid", 10, AND, True)

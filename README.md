@@ -57,13 +57,16 @@ Now you're all set to harness the power of **pyawsopstoolkit** in your AWS workf
 The **Credentials** class represents a set of AWS credentials, including an access key, secret access key, token, and
 optional expiry datetime.
 
-#### Methods
+#### Constructors
 
-- `__init__(self, access_key: str, secret_access_key: str, token: str, expiry: Optional[datetime] = None) -> None`:
+- `Credentials(access_key: str, secret_access_key: str, token: str, expiry: Optional[datetime] = None) -> None`:
   Initializes a **Credentials** object with the provided access key, secret access key, token, and expiry datetime if
   available.
-- `__str__(self) -> str`: Returns a string representation of the **Credentials** object.
-- `__dict__(self) -> dict`: Returns a dictionary representation of the **Credentials** object.
+
+#### Methods
+
+- `__str__() -> str`: Returns a string representation of the **Credentials** object.
+- `to_dict() -> dict`: Returns a dictionary representation of the **Credentials** object.
 
 #### Usage
 
@@ -98,12 +101,14 @@ print(creds.__dict__())
 The **Account** class represents an AWS account with various attributes. This class implements the **IAccount**
 interface, providing basic functionality for managing an AWS account.
 
+#### Constructors
+
+- `Account(number: str) -> None`: Initializes an **Account** object with the provided account number.
+
 #### Methods
 
-- `__init__(self, number: str) -> None`: Initializes an **Account** object with the provided account number.
--
-    - `__str__(self) -> str`: Returns a string representation of the **Account** object.
-- `__dict__(self) -> dict`: Returns a dictionary representation of the **Account** object.
+- `__str__() -> str`: Returns a string representation of the **Account** object.
+- `to_dict(self) -> dict`: Returns a dictionary representation of the **Account** object.
 
 #### Usage
 
@@ -122,20 +127,23 @@ print(account.number)  # Output: 123456789012
 The **Session** class represents a boto3 Session with various attributes. It implements the **ISession** interface,
 offering functionality to manage sessions. Additionally, it provides the option to assume a session.
 
+#### Constructors
+
+- `Session(profile_name: Optional[str] = None, credentials: Optional[ICredentials] = None, region_code: Optional[str] = 'eu-west-1') -> None`:
+  Initializes a **Session** object for AWS with optional parameters for profile name, credentials, and region code.
+
 #### Methods
 
-- `__init__(self, profile_name: Optional[str] = None, credentials: Optional[ICredentials] = None, region_code: Optional[str] = 'eu-west-1') -> None`:
-  Initializes a **Session** object for AWS with optional parameters for profile name, credentials, and region code.
-- `get_session(self) -> boto3.Session`: Returns the **boto3.Session** object based on the specified parameters within
+- `get_session() -> boto3.Session`: Returns the **boto3.Session** object based on the specified parameters within
   the class object. This method prioritizes the profile name, followed by credentials. It verifies the session validity
   by performing a quick S3 list buckets action.
-- `get_config(self) -> botocore.config.Config`: Returns the **botocore.config.Config** based on the specified region
+- `get_config() -> botocore.config.Config`: Returns the **botocore.config.Config** based on the specified region
   code within the class object.
-- `get_account(self) -> IAccount`: Returns the AWS account number based on the **get_session** with specified parameters
+- `get_account() -> IAccount`: Returns the AWS account number based on the **get_session** with specified parameters
   within the class object.
-- `get_credentials_for_profile(self) -> ICredentials`: Returns the AWS credentials (access key, secret access key, and
+- `get_credentials_for_profile() -> ICredentials`: Returns the AWS credentials (access key, secret access key, and
   token) based on the **get_session** with specified parameters within the class object.
-- `assume_role(self, role_arn: str, role_session_name: Optional[str] = 'AssumeSession', policy_arns: Optional[list] = None, policy: Optional[Union[str, dict]] = None, duration_seconds: Optional[int] = 3600, tags: Optional[list] = None) -> ISession`:
+- `assume_role(role_arn: str, role_session_name: Optional[str] = 'AssumeSession', policy_arns: Optional[list] = None, policy: Optional[Union[str, dict]] = None, duration_seconds: Optional[int] = 3600, tags: Optional[list] = None) -> ISession`:
   Returns the **ISession** object for the assumed role based on the specified parameters.
 
 #### Usage
@@ -167,7 +175,7 @@ print(
 
 ## pyawsopstoolkit.advsearch
 
-For detailed information and usage examples, please refer to [ADVANCE_SEARCH](readme/ADVANCE_SEARCH.md).
+For detailed information and usage examples, please refer to [ADVANCE_SEARCH](readme/advsearch/ADVANCE_SEARCH.md).
 
 ## pyawsopstoolkit.exceptions
 
@@ -175,7 +183,7 @@ For detailed information and usage examples, please refer to [EXCEPTIONS](readme
 
 ## pyawsopstoolkit.insights
 
-For detailed information and usage examples, please refer to [INSIGHTS](readme/INSIGHTS.md).
+For detailed information and usage examples, please refer to [INSIGHTS](readme/insights/INSIGHTS.md).
 
 ## pyawsopstoolkit.models
 
@@ -183,7 +191,7 @@ For detailed information and usage examples, please refer to [MODELS](readme/mod
 
 ## pyawsopstoolkit.security
 
-For detailed information and usage examples, please refer to [SECURITY](readme/SECURITY.md).
+For detailed information and usage examples, please refer to [SECURITY](readme/security/SECURITY.md).
 
 ## pyawsopstoolkit.validators
 
