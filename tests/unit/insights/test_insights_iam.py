@@ -2,10 +2,9 @@ import unittest
 from datetime import datetime
 from unittest.mock import patch
 
+import pyawsopstoolkit
 from pyawsopstoolkit import Account, Session
 from pyawsopstoolkit.insights import IAM
-from pyawsopstoolkit.models import IAMRole, IAMPermissionsBoundary, IAMRoleLastUsed, IAMUser, IAMUserLoginProfile, \
-    IAMUserAccessKey
 
 
 class TestIAM(unittest.TestCase):
@@ -41,17 +40,17 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_roles.return_value = [
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role',
                 id='ABCDGH',
                 arn=f'arn:aws:iam::{self.account.number}:role/test_role',
                 max_session_duration=3600,
-                permissions_boundary=IAMPermissionsBoundary(
+                permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                     type='Policy',
                     arn=f'arn:aws:iam::{self.account.number}:policy/some_boundary'
                 ),
-                last_used=IAMRoleLastUsed(
+                last_used=pyawsopstoolkit.models.iam.role.LastUsed(
                     used_date=datetime.today()
                 ),
                 created_date=datetime(2022, 3, 15)
@@ -70,7 +69,7 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_users.return_value = [
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user',
                 id='ABCDGJH',
@@ -92,13 +91,13 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_users.return_value = [
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user',
                 id='ABCDGJH',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user',
                 created_date=datetime(2022, 5, 18),
-                login_profile=IAMUserLoginProfile(
+                login_profile=pyawsopstoolkit.models.iam.user.LoginProfile(
                     created_date=datetime.today()
                 )
             )
@@ -116,7 +115,7 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_users.return_value = [
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user',
                 id='ABCDGJH',
@@ -138,14 +137,14 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_users.return_value = [
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user',
                 id='ABCDGJH',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user',
                 created_date=datetime(2022, 5, 18),
                 access_keys=[
-                    IAMUserAccessKey(
+                    pyawsopstoolkit.models.iam.user.AccessKey(
                         id='ACCESS_KEY1',
                         status='Active',
                         created_date=datetime(2022, 6, 18),
@@ -167,22 +166,22 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_roles.return_value = [
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role1',
                 id='ABCDGH',
                 arn=f'arn:aws:iam::{self.account.number}:role/test_role1',
                 max_session_duration=3600,
-                permissions_boundary=IAMPermissionsBoundary(
+                permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                     type='Policy',
                     arn=f'arn:aws:iam::{self.account.number}:policy/some_boundary'
                 ),
-                last_used=IAMRoleLastUsed(
+                last_used=pyawsopstoolkit.models.iam.role.LastUsed(
                     used_date=datetime.today()
                 ),
                 created_date=datetime(2022, 3, 15)
             ),
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role2',
                 id='BCDGHY',
@@ -191,7 +190,7 @@ class TestIAM(unittest.TestCase):
                 last_used=None,
                 created_date=datetime.today()
             ),
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role3',
                 id='BCDGHY',
@@ -201,7 +200,7 @@ class TestIAM(unittest.TestCase):
                 last_used=None,
                 created_date=datetime(2022, 3, 15)
             ),
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role2',
                 id='BCDGHY',
@@ -225,17 +224,17 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_users.return_value = [
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user1',
                 id='ABDCGHY',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user1',
                 created_date=datetime(2022, 5, 18),
-                login_profile=IAMUserLoginProfile(
+                login_profile=pyawsopstoolkit.models.iam.user.LoginProfile(
                     created_date=datetime.today()
                 )
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user2',
                 id='SHJYG',
@@ -243,14 +242,14 @@ class TestIAM(unittest.TestCase):
                 created_date=datetime(2022, 5, 18),
                 password_last_used_date=datetime.today()
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user3',
                 id='SHJYG',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user3',
                 created_date=datetime(2022, 5, 18),
                 access_keys=[
-                    IAMUserAccessKey(
+                    pyawsopstoolkit.models.iam.user.AccessKey(
                         id='ACCESS_KEY1',
                         status='Active',
                         created_date=datetime(2022, 6, 18),
@@ -258,7 +257,7 @@ class TestIAM(unittest.TestCase):
                     )
                 ]
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user4',
                 id='SHJYG',
@@ -266,14 +265,14 @@ class TestIAM(unittest.TestCase):
                 created_date=datetime(2022, 5, 18),
                 password_last_used_date=datetime(2022, 5, 20)
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user5',
                 id='SHJYG',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user5',
                 created_date=datetime(2022, 5, 18)
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user5',
                 id='SHJYG',
@@ -294,22 +293,22 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_roles.return_value = [
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role1',
                 id='ABCDGH',
                 arn=f'arn:aws:iam::{self.account.number}:role/test_role1',
                 max_session_duration=3600,
-                permissions_boundary=IAMPermissionsBoundary(
+                permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                     type='Policy',
                     arn=f'arn:aws:iam::{self.account.number}:policy/some_boundary'
                 ),
-                last_used=IAMRoleLastUsed(
+                last_used=pyawsopstoolkit.models.iam.role.LastUsed(
                     used_date=datetime.today()
                 ),
                 created_date=datetime(2022, 3, 15)
             ),
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role2',
                 id='BCDGHY',
@@ -318,7 +317,7 @@ class TestIAM(unittest.TestCase):
                 last_used=None,
                 created_date=datetime.today()
             ),
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role3',
                 id='BCDGHY',
@@ -328,7 +327,7 @@ class TestIAM(unittest.TestCase):
                 last_used=None,
                 created_date=datetime(2022, 3, 15)
             ),
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role2',
                 id='BCDGHY',
@@ -352,17 +351,17 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_users.return_value = [
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user1',
                 id='ABDCGHY',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user1',
                 created_date=datetime(2022, 5, 18),
-                login_profile=IAMUserLoginProfile(
+                login_profile=pyawsopstoolkit.models.iam.user.LoginProfile(
                     created_date=datetime.today()
                 )
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user2',
                 id='SHJYG',
@@ -370,14 +369,14 @@ class TestIAM(unittest.TestCase):
                 created_date=datetime(2022, 5, 18),
                 password_last_used_date=datetime.today()
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user3',
                 id='SHJYG',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user3',
                 created_date=datetime(2022, 5, 18),
                 access_keys=[
-                    IAMUserAccessKey(
+                    pyawsopstoolkit.models.iam.user.AccessKey(
                         id='ACCESS_KEY1',
                         status='Active',
                         created_date=datetime(2022, 6, 18),
@@ -385,7 +384,7 @@ class TestIAM(unittest.TestCase):
                     )
                 ]
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user4',
                 id='SHJYG',
@@ -393,14 +392,14 @@ class TestIAM(unittest.TestCase):
                 created_date=datetime(2022, 5, 18),
                 password_last_used_date=datetime(2022, 5, 20)
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user5',
                 id='SHJYG',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user5',
                 created_date=datetime(2022, 5, 18)
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user5',
                 id='SHJYG',

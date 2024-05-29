@@ -215,6 +215,11 @@ class Account(IAccount):
             "number": self.number
         }
 
+    def to_dict(self) -> dict:
+        return {
+            "number": self.number
+        }
+
 
 class Session(ISession):
     """

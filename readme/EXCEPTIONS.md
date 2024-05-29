@@ -11,9 +11,10 @@ pyawsopstoolkit operations, providing comprehensive support for error handling a
 Custom exception class designed for AWS Ops Toolkit. This exception is typically raised when there's a failure during
 advance search.
 
-### Methods
+### Constructors
 
-- `__init__(message: str, exception: Optional[Exception] = None) -> None`: Constructor for the SearchAttributeError
+- `AdvanceSearchError(message: str, exception: Optional[Exception] = None) -> None`: Constructor for the
+  SearchAttributeError
   class.
 
 ## AssumeRoleError
@@ -21,18 +22,20 @@ advance search.
 Custom exception class designed for AWS Ops Toolkit. This exception is typically raised when there's a failure during
 the assumption of a role session.
 
-### Methods
+### Constructors
 
-- `__init__(role_arn: str, exception: Optional[Exception] = None) -> None`: Constructor for the AssumeRoleError class.
+- `AssumeRoleError(role_arn: str, exception: Optional[Exception] = None) -> None`: Constructor for the AssumeRoleError
+  class.
 
 ## SearchAttributeError
 
 Custom exception class designed for AWS Ops Toolkit. This exception is typically raised when either invalid attributes
 are provided or key attributes are missing.
 
-### Methods
+### Constructors
 
-- `__init__(message: str, exception: Optional[Exception] = None) -> None`: Constructor for the SearchAttributeError
+- `SearchAttributeError(message: str, exception: Optional[Exception] = None) -> None`: Constructor for the
+  SearchAttributeError
   class.
 
 ## ValidationError
@@ -40,6 +43,7 @@ are provided or key attributes are missing.
 Custom exception class designed for AWS Ops Toolkit. This exception is typically raised when there's a failure during
 validation.
 
-### Methods
+### Constructors
 
-- `__init__(message: str, exception: Optional[Exception] = None) -> None`: Constructor for the ValidationError class.
+- `ValidationError(message: str, exception: Optional[Exception] = None) -> None`: Constructor for the ValidationError
+  class.

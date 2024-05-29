@@ -179,7 +179,7 @@ For detailed information and usage examples, please refer to [INSIGHTS](readme/I
 
 ## pyawsopstoolkit.models
 
-For detailed information and usage examples, please refer to [MODELS](readme/MODELS.md).
+For detailed information and usage examples, please refer to [MODELS](readme/models/MODELS.md).
 
 ## pyawsopstoolkit.security
 
