@@ -1,5 +1,5 @@
 __all__ = [
-    "IAM"
+    "iam"
 ]
 __name__ = "pyawsopstoolkit.insights"
 __description__ = """
@@ -8,5 +8,3 @@ This package offers a comprehensive array of features designed to clean up and m
 Meticulously engineered, these features are finely tuned to meet the unique demands of the expansive AWS
 ecosystem, encompassing a diverse spectrum of aspects.
 """
-
-from pyawsopstoolkit.insights.__main__ import IAM

@@ -62,6 +62,10 @@ class ICredentials(ABC):
     def expiry(self, value: Optional[datetime] = None) -> None:
         raise NotImplementedError(_property_message)
 
+    @abstractmethod
+    def to_dict(self) -> dict:
+        raise NotImplementedError(_method_message)
+
 
 class IAccount(ABC):
     """
@@ -85,10 +89,6 @@ class IAccount(ABC):
 
     @abstractmethod
     def __str__(self) -> str:
-        raise NotImplementedError(_method_message)
-
-    @abstractmethod
-    def __dict__(self) -> dict:
         raise NotImplementedError(_method_message)
 
     @abstractmethod

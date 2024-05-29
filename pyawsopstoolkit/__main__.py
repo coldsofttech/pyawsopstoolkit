@@ -130,21 +130,19 @@ class Credentials(ICredentials):
         :return: String representation of Credentials object.
         :rtype: str
         """
-        access_key = f'"{self.access_key}"'
-        secret_access_key = f'"{self.secret_access_key}"'
         token = f'"{self.token}"' if self.token else None
         expiry = f'{self.expiry.isoformat()}' if self.expiry else None
 
         return (
             f'Credentials('
-            f'access_key={access_key},'
-            f'secret_access_key={secret_access_key},'
+            f'access_key="{self.access_key}",'
+            f'secret_access_key="{self.secret_access_key}",'
             f'token={token},'
             f'expiry={expiry}'
             f')'
         )
 
-    def __dict__(self) -> dict:
+    def to_dict(self) -> dict:
         """
         Convert Credentials object to dictionary.
         :return: Dictionary representation of Credentials object.
@@ -205,17 +203,12 @@ class Account(IAccount):
             f')'
         )
 
-    def __dict__(self) -> dict:
+    def to_dict(self) -> dict:
         """
         Return a dictionary representation of the Account object.
         :return: Dictionary representation of the Account object.
         :rtype: dict
         """
-        return {
-            "number": self.number
-        }
-
-    def to_dict(self) -> dict:
         return {
             "number": self.number
         }
