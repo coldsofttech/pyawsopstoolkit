@@ -1,10 +1,5 @@
 __all__ = [
-    "IAMRole",
-    "IAMUser",
-    "IAMRoleLastUsed",
-    "IAMUserLoginProfile",
-    "IAMUserAccessKey",
-    "IAMPermissionsBoundary"
+    "iam"
 ]
 __name__ = "pyawsopstoolkit.models"
 __description__ = """
@@ -13,6 +8,3 @@ AWS Ops Toolkit packages, such as finops and advsearch. These models are meticul
 closely with AWS services and their respective properties, ensuring seamless integration and optimal
 performance.
 """
-
-from pyawsopstoolkit.models.__main__ import IAMRole, IAMRoleLastUsed, IAMPermissionsBoundary, IAMUser, \
-    IAMUserLoginProfile, IAMUserAccessKey

@@ -91,6 +91,10 @@ class IAccount(ABC):
     def __dict__(self) -> dict:
         raise NotImplementedError(_method_message)
 
+    @abstractmethod
+    def to_dict(self) -> dict:
+        raise NotImplementedError(_method_message)
+
 
 class ISession(ABC):
     """

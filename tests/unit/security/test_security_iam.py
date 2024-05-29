@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
+import pyawsopstoolkit.models.iam
 from pyawsopstoolkit import Session, Account
-from pyawsopstoolkit.models import IAMRole, IAMPermissionsBoundary, IAMUser
 from pyawsopstoolkit.security import IAM
 
 
@@ -39,13 +39,13 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_roles.return_value = [
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role1',
                 id='ABCHYSF',
                 arn=f'arn:aws:iam::{self.account.number}:role/test_role1',
                 max_session_duration=3600,
-                permissions_boundary=IAMPermissionsBoundary(
+                permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                     type='Policy',
                     arn=f'arn:aws:iam::{self.account.number}:policy/some_boundary'
                 )
@@ -64,12 +64,12 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_users.return_value = [
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user',
                 id='ABCDEFGH',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user',
-                permissions_boundary=IAMPermissionsBoundary(
+                permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                     type='Policy',
                     arn=f'arn:aws:iam::{self.account.number}:policy/some_boundary'
                 )
@@ -88,25 +88,25 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_roles.return_value = [
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role1',
                 id='ABCHYSF',
                 arn=f'arn:aws:iam::{self.account.number}:role/test_role1',
                 max_session_duration=3600,
-                permissions_boundary=IAMPermissionsBoundary(
+                permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                     type='Policy',
                     arn=f'arn:aws:iam::{self.account.number}:policy/some_boundary'
                 )
             ),
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role2',
                 id='BHGSFA',
                 arn=f'arn:aws:iam::{self.account.number}:role/test_role2',
                 max_session_duration=3600
             ),
-            IAMRole(
+            pyawsopstoolkit.models.iam.role.Role(
                 account=self.account,
                 name='test_role3',
                 id='HYGDSG',
@@ -129,23 +129,23 @@ class TestIAM(unittest.TestCase):
 
         session = Session(profile_name=self.profile_name)
         mock_iam.return_value.search_users.return_value = [
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user1',
                 id='ABCDEFGH',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user1',
-                permissions_boundary=IAMPermissionsBoundary(
+                permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                     type='Policy',
                     arn=f'arn:aws:iam::{self.account.number}:policy/some_boundary'
                 )
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user2',
                 id='BCDGHEY',
                 arn=f'arn:aws:iam::{self.account.number}:user/test_user2'
             ),
-            IAMUser(
+            pyawsopstoolkit.models.iam.user.User(
                 account=self.account,
                 name='test_user3',
                 id='CDGHFYU',

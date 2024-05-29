@@ -3,10 +3,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from typing import Any, Optional
 
-import pyawsopstoolkit.models
 from pyawsopstoolkit.__interfaces__ import IAccount, ISession
 from pyawsopstoolkit.__validations__ import Validation
-from pyawsopstoolkit.models import IAMUserLoginProfile, IAMUserAccessKey
+from pyawsopstoolkit.exceptions import SearchAttributeError
+from pyawsopstoolkit.models.iam import PermissionsBoundary
+from pyawsopstoolkit.models.iam.role import Role, LastUsed
+from pyawsopstoolkit.models.iam.user import User, LoginProfile, AccessKey
 
 MAX_WORKERS = 10
 
@@ -305,7 +307,7 @@ class IAM:
             raise e
 
     @staticmethod
-    def _convert_to_iam_role(account: IAccount, role: dict) -> pyawsopstoolkit.models.IAMRole:
+    def _convert_to_iam_role(account: IAccount, role: dict) -> Role:
         """
         This function transforms the dictionary response from boto3 IAM into a format compatible with the
         AWS Ops Toolkit, adhering to the pyawsopstoolkit.models structure. Additionally, it incorporates
@@ -317,7 +319,7 @@ class IAM:
         :return: An AWS Ops Toolkit compatible object containing all IAM role details.
         :rtype: IAMRole
         """
-        iam_role = pyawsopstoolkit.models.IAMRole(
+        iam_role = Role(
             account=account,
             name=role.get('RoleName', ''),
             id=role.get('RoleId', ''),
@@ -331,7 +333,7 @@ class IAM:
 
         _permissions_boundary = role.get('PermissionsBoundary', {})
         if _permissions_boundary:
-            boundary = pyawsopstoolkit.models.IAMPermissionsBoundary(
+            boundary = PermissionsBoundary(
                 type=_permissions_boundary.get('PermissionsBoundaryType', ''),
                 arn=_permissions_boundary.get('PermissionsBoundaryArn', '')
             )
@@ -339,7 +341,7 @@ class IAM:
 
         _last_used = role.get('RoleLastUsed', {})
         if _last_used:
-            last_used = pyawsopstoolkit.models.IAMRoleLastUsed(
+            last_used = LastUsed(
                 used_date=_last_used.get('LastUsedDate', None),
                 region=_last_used.get('Region', None)
             )
@@ -357,7 +359,7 @@ class IAM:
             user: dict,
             login_profile: Optional[dict] = None,
             access_keys: Optional[list] = None
-    ) -> pyawsopstoolkit.models.IAMUser:
+    ) -> User:
         """
         This function transforms the dictionary response from boto3 IAM into a format compatible with the
         AWS Ops Toolkit, adhering to the pyawsopstoolkit.models structure. Additionally, it incorporates
@@ -373,7 +375,7 @@ class IAM:
         :return: An AWS Ops Toolkit compatible object containing all IAM user details.
         :rtype: IAMUser
         """
-        iam_user = pyawsopstoolkit.models.IAMUser(
+        iam_user = User(
             account=account,
             name=user.get('UserName', ''),
             id=user.get('UserId', ''),
@@ -385,14 +387,14 @@ class IAM:
 
         _permissions_boundary = user.get('PermissionsBoundary', {})
         if _permissions_boundary:
-            boundary = pyawsopstoolkit.models.IAMPermissionsBoundary(
+            boundary = PermissionsBoundary(
                 type=_permissions_boundary.get('PermissionsBoundaryType', ''),
                 arn=_permissions_boundary.get('PermissionsBoundaryArn', '')
             )
             iam_user.permissions_boundary = boundary
 
         if login_profile is not None:
-            _login_profile = IAMUserLoginProfile(
+            _login_profile = LoginProfile(
                 created_date=login_profile.get('CreateDate', None),
                 password_reset_required=login_profile.get('PasswordResetRequired', False)
             )
@@ -400,7 +402,7 @@ class IAM:
 
         if access_keys is not None:
             for a_key in access_keys:
-                _access_key = IAMUserAccessKey(
+                _access_key = AccessKey(
                     id=a_key.get('access_key', {}).get('AccessKeyId', ''),
                     status=a_key.get('access_key', {}).get('Status', ''),
                     created_date=a_key.get('access_key', {}).get('CreateDate', None),
@@ -424,7 +426,7 @@ class IAM:
             condition: str = OR,
             include_details: bool = False,
             **kwargs
-    ) -> list[pyawsopstoolkit.models.IAMRole]:
+    ) -> list[Role]:
         """
         Returns a list of IAM roles using advanced search features supported by the specified arguments.
         For details on supported kwargs, please refer to the readme document.
@@ -529,7 +531,6 @@ class IAM:
             }
 
             if not include_details and any(k in include_details_keys for k in kwargs):
-                from pyawsopstoolkit.exceptions import SearchAttributeError
                 raise SearchAttributeError(
                     f'include_details is required for below keys: {", ".join(sorted(include_details_keys))}'
                 )
@@ -560,7 +561,7 @@ class IAM:
             condition: str = OR,
             include_details: bool = False,
             **kwargs
-    ) -> list[pyawsopstoolkit.models.IAMUser]:
+    ) -> list[User]:
         """
         Returns a list of IAM users using advanced search feature supported by the specified arguments.
         For details on supported kwargs, please refer to the readme document.
@@ -707,7 +708,6 @@ class IAM:
             }
 
             if not include_details and any(k in include_details_keys for k in kwargs):
-                from pyawsopstoolkit.exceptions import SearchAttributeError
                 raise SearchAttributeError(
                     f'include_details is required for below keys: {", ".join(sorted(include_details_keys))}'
                 )

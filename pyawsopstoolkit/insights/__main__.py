@@ -49,7 +49,7 @@ class IAM:
             self,
             no_of_days: Optional[int] = 90,
             include_newly_created: Optional[bool] = False
-    ) -> list[pyawsopstoolkit.models.IAMRole]:
+    ) -> list[pyawsopstoolkit.models.iam.role.Role]:
         """
         Returns a list of unused IAM roles based on the specified parameters.
         :param no_of_days: The number of days (integer) to check if the IAM role has been used within the
@@ -102,7 +102,7 @@ class IAM:
             self,
             no_of_days: Optional[int] = 90,
             include_newly_created: Optional[bool] = False
-    ) -> list[pyawsopstoolkit.models.IAMUser]:
+    ) -> list[pyawsopstoolkit.models.iam.user.User]:
         """
         Returns a list of unused IAM users based on the specified parameters.
         :param no_of_days: The number of days (integer) to check if the IAM user has been used within the

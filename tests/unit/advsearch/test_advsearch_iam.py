@@ -6,8 +6,6 @@ from unittest.mock import patch, MagicMock
 from pyawsopstoolkit import Session, Account
 from pyawsopstoolkit.advsearch import IAM, OR, BETWEEN
 from pyawsopstoolkit.exceptions import SearchAttributeError
-from pyawsopstoolkit.models import IAMRole, IAMPermissionsBoundary, IAMRoleLastUsed, IAMUser, IAMUserLoginProfile, \
-    IAMUserAccessKey
 
 
 class TestIAM(unittest.TestCase):
@@ -71,6 +69,8 @@ class TestIAM(unittest.TestCase):
     def test_search_roles_basic(
             self, mock_region, mock_arn, mock_validation, mock_list_roles, mock_get_session, mock_session
     ):
+        import pyawsopstoolkit
+
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -84,7 +84,7 @@ class TestIAM(unittest.TestCase):
         session = Session(profile_name=self.profile_name)
         iam_object = IAM(session)
         roles_data = mock_list_roles.return_value
-        roles = [IAMRole(
+        roles = [pyawsopstoolkit.models.iam.role.Role(
             account=Account('123456789012'),
             name=role_data['RoleName'],
             id=role_data['RoleId'],
@@ -120,6 +120,8 @@ class TestIAM(unittest.TestCase):
     def test_search_users_basic(
             self, mock_region, mock_arn, mock_validation, mock_list_users, mock_get_session, mock_session
     ):
+        import pyawsopstoolkit
+
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -133,7 +135,7 @@ class TestIAM(unittest.TestCase):
         session = Session(profile_name=self.profile_name)
         iam_object = IAM(session)
         users_data = mock_list_users.return_value
-        users = [IAMUser(
+        users = [pyawsopstoolkit.models.iam.user.User(
             account=Account('123456789012'),
             name=user_data['UserName'],
             id=user_data['UserId'],
@@ -181,6 +183,8 @@ class TestIAM(unittest.TestCase):
     def test_search_roles_with_permissions_boundary(
             self, mock_region, mock_arn, mock_validation, mock_get_role, mock_list_roles, mock_get_session, mock_session
     ):
+        import pyawsopstoolkit
+
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -194,7 +198,7 @@ class TestIAM(unittest.TestCase):
         session = Session(profile_name=self.profile_name)
         iam_object = IAM(session)
         roles_data = mock_get_role.return_value
-        roles = [IAMRole(
+        roles = [pyawsopstoolkit.models.iam.role.Role(
             account=Account('123456789012'),
             name=role_data['RoleName'],
             id=role_data['RoleId'],
@@ -204,7 +208,7 @@ class TestIAM(unittest.TestCase):
             created_date=role_data.get('CreateDate'),
             assume_role_policy_document=None,
             description=role_data.get('Description'),
-            permissions_boundary=IAMPermissionsBoundary(
+            permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                 type=role_data['PermissionsBoundary']['PermissionsBoundaryType'],
                 arn=role_data['PermissionsBoundary']['PermissionsBoundaryArn']
             ),
@@ -248,6 +252,8 @@ class TestIAM(unittest.TestCase):
     def test_search_users_with_permissions_boundary(
             self, mock_region, mock_arn, mock_validation, mock_get_user, mock_list_users, mock_get_session, mock_session
     ):
+        import pyawsopstoolkit
+
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -261,7 +267,7 @@ class TestIAM(unittest.TestCase):
         session = Session(profile_name=self.profile_name)
         iam_object = IAM(session)
         users_data = mock_get_user.return_value
-        users = [IAMUser(
+        users = [pyawsopstoolkit.models.iam.user.User(
             account=Account('123456789012'),
             name=user_data['UserName'],
             id=user_data['UserId'],
@@ -269,7 +275,7 @@ class TestIAM(unittest.TestCase):
             path=user_data['Path'],
             created_date=user_data.get('CreateDate'),
             password_last_used_date=None,
-            permissions_boundary=IAMPermissionsBoundary(
+            permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                 type=user_data['PermissionsBoundary']['PermissionsBoundaryType'],
                 arn=user_data['PermissionsBoundary']['PermissionsBoundaryArn']
             ),
@@ -366,6 +372,8 @@ class TestIAM(unittest.TestCase):
     def test_search_roles_with_last_used(
             self, mock_region, mock_arn, mock_validation, mock_get_role, mock_list_roles, mock_get_session, mock_session
     ):
+        import pyawsopstoolkit
+
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -379,7 +387,7 @@ class TestIAM(unittest.TestCase):
         session = Session(profile_name=self.profile_name)
         iam_object = IAM(session)
         roles_data = mock_get_role.return_value
-        roles = [IAMRole(
+        roles = [pyawsopstoolkit.models.iam.role.Role(
             account=Account('123456789012'),
             name=role_data['RoleName'],
             id=role_data['RoleId'],
@@ -389,11 +397,11 @@ class TestIAM(unittest.TestCase):
             created_date=role_data.get('CreateDate'),
             assume_role_policy_document=None,
             description=role_data.get('Description'),
-            permissions_boundary=IAMPermissionsBoundary(
+            permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                 type=role_data['PermissionsBoundary']['PermissionsBoundaryType'],
                 arn=role_data['PermissionsBoundary']['PermissionsBoundaryArn']
             ),
-            last_used=IAMRoleLastUsed(
+            last_used=pyawsopstoolkit.models.iam.role.LastUsed(
                 used_date=role_data['RoleLastUsed']['LastUsedDate'],
                 region=role_data['RoleLastUsed']['Region']
             ),
@@ -468,6 +476,8 @@ class TestIAM(unittest.TestCase):
     def test_search_roles_with_tags(
             self, mock_region, mock_arn, mock_validation, mock_get_role, mock_list_roles, mock_get_session, mock_session
     ):
+        import pyawsopstoolkit
+
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -481,7 +491,7 @@ class TestIAM(unittest.TestCase):
         session = Session(profile_name=self.profile_name)
         iam_object = IAM(session)
         roles_data = mock_get_role.return_value
-        roles = [IAMRole(
+        roles = [pyawsopstoolkit.models.iam.role.Role(
             account=Account('123456789012'),
             name=role_data['RoleName'],
             id=role_data['RoleId'],
@@ -491,11 +501,11 @@ class TestIAM(unittest.TestCase):
             created_date=role_data.get('CreateDate'),
             assume_role_policy_document=None,
             description=role_data.get('Description'),
-            permissions_boundary=IAMPermissionsBoundary(
+            permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                 type=role_data['PermissionsBoundary']['PermissionsBoundaryType'],
                 arn=role_data['PermissionsBoundary']['PermissionsBoundaryArn']
             ),
-            last_used=IAMRoleLastUsed(
+            last_used=pyawsopstoolkit.models.iam.role.LastUsed(
                 used_date=role_data['RoleLastUsed']['LastUsedDate'],
                 region=role_data['RoleLastUsed']['Region']
             ),
@@ -535,6 +545,8 @@ class TestIAM(unittest.TestCase):
     def test_search_users_with_tags(
             self, mock_region, mock_arn, mock_validation, mock_get_user, mock_list_users, mock_get_session, mock_session
     ):
+        import pyawsopstoolkit
+
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -548,7 +560,7 @@ class TestIAM(unittest.TestCase):
         session = Session(profile_name=self.profile_name)
         iam_object = IAM(session)
         users_data = mock_get_user.return_value
-        users = [IAMUser(
+        users = [pyawsopstoolkit.models.iam.user.User(
             account=Account('123456789012'),
             name=user_data['UserName'],
             id=user_data['UserId'],
@@ -556,7 +568,7 @@ class TestIAM(unittest.TestCase):
             path=user_data['Path'],
             created_date=user_data.get('CreateDate'),
             password_last_used_date=None,
-            permissions_boundary=IAMPermissionsBoundary(
+            permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                 type=user_data['PermissionsBoundary']['PermissionsBoundaryType'],
                 arn=user_data['PermissionsBoundary']['PermissionsBoundaryArn']
             ),
@@ -636,6 +648,8 @@ class TestIAM(unittest.TestCase):
             self, mock_region, mock_arn, mock_validation, mock_get_login_profile, mock_get_user, mock_list_users,
             mock_get_session, mock_session
     ):
+        import pyawsopstoolkit
+
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -650,7 +664,7 @@ class TestIAM(unittest.TestCase):
         iam_object = IAM(session)
         users_data = mock_get_user.return_value
         login_profile_data = mock_get_login_profile.return_value
-        users = [IAMUser(
+        users = [pyawsopstoolkit.models.iam.user.User(
             account=Account('123456789012'),
             name=user_data['UserName'],
             id=user_data['UserId'],
@@ -658,11 +672,11 @@ class TestIAM(unittest.TestCase):
             path=user_data['Path'],
             created_date=user_data.get('CreateDate'),
             password_last_used_date=None,
-            permissions_boundary=IAMPermissionsBoundary(
+            permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                 type=user_data['PermissionsBoundary']['PermissionsBoundaryType'],
                 arn=user_data['PermissionsBoundary']['PermissionsBoundaryArn']
             ),
-            login_profile=IAMUserLoginProfile(
+            login_profile=pyawsopstoolkit.models.iam.user.LoginProfile(
                 created_date=login_profile_data.get('CreateDate')
             ),
             tags=None
@@ -745,6 +759,8 @@ class TestIAM(unittest.TestCase):
             self, mock_region, mock_arn, mock_validation, mock_get_access_key_last_used, mock_list_access_keys,
             mock_get_login_profile, mock_get_user, mock_list_users, mock_get_session, mock_session
     ):
+        import pyawsopstoolkit
+
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
 
@@ -761,7 +777,7 @@ class TestIAM(unittest.TestCase):
         login_profile_data = mock_get_login_profile.return_value
         access_keys = mock_list_access_keys.return_value
         access_key_data = mock_get_access_key_last_used.return_value
-        users = [IAMUser(
+        users = [pyawsopstoolkit.models.iam.user.User(
             account=Account('123456789012'),
             name=user_data['UserName'],
             id=user_data['UserId'],
@@ -769,14 +785,14 @@ class TestIAM(unittest.TestCase):
             path=user_data['Path'],
             created_date=user_data.get('CreateDate'),
             password_last_used_date=None,
-            permissions_boundary=IAMPermissionsBoundary(
+            permissions_boundary=pyawsopstoolkit.models.iam.PermissionsBoundary(
                 type=user_data['PermissionsBoundary']['PermissionsBoundaryType'],
                 arn=user_data['PermissionsBoundary']['PermissionsBoundaryArn']
             ),
-            login_profile=IAMUserLoginProfile(
+            login_profile=pyawsopstoolkit.models.iam.user.LoginProfile(
                 created_date=login_profile_data.get('CreateDate')
             ),
-            access_keys=[IAMUserAccessKey(
+            access_keys=[pyawsopstoolkit.models.iam.user.AccessKey(
                 id=a_key.get('AccessKeyId', ''),
                 status=a_key.get('Status', ''),
                 created_date=a_key.get('CreateDate', None),

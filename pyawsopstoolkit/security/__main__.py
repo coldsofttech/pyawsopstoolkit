@@ -43,7 +43,7 @@ class IAM:
 
         self._session = value
 
-    def roles_without_permissions_boundary(self) -> list[pyawsopstoolkit.models.IAMRole]:
+    def roles_without_permissions_boundary(self) -> list[pyawsopstoolkit.models.iam.role.Role]:
         """
         Returns a list of IAM roles that do not have an associated permissions boundary.
         :return: A list of IAM roles without an associated permissions boundary.
@@ -65,7 +65,7 @@ class IAM:
 
         return roles_without_permissions_boundary
 
-    def users_without_permissions_boundary(self) -> list[pyawsopstoolkit.models.IAMUser]:
+    def users_without_permissions_boundary(self) -> list[pyawsopstoolkit.models.iam.user.User]:
         """
         Returns a list of IAM users that do not have an associated permissions boundary.
         :return: A list of IAM users without an associated permissions boundary.
