@@ -1,5 +1,6 @@
 __all__ = [
-    "iam"
+    "iam",
+    "ec2"
 ]
 __name__ = "pyawsopstoolkit.models"
 __description__ = """
