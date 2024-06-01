@@ -8,7 +8,8 @@ __all__ = [
     "EQUAL_TO",
     "NOT_EQUAL_TO",
     "BETWEEN",
-    "iam"
+    "iam",
+    "ec2"
 ]
 __name__ = "pyawsopstoolkit.advsearch"
 __description__ = """

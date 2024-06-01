@@ -24,3 +24,7 @@ This package supports various conditions for advanced searches, outlined below a
 ## pyawsopstoolkit.advsearch.iam
 
 For detailed information and usage examples about IAM, please refer to the [IAM](IAM.md).
+
+## pyawsopstoolkit.advsearc.ec2
+
+For detailed information and usage examples about EC2, please refer to the [EC2](EC2.md).

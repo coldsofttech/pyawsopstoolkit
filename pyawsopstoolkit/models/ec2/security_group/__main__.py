@@ -1,7 +1,8 @@
 from typing import Optional, Union
 
+from pyawsopstoolkit.__interfaces__ import IAccount
 from pyawsopstoolkit.__validations__ import Validation
-from pyawsopstoolkit.validators import AccountValidator
+from pyawsopstoolkit.validators import AccountValidator, Validator
 
 
 class IPRange:
@@ -773,12 +774,18 @@ class IPPermission:
         :return: Dictionary representation of the IPPermission instance.
         :rtype: dict
         """
-        ip_ranges = self.ip_ranges if self.ip_ranges and len(self.ip_ranges) > 0 else None
-        ipv6_ranges = self.ipv6_ranges if self.ipv6_ranges and len(self.ipv6_ranges) > 0 else None
-        prefix_list_ids = self.prefix_list_ids if self.prefix_list_ids and len(self.prefix_list_ids) > 0 else None
-        user_id_group_pairs = (
-            self.user_id_group_pairs if self.user_id_group_pairs and len(self.user_id_group_pairs) else None
-        )
+        ip_ranges = [
+            ip.to_dict() for ip in self.ip_ranges
+        ] if self.ip_ranges and len(self.ip_ranges) > 0 else None
+        ipv6_ranges = [
+            ip.to_dict() for ip in self.ipv6_ranges
+        ] if self.ipv6_ranges and len(self.ipv6_ranges) > 0 else None
+        prefix_list_ids = [
+            prefix.to_dict() for prefix in self.prefix_list_ids
+        ] if self.prefix_list_ids and len(self.prefix_list_ids) > 0 else None
+        user_id_group_pairs = [
+            pair.to_dict() for pair in self.user_id_group_pairs
+        ] if self.user_id_group_pairs and len(self.user_id_group_pairs) > 0 else None
 
         return {
             "from_port": self.from_port,
@@ -798,6 +805,8 @@ class SecurityGroup:
 
     def __init__(
             self,
+            account: IAccount,
+            region: str,
             id: str,
             name: str,
             owner_id: str,
@@ -809,6 +818,10 @@ class SecurityGroup:
     ) -> None:
         """
         Initializes a new SecurityGroup instance with specified parameters.
+        :param account: The account associated with the EC2 security group.
+        :type account: IAccount
+        :param region: The region associated with the EC2 security group.
+        :type region: str
         :param id: The unique identifier of the EC2 security group.
         :type id: str
         :param name: The name of the EC2 security group.
@@ -826,6 +839,8 @@ class SecurityGroup:
         :param tags: The tags of the EC2 security group.
         :type tags: list
         """
+        Validation.validate_type(account, IAccount, 'account should be of IAccount type.')
+        Validator.region(region, True)
         Validation.validate_type(id, str, 'id should be a string.')
         Validation.validate_type(name, str, 'name should be a string.')
         AccountValidator.number(owner_id)
@@ -833,9 +848,9 @@ class SecurityGroup:
         Validation.validate_type(ip_permissions, Union[list, None], 'ip_permissions should be a list of IPPermission.')
         if ip_permissions is not None and len(ip_permissions) > 0:
             all(
-                Validation.validate_type(ip_permission, IPPermission,
-                                         'ip_permissions should be a list of IPPermission.')
-                for ip_permission in ip_permissions
+                Validation.validate_type(
+                    ip_permission, IPPermission, 'ip_permissions should be a list of IPPermission.'
+                ) for ip_permission in ip_permissions
             )
         Validation.validate_type(
             ip_permissions_egress, Union[list, None], 'ip_permissions_egress should be a list of IPPermission.'
@@ -844,12 +859,13 @@ class SecurityGroup:
             all(
                 Validation.validate_type(
                     ip_permission, IPPermission, 'ip_permissions_egress should be a list of IPPermission.'
-                )
-                for ip_permission in ip_permissions_egress
+                ) for ip_permission in ip_permissions_egress
             )
         Validation.validate_type(description, Union[str, None], 'description should be a string.')
         Validation.validate_type(tags, Union[list, None], 'tags should be a list.')
 
+        self._account = account
+        self._region = region
         self._id = id
         self._name = name
         self._owner_id = owner_id
@@ -858,6 +874,25 @@ class SecurityGroup:
         self._ip_permissions_egress = ip_permissions_egress
         self._description = description
         self._tags = tags
+
+    @property
+    def account(self) -> IAccount:
+        """
+        Gets the account associated with the EC2 security group.
+        :return: The account associated with the EC2 security group.
+        :rtype: IAccount
+        """
+        return self._account
+
+    @account.setter
+    def account(self, value: IAccount) -> None:
+        """
+        Sets the account associated with the EC2 security group.
+        :param value: The account to be associated with the EC2 security group.
+        :type value: IAccount
+        """
+        Validation.validate_type(value, IAccount, 'account should be of Account type.')
+        self._account = value
 
     @property
     def description(self) -> Optional[str]:
@@ -987,6 +1022,25 @@ class SecurityGroup:
         self._owner_id = value
 
     @property
+    def region(self) -> str:
+        """
+        Gets the region associated with the EC2 security group.
+        :return: The region associated with the EC2 security group.
+        :rtype: str
+        """
+        return self._region
+
+    @region.setter
+    def region(self, value: str) -> None:
+        """
+        Sets the region associated with the EC2 security group.
+        :param value: The region associated with the EC2 security group.
+        :type value: str
+        """
+        Validator.region(value, True)
+        self._region = value
+
+    @property
     def tags(self) -> Optional[list]:
         """
         Gets the tags of the EC2 security group.
@@ -1039,6 +1093,8 @@ class SecurityGroup:
 
         return (
             f'SecurityGroup('
+            f'account={self.account},'
+            f'region="{self.region}",'
             f'id="{self.id}",'
             f'name="{self.name}",'
             f'owner_id="{self.owner_id}",'
@@ -1056,13 +1112,17 @@ class SecurityGroup:
         :return: Dictionary representation of the SecurityGroup instance.
         :rtype: dict
         """
-        ip_permissions = self.ip_permissions if self.ip_permissions and len(self.ip_permissions) > 0 else None
-        ip_permissions_egress = (
-            self.ip_permissions_egress if self.ip_permissions_egress and len(self.ip_permissions_egress) > 0 else None
-        )
+        ip_permissions = [
+            ip_perm.to_dict() for ip_perm in self.ip_permissions
+        ] if self.ip_permissions and len(self.ip_permissions) else None
+        ip_permissions_egress = [
+            ip_perm.to_dict() for ip_perm in self.ip_permissions_egress
+        ] if self.ip_permissions_egress and len(self.ip_permissions_egress) else None
         tags = self.tags if self.tags else None
 
         return {
+            "account": self.account.to_dict(),
+            "region": self.region,
             "id": self.id,
             "name": self.name,
             "owner_id": self.owner_id,

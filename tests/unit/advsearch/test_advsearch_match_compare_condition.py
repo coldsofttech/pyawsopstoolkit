@@ -7,6 +7,7 @@ from pyawsopstoolkit.advsearch.__main__ import _match_compare_condition
 
 
 class TestMatchCompareCondition(unittest.TestCase):
+    """Unit test cases for _match_compare_condition."""
 
     def test_less_than(self):
         self.assertTrue(_match_compare_condition({LESS_THAN: 10}, 5, AND, True))

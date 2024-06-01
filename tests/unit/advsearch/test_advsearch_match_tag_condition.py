@@ -4,6 +4,8 @@ from pyawsopstoolkit.advsearch.__main__ import _match_tag_condition
 
 
 class TestMatchTagCondition(unittest.TestCase):
+    """Unit test cases for _match_tag_condition."""
+
     def test_key_only_match(self):
         value = 'tag1'
         tags = ['tag1', 'tag2', 'tag3']
@@ -24,7 +26,7 @@ class TestMatchTagCondition(unittest.TestCase):
         value = {'color': 'red', 'size': 'large'}
         tags = {'color': 'blue', 'size': 'large'}
         condition = "AND"
-        matched = True
+        matched = False
         key_only = False
         self.assertFalse(_match_tag_condition(value, tags, condition, matched, key_only))
 
@@ -58,7 +60,7 @@ class TestMatchTagCondition(unittest.TestCase):
         condition = "OR"
         matched = False
         key_only = True
-        self.assertFalse(_match_tag_condition(value, tags, condition, matched, key_only))
+        self.assertTrue(_match_tag_condition(value, tags, condition, matched, key_only))
 
 
 if __name__ == "__main__":

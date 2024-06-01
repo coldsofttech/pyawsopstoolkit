@@ -154,10 +154,10 @@ class TestIPPermission(unittest.TestCase):
             "from_port": self.from_port,
             "to_port": self.to_port,
             "ip_protocol": self.ip_protocol,
-            "ip_ranges": self.ip_ranges,
-            "ipv6_ranges": self.ipv6_ranges,
-            "prefix_list_ids": self.prefix_list_ids,
-            "user_id_group_pairs": self.user_id_group_pairs
+            "ip_ranges": [ip_range.to_dict() for ip_range in self.ip_ranges],
+            "ipv6_ranges": [ip_range.to_dict() for ip_range in self.ipv6_ranges],
+            "prefix_list_ids": [prefix.to_dict() for prefix in self.prefix_list_ids],
+            "user_id_group_pairs": [pair.to_dict() for pair in self.user_id_group_pairs]
         }
         self.assertDictEqual(self.ip_permission_full.to_dict(), expected_dict)
 

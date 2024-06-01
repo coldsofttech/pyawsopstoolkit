@@ -1,5 +1,6 @@
 import unittest
 
+from pyawsopstoolkit import Account
 from pyawsopstoolkit.models.ec2.security_group import IPPermission, SecurityGroup
 
 
@@ -7,6 +8,8 @@ class TestSecurityGroup(unittest.TestCase):
     """Unit test cases for SecurityGroup."""
 
     def setUp(self) -> None:
+        self.account = Account('123456789012')
+        self.region = 'eu-west-1'
         self.id = 'sg-12345678'
         self.name = 'web-servers-sg'
         self.owner_id = '123456789012'
@@ -21,25 +24,28 @@ class TestSecurityGroup(unittest.TestCase):
         self.tags = [
             {'Key': 'test_key', 'Value': 'test_value'}
         ]
-        self.security_group = SecurityGroup(self.id, self.name, self.owner_id, self.vpc_id)
+        self.security_group = SecurityGroup(self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id)
         self.security_group_with_ip_permissions = SecurityGroup(
-            self.id, self.name, self.owner_id, self.vpc_id, self.ip_permissions
+            self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id, self.ip_permissions
         )
         self.security_group_with_ip_permissions_egress = SecurityGroup(
-            self.id, self.name, self.owner_id, self.vpc_id, ip_permissions_egress=self.ip_permissions_egress
+            self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id,
+            ip_permissions_egress=self.ip_permissions_egress
         )
         self.security_group_with_desc = SecurityGroup(
-            self.id, self.name, self.owner_id, self.vpc_id, description=self.description
+            self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id, description=self.description
         )
         self.security_group_with_tags = SecurityGroup(
-            self.id, self.name, self.owner_id, self.vpc_id, tags=self.tags
+            self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id, tags=self.tags
         )
         self.security_group_full = SecurityGroup(
-            self.id, self.name, self.owner_id, self.vpc_id, self.ip_permissions, self.ip_permissions_egress,
-            self.description, self.tags
+            self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id, self.ip_permissions,
+            self.ip_permissions_egress, self.description, self.tags
         )
 
     def test_initialization(self):
+        self.assertEqual(self.security_group.account, self.account)
+        self.assertEqual(self.security_group.region, self.region)
         self.assertEqual(self.security_group.id, self.id)
         self.assertEqual(self.security_group.name, self.name)
         self.assertEqual(self.security_group.owner_id, self.owner_id)
@@ -50,6 +56,8 @@ class TestSecurityGroup(unittest.TestCase):
         self.assertIsNone(self.security_group.tags)
 
     def test_initialization_with_ip_permissions(self):
+        self.assertEqual(self.security_group_with_ip_permissions.account, self.account)
+        self.assertEqual(self.security_group_with_ip_permissions.region, self.region)
         self.assertEqual(self.security_group_with_ip_permissions.id, self.id)
         self.assertEqual(self.security_group_with_ip_permissions.name, self.name)
         self.assertEqual(self.security_group_with_ip_permissions.owner_id, self.owner_id)
@@ -60,6 +68,8 @@ class TestSecurityGroup(unittest.TestCase):
         self.assertIsNone(self.security_group_with_ip_permissions.tags)
 
     def test_initialization_with_ip_permissions_egress(self):
+        self.assertEqual(self.security_group_with_ip_permissions_egress.account, self.account)
+        self.assertEqual(self.security_group_with_ip_permissions_egress.region, self.region)
         self.assertEqual(self.security_group_with_ip_permissions_egress.id, self.id)
         self.assertEqual(self.security_group_with_ip_permissions_egress.name, self.name)
         self.assertEqual(self.security_group_with_ip_permissions_egress.owner_id, self.owner_id)
@@ -72,6 +82,8 @@ class TestSecurityGroup(unittest.TestCase):
         self.assertIsNone(self.security_group_with_ip_permissions_egress.tags)
 
     def test_initialization_with_desc(self):
+        self.assertEqual(self.security_group_with_desc.account, self.account)
+        self.assertEqual(self.security_group_with_desc.region, self.region)
         self.assertEqual(self.security_group_with_desc.id, self.id)
         self.assertEqual(self.security_group_with_desc.name, self.name)
         self.assertEqual(self.security_group_with_desc.owner_id, self.owner_id)
@@ -82,6 +94,8 @@ class TestSecurityGroup(unittest.TestCase):
         self.assertIsNone(self.security_group_with_desc.tags)
 
     def test_initialization_with_tags(self):
+        self.assertEqual(self.security_group_with_tags.account, self.account)
+        self.assertEqual(self.security_group_with_tags.region, self.region)
         self.assertEqual(self.security_group_with_tags.id, self.id)
         self.assertEqual(self.security_group_with_tags.name, self.name)
         self.assertEqual(self.security_group_with_tags.owner_id, self.owner_id)
@@ -92,6 +106,8 @@ class TestSecurityGroup(unittest.TestCase):
         self.assertEqual(self.security_group_with_tags.tags, self.tags)
 
     def test_initialization_full(self):
+        self.assertEqual(self.security_group_full.account, self.account)
+        self.assertEqual(self.security_group_full.region, self.region)
         self.assertEqual(self.security_group_full.id, self.id)
         self.assertEqual(self.security_group_full.name, self.name)
         self.assertEqual(self.security_group_full.owner_id, self.owner_id)
@@ -100,6 +116,16 @@ class TestSecurityGroup(unittest.TestCase):
         self.assertEqual(self.security_group_full.ip_permissions_egress, self.ip_permissions_egress)
         self.assertEqual(self.security_group_full.description, self.description)
         self.assertEqual(self.security_group_full.tags, self.tags)
+
+    def test_set_account(self):
+        new_account = Account('987654321012')
+        self.security_group_full.account = new_account
+        self.assertEqual(self.security_group_full.account, new_account)
+
+    def test_set_region(self):
+        new_region = 'us-east-2'
+        self.security_group_full.region = new_region
+        self.assertEqual(self.security_group_full.region, new_region)
 
     def test_set_id(self):
         new_id = 'sg-87654321'
@@ -150,6 +176,8 @@ class TestSecurityGroup(unittest.TestCase):
     def test_str(self):
         expected_str = (
             f'SecurityGroup('
+            f'account={self.account},'
+            f'region="{self.region}",'
             f'id="{self.id}",'
             f'name="{self.name}",'
             f'owner_id="{self.owner_id}",'
@@ -164,12 +192,14 @@ class TestSecurityGroup(unittest.TestCase):
 
     def test_to_dict(self):
         expected_dict = {
+            "account": self.account.to_dict(),
+            "region": self.region,
             "id": self.id,
             "name": self.name,
             "owner_id": self.owner_id,
             "vpc_id": self.vpc_id,
-            "ip_permissions": self.ip_permissions,
-            "ip_permissions_egress": self.ip_permissions_egress,
+            "ip_permissions": [ip_perm.to_dict() for ip_perm in self.ip_permissions],
+            "ip_permissions_egress": [ip_perm.to_dict() for ip_perm in self.ip_permissions_egress],
             "description": self.description,
             "tags": self.tags
         }

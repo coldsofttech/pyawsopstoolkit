@@ -5,6 +5,8 @@ from pyawsopstoolkit.advsearch.__main__ import _match_condition
 
 
 class TestMatchCondition(unittest.TestCase):
+    """Unit test cases for _match_condition."""
+
     def test_match_condition_or_true(self):
         self.assertTrue(_match_condition("admin", "Administrator", OR, False))
 
