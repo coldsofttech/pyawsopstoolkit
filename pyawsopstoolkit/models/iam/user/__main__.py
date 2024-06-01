@@ -657,7 +657,9 @@ class User:
         permissions_boundary = self.permissions_boundary.to_dict() if self.permissions_boundary else None
         tags = self.tags if self.tags else None
         login_profile = self.login_profile.to_dict() if self.login_profile else None
-        access_keys = self.access_keys if self.access_keys and len(self.access_keys) > 0 else None
+        access_keys = [
+            key.to_dict() for key in self.access_keys
+        ] if self.access_keys and len(self.access_keys) > 0 else None
 
         return {
             "account": account,

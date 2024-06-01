@@ -9,7 +9,7 @@ from pyawsopstoolkit.advsearch import OR, AND
 from pyawsopstoolkit.advsearch.__main__ import _match_compare_condition, _match_tag_condition, _match_condition
 from pyawsopstoolkit.advsearch.iam.__handlers__ import _get_role, _list_roles, _get_user, _get_login_profile, \
     _list_access_keys, _get_access_key_last_used, _list_users
-from pyawsopstoolkit.exceptions import SearchAttributeError
+from pyawsopstoolkit.exceptions import SearchAttributeError, AdvanceSearchError
 
 
 class Role:
@@ -60,9 +60,10 @@ class Role:
         :return: An AWS Ops Toolkit compatible object containing all IAM role details.
         :rtype: pyawsopstoolkit.models.iam.role.Role
         """
-        import pyawsopstoolkit
+        from pyawsopstoolkit.models.iam.role import Role, LastUsed
+        from pyawsopstoolkit.models.iam import PermissionsBoundary
 
-        iam_role = pyawsopstoolkit.models.iam.role.Role(
+        iam_role = Role(
             account=account,
             name=role.get('RoleName', ''),
             id=role.get('RoleId', ''),
@@ -74,25 +75,21 @@ class Role:
             description=role.get('Description', None)
         )
 
-        _permissions_boundary = role.get('PermissionsBoundary', {})
-        if _permissions_boundary:
-            boundary = pyawsopstoolkit.models.iam.PermissionsBoundary(
-                type=_permissions_boundary.get('PermissionsBoundaryType', ''),
-                arn=_permissions_boundary.get('PermissionsBoundaryArn', '')
+        boundary = role.get('PermissionsBoundary', {})
+        if boundary:
+            iam_role.permissions_boundary = PermissionsBoundary(
+                type=boundary.get('PermissionsBoundaryType', ''),
+                arn=boundary.get('PermissionsBoundaryArn', '')
             )
-            iam_role.permissions_boundary = boundary
 
-        _last_used = role.get('RoleLastUsed', {})
-        if _last_used:
-            last_used = pyawsopstoolkit.models.iam.role.LastUsed(
-                used_date=_last_used.get('LastUsedDate', None),
-                region=_last_used.get('Region', None)
+        last_used = role.get('RoleLastUsed')
+        if last_used:
+            iam_role.last_used = LastUsed(
+                used_date=last_used.get('LastUsedDate', None),
+                region=last_used.get('Region', None)
             )
-            iam_role.last_used = last_used
 
-        _tags = role.get('Tags', [])
-        if _tags:
-            iam_role.tags = _tags
+        iam_role.tags = role.get('Tags', [])
 
         return iam_role
 
@@ -227,7 +224,7 @@ class Role:
                         if role_result is not None:
                             roles_to_return.append(role_result)
         except ClientError as e:
-            raise e
+            raise AdvanceSearchError('search_roles', e)
 
         return roles_to_return
 
@@ -289,9 +286,10 @@ class User:
         :return: An AWS Ops Toolkit compatible object containing all IAM user details.
         :rtype: pyawsopstoolkit.models.iam.user.User
         """
-        import pyawsopstoolkit
+        from pyawsopstoolkit.models.iam.user import User, AccessKey, LoginProfile
+        from pyawsopstoolkit.models.iam import PermissionsBoundary
 
-        iam_user = pyawsopstoolkit.models.iam.user.User(
+        iam_user = User(
             account=account,
             name=user.get('UserName', ''),
             id=user.get('UserId', ''),
@@ -301,39 +299,33 @@ class User:
             password_last_used_date=user.get('PasswordLastUsed', None)
         )
 
-        _permissions_boundary = user.get('PermissionsBoundary', {})
-        if _permissions_boundary:
-            boundary = pyawsopstoolkit.models.iam.PermissionsBoundary(
-                type=_permissions_boundary.get('PermissionsBoundaryType', ''),
-                arn=_permissions_boundary.get('PermissionsBoundaryArn', '')
+        boundary = user.get('PermissionsBoundary', {})
+        if boundary:
+            iam_user.permissions_boundary = PermissionsBoundary(
+                type=boundary.get('PermissionsBoundaryType', ''),
+                arn=boundary.get('PermissionsBoundaryArn', '')
             )
-            iam_user.permissions_boundary = boundary
 
-        if login_profile is not None:
-            _login_profile = pyawsopstoolkit.models.iam.user.LoginProfile(
+        if login_profile:
+            iam_user.login_profile = LoginProfile(
                 created_date=login_profile.get('CreateDate', None),
                 password_reset_required=login_profile.get('PasswordResetRequired', False)
             )
-            iam_user.login_profile = _login_profile
 
-        if access_keys is not None:
-            for a_key in access_keys:
-                _access_key = pyawsopstoolkit.models.iam.user.AccessKey(
-                    id=a_key.get('access_key', {}).get('AccessKeyId', ''),
-                    status=a_key.get('access_key', {}).get('Status', ''),
-                    created_date=a_key.get('access_key', {}).get('CreateDate', None),
-                    last_used_date=a_key.get('last_used', {}).get('AccessKeyLastUsed', {}).get('LastUsedDate', None),
-                    last_used_service=a_key.get('last_used', {}).get('AccessKeyLastUsed', {}).get('ServiceName', None),
-                    last_used_region=a_key.get('last_used', {}).get('AccessKeyLastUsed', {}).get('Region', None)
+        if access_keys:
+            iam_user.access_keys = [
+                AccessKey(
+                    id=key.get('access_key', {}).get('AccessKeyId', ''),
+                    status=key.get('access_key', {}).get('Status', ''),
+                    created_date=key.get('access_key', {}).get('CreateDate', None),
+                    last_used_date=key.get('last_used', {}).get('AccessKeyLastUsed', {}).get('LastUsedDate', None),
+                    last_used_service=key.get('last_used', {}).get('AccessKeyLastUsed', {}).get('ServiceName', None),
+                    last_used_region=key.get('last_used', {}).get('AccessKeyLastUsed', {}).get('Region', None)
                 )
-                if iam_user.access_keys is None:
-                    iam_user.access_keys = [_access_key]
-                else:
-                    iam_user.access_keys.append(_access_key)
+                for key in access_keys
+            ]
 
-        _tags = user.get('Tags', [])
-        if _tags:
-            iam_user.tags = _tags
+        iam_user.tags = user.get('Tags', [])
 
         return iam_user
 
@@ -513,6 +505,6 @@ class User:
                         if user_result is not None:
                             users_to_return.append(user_result)
         except ClientError as e:
-            raise e
+            raise AdvanceSearchError('search_users', e)
 
         return users_to_return

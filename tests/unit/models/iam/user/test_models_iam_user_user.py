@@ -253,7 +253,7 @@ class TestUser(unittest.TestCase):
             "password_last_used_date": self.pwd_used_date.isoformat(),
             "permissions_boundary": self.permissions_boundary.to_dict(),
             "login_profile": self.login_profile.to_dict(),
-            "access_keys": self.access_keys,
+            "access_keys": [key.to_dict() for key in self.access_keys],
             "tags": self.tags
         }
         self.assertDictEqual(self.user_full.to_dict(), expected_dict)

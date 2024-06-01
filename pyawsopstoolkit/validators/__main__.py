@@ -1,6 +1,7 @@
 import re
 from typing import Optional, Union
 
+from pyawsopstoolkit.__globals__ import AWS_REGION_CODES
 from pyawsopstoolkit.exceptions import ValidationError
 
 
@@ -751,7 +752,11 @@ class Validator:
             'https://docs.aws.amazon.com/organizations/latest/APIReference/API_DescribeAccount.html'
         )
 
-        if not _check_type(value, str, raise_error, error_message) or not re.match(cls.REGION_PATTERN, value):
+        if (
+                not _check_type(value, str, raise_error, error_message)
+                or not re.match(cls.REGION_PATTERN, value)
+                or value not in AWS_REGION_CODES
+        ):
             if raise_error:
                 raise ValidationError(error_message)
             return False
