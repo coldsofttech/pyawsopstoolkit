@@ -16,8 +16,6 @@ A class representing the access key information of an IAM user.
 
 ### Methods
 
-- `__str__() -> str`: Returns a string representation of the **AccessKey** object.
-- `__repr__() -> str`: Returns a detailed string representation of the **AccessKey** object.
 - `to_dict() -> dict`: Returns a dictionary representation of the **AccessKey** object.
 
 ### Properties

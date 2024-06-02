@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Union
 
@@ -7,198 +8,38 @@ from pyawsopstoolkit.models.iam import PermissionsBoundary
 from pyawsopstoolkit.validators import Validator, ArnValidator
 
 
+@dataclass
 class AccessKey:
     """
     A class representing the access key information of an IAM user.
     """
+    id: str
+    status: str
+    created_date: Optional[datetime] = None
+    last_used_date: Optional[datetime] = None
+    last_used_service: Optional[str] = None
+    last_used_region: Optional[str] = None
 
-    def __init__(
-            self,
-            id: str,
-            status: str,
-            created_date: Optional[datetime] = None,
-            last_used_date: Optional[datetime] = None,
-            last_used_service: Optional[str] = None,
-            last_used_region: Optional[str] = None
-    ) -> None:
-        """
-        Initializes the AccessKey instance.
-        :param id: The ID of the IAM user access key.
-        :type id: str
-        :param status: The status of the IAM user access key.
-        :type status: str
-        :param created_date: The created date of the IAM user access key. Defaults to None.
-        :type created_date: datetime
-        :param last_used_date: The last used date of the IAM user access key. Defaults to None.
-        :type last_used_date: datetime
-        :param last_used_service: The last used service of the IAM user access key. Defaults to None.
-        :type last_used_service: str
-        :param last_used_region: The last used region of the IAM user access key. Defaults to None.
-        :type last_used_region: str
-        """
-        Validation.validate_type(id, str, 'id should be a string.')
-        Validation.validate_type(status, str, 'status should be a string.')
-        Validation.validate_type(created_date, Union[datetime, None], 'created_date should be a datetime.')
-        Validation.validate_type(last_used_date, Union[datetime, None], 'last_used_date should be a datetime.')
-        Validation.validate_type(last_used_service, Union[str, None], 'last_used_service should be a string.')
-        if last_used_region is not None:
-            Validator.region(last_used_region)
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._id = id
-        self._status = status
-        self._created_date = created_date
-        self._last_used_date = last_used_date
-        self._last_used_service = last_used_service
-        self._last_used_region = last_used_region
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['id', 'status']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+        elif field_name in ['created_date', 'last_used_date']:
+            Validation.validate_type(field_value, Union[datetime, None], f'{field_name} should be a datetime.')
+        elif field_name in ['last_used_service']:
+            Validation.validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
+        elif field_name in ['last_used_region']:
+            if field_value is not None:
+                Validator.region(field_value, True)
 
-    @property
-    def created_date(self) -> Optional[datetime]:
-        """
-        Gets the created date of the IAM user access key.
-        :return: The created date of the IAM user access key.
-        :rtype: datetime
-        """
-        return self._created_date
-
-    @created_date.setter
-    def created_date(self, value: Optional[datetime]) -> None:
-        """
-        Sets the created date of the IAM user access key.
-        :param value: The created date of the IAM user access key.
-        :type value: datetime
-        """
-        Validation.validate_type(value, Union[datetime, None], 'created_date should be a datetime.')
-
-        self._created_date = value
-
-    @property
-    def id(self) -> str:
-        """
-        Gets the ID of the IAM user access key.
-        :return: The ID of the IAM user access key.
-        :rtype: str
-        """
-        return self._id
-
-    @id.setter
-    def id(self, value: str) -> None:
-        """
-        Sets the ID of the IAM user access key.
-        :param value: The ID of the IAM user access key.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'id should be a string.')
-
-        self._id = value
-
-    @property
-    def last_used_date(self) -> Optional[datetime]:
-        """
-        Gets the last used date of the IAM user access key.
-        :return: The last used date of the IAM user access key.
-        :rtype: datetime
-        """
-        return self._last_used_date
-
-    @last_used_date.setter
-    def last_used_date(self, value: Optional[datetime]) -> None:
-        """
-        Sets the last used date of the IAM user access key.
-        :param value: The last used date of the IAM user access key.
-        :type value: datetime
-        """
-        Validation.validate_type(value, Union[datetime, None], 'last_used_date should be a datetime.')
-
-        self._last_used_date = value
-
-    @property
-    def last_used_region(self) -> Optional[str]:
-        """
-        Gets the last used region of the IAM user access key.
-        :return: The last used region of the IAM user access key.
-        :rtype: str
-        """
-        return self._last_used_region
-
-    @last_used_region.setter
-    def last_used_region(self, value: Optional[str]) -> None:
-        """
-        Sets the last used region of the IAM user access key.
-        :param value: The last used region of the IAM user access key.
-        :type value: str
-        """
-        if value is not None:
-            Validator.region(value)
-
-        self._last_used_region = value
-
-    @property
-    def last_used_service(self) -> Optional[str]:
-        """
-        Gets the last used service of the IAM user access key.
-        :return: The last used service of the IAM user access key.
-        :rtype: str
-        """
-        return self._last_used_service
-
-    @last_used_service.setter
-    def last_used_service(self, value: Optional[str]) -> None:
-        """
-        Sets the last used service of the IAM user access key.
-        :param value: The last used service of the IAM user access key.
-        :type value: str
-        """
-        Validation.validate_type(value, Union[str, None], 'last_used_service should be a string.')
-
-        self._last_used_service = value
-
-    @property
-    def status(self) -> str:
-        """
-        Gets the status of the IAM user access key.
-        :return: The status of the IAM user access key.
-        :rtype: str
-        """
-        return self._status
-
-    @status.setter
-    def status(self, value: str) -> None:
-        """
-        Sets the status of the IAM user access key.
-        :param value: The status of the IAM user access key.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'status should be a string.')
-
-        self._status = value
-
-    def __str__(self) -> str:
-        """
-        Return a string representation of the AccessKey object.
-        :return: String representation of the AccessKey object.
-        :rtype: str
-        """
-        created_date = self.created_date.isoformat() if self.created_date else None
-        last_used_date = self.last_used_date.isoformat() if self._last_used_date else None
-
-        return (
-            f'AccessKey('
-            f'id="{self.id}",'
-            f'status="{self.status}",'
-            f'created_date={created_date},'
-            f'last_used_date={last_used_date},'
-            f'last_used_service="{self.last_used_service}",'
-            f'last_used_region="{self.last_used_region}"'
-            f')'
-        )
-
-    def __repr__(self) -> str:
-        """
-        Returns a detailed string representation of the AccessKey object.
-        :return: Detailed string representation of the AccessKey object.
-        :rtype: str
-        """
-        return self.__str__()
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def to_dict(self) -> dict:
         """
@@ -206,14 +47,11 @@ class AccessKey:
         :return: Dictionary representation of the AccessKey object.
         :rtype: dict
         """
-        created_date = self.created_date.isoformat() if self.created_date else None
-        last_used_date = self.last_used_date.isoformat() if self._last_used_date else None
-
         return {
             "id": self.id,
             "status": self.status,
-            "created_date": created_date,
-            "last_used_date": last_used_date,
+            "created_date": self.created_date.isoformat() if self.created_date is not None else None,
+            "last_used_date": self.last_used_date.isoformat() if self.last_used_date is not None else None,
             "last_used_service": self.last_used_service,
             "last_used_region": self.last_used_region
         }
