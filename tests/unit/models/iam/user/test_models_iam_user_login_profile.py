@@ -13,7 +13,7 @@ class TestLoginProfile(unittest.TestCase):
             'created_date': datetime(2023, 5, 18),
             'pwd_reset': True
         }
-        self.login_profile_empty = LoginProfile()
+        self.login_profile_empty = self.create_login_profile()
         self.login_profile_with_date = self.create_login_profile(created_date=self.params['created_date'])
         self.login_profile_with_pwd_reset = self.create_login_profile(password_reset_required=self.params['pwd_reset'])
         self.login_profile = self.create_login_profile(

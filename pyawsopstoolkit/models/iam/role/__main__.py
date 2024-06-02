@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Union
 
@@ -7,81 +8,30 @@ from pyawsopstoolkit.models.iam.__main__ import PermissionsBoundary
 from pyawsopstoolkit.validators import Validator, ArnValidator
 
 
+@dataclass
 class LastUsed:
     """
     A class representing the last used information of an IAM role.
     """
+    used_date: Optional[datetime] = None
+    region: Optional[str] = None
 
-    def __init__(self, used_date: Optional[datetime] = None, region: Optional[str] = None) -> None:
-        """
-        Initializes the LastUsed instance with optional used_date and region.
-        :param used_date: The last date and time the IAM role was used.
-        :type used_date: datetime
-        :param region: The AWS region where the IAM role was last used.
-        :type region: str
-        """
-        Validation.validate_type(used_date, Union[datetime, None], 'used_date should be a datetime.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        if region is not None:
-            Validator.region(region, True)
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['used_date']:
+            Validation.validate_type(field_value, Union[datetime, None], f'{field_name} should be a datetime.')
+        elif field_name in ['region']:
+            if field_value is not None:
+                Validator.region(field_value, True)
 
-        self._used_date = used_date
-        self._region = region
-
-    @property
-    def region(self) -> Optional[str]:
-        """
-        Gets the AWS region where the IAM role was last used.
-        :return: The AWS region where the IAM role was last used.
-        :rtype: str
-        """
-        return self._region
-
-    @region.setter
-    def region(self, value: Optional[str]) -> None:
-        """
-        Sets the AWS region where the IAM role was last used.
-        :param value: The AWS region to set.
-        :type value: str
-        """
-        if value is not None:
-            Validator.region(value, True)
-        self._region = value
-
-    @property
-    def used_date(self) -> Optional[datetime]:
-        """
-        Gets the last date and time the IAM role was used.
-        :return: The last date and time the IAM role was used.
-        :rtype: datetime
-        """
-        return self._used_date
-
-    @used_date.setter
-    def used_date(self, value: Optional[datetime]) -> None:
-        """
-        Sets the last date and time the IAM role was used.
-        :param value: The last date and time to set.
-        :type value: datetime
-        """
-        Validation.validate_type(value, Union[datetime, None], 'used_date should be a datetime.')
-        self._used_date = value
-
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the LastUsed instance.
-        :return: String representation of the LastUsed instance.
-        :rtype: str
-        """
-        used_date = self.used_date.isoformat() if self.used_date else None
-        region = self.region if self.region else None
-
-        return (
-            f'LastUsed('
-            f'used_date={used_date},'
-            f'region="{region}"'
-            f')'
-        )
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def to_dict(self) -> dict:
         """
@@ -89,12 +39,9 @@ class LastUsed:
         :return: Dictionary representation of the LastUsed instance.
         :rtype: dict
         """
-        used_date = self.used_date.isoformat() if self.used_date else None
-        region = self.region if self.region else None
-
         return {
-            "used_date": used_date,
-            "region": region
+            "used_date": self.used_date.isoformat() if self.used_date is not None else None,
+            "region": self.region
         }
 
 

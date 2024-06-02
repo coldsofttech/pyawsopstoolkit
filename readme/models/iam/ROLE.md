@@ -17,7 +17,6 @@ The `LastUsed` class encapsulates the information regarding the last time an IAM
 
 ### Methods
 
-- `__str__() -> str`: Returns a string representation of the **LastUsed** object.
 - `to_dict() -> dict`: Returns a dictionary representation of the **LastUsed** object.
 
 ### Properties
