@@ -57,83 +57,29 @@ class AccessKey:
         }
 
 
+@dataclass
 class LoginProfile:
     """
     A class representing the login profile information of an IAM user.
     """
+    created_date: Optional[datetime] = None
+    password_reset_required: Optional[bool] = False
 
-    def __init__(
-            self,
-            created_date: Optional[datetime] = None,
-            password_reset_required: Optional[bool] = False
-    ) -> None:
-        """
-        Initialize the LoginProfile object.
-        :param created_date: The created date of the IAM user login profile.
-        :type created_date: datetime
-        :param password_reset_required: Flag to indicate if password reset required for the IAM user. Defaults to False.
-        :type password_reset_required: bool
-        """
-        Validation.validate_type(created_date, Union[datetime, None], 'created_date should be a datetime.')
-        Validation.validate_type(password_reset_required, bool, 'password_reset_required should be a boolean.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._created_date = created_date
-        self._password_reset_required = password_reset_required
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['created_date']:
+            Validation.validate_type(field_value, Union[datetime, None], f'{field_name} should be a datetime.')
+        elif field_name in ['password_reset_required']:
+            Validation.validate_type(field_value, Union[bool, None], f'{field_name} should be a boolean.')
 
-    @property
-    def created_date(self) -> Optional[datetime]:
-        """
-        Gets the created date of the IAM user login profile.
-        :return: The created date of the IAM user login profile.
-        :rtype: datetime
-        """
-        return self._created_date
-
-    @created_date.setter
-    def created_date(self, value: Optional[datetime]) -> None:
-        """
-        Sets the created date of the IAM user login profile.
-        :param value: The created date of the IAM user login profile.
-        :type value: datetime
-        """
-        Validation.validate_type(value, Union[datetime, None], 'created_date should be a datetime.')
-
-        self._created_date = value
-
-    @property
-    def password_reset_required(self) -> Optional[bool]:
-        """
-        Gets the flag to indicate if password reset required for the IAM user.
-        :return: Flag to indicate if password reset required for the IAM user.
-        :rtype: bool
-        """
-        return self._password_reset_required
-
-    @password_reset_required.setter
-    def password_reset_required(self, value: Optional[bool] = False) -> None:
-        """
-        Sets the flag to indicate if password reset required for the IAM user.
-        :param value: The flag to indicate if password reset required for the IAM user. Defaults to False.
-        :type value: bool
-        """
-        Validation.validate_type(value, bool, 'password_reset_required should be a boolean.')
-
-        self._password_reset_required = value
-
-    def __str__(self) -> str:
-        """
-        Return a string representation of the LoginProfile object.
-        :return: String representation of the LoginProfile object.
-        :rtype: str
-        """
-        created_date = self.created_date.isoformat() if self.created_date else None
-
-        return (
-            f'LoginProfile('
-            f'created_date={created_date},'
-            f'password_reset_required={self.password_reset_required}'
-            f')'
-        )
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def to_dict(self) -> dict:
         """
@@ -141,10 +87,8 @@ class LoginProfile:
         :return: Dictionary representation of the LoginProfile object.
         :rtype: dict
         """
-        created_date = self.created_date.isoformat() if self.created_date else None
-
         return {
-            "created_date": created_date,
+            "created_date": self.created_date.isoformat() if self.created_date is not None else None,
             "password_reset_required": self.password_reset_required
         }
 

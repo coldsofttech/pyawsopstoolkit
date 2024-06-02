@@ -38,7 +38,6 @@ A class representing the login profile information of an IAM user.
 
 ### Methods
 
-- `__str__() -> str`: Returns a string representation of the **LoginProfile** object.
 - `to_dict() -> dict`: Returns a dictionary representation of the **LoginProfile** object.
 
 ### Properties
