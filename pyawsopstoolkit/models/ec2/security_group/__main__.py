@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Optional, Union
 
 from pyawsopstoolkit.__interfaces__ import IAccount
@@ -5,85 +6,29 @@ from pyawsopstoolkit.__validations__ import Validation
 from pyawsopstoolkit.validators import AccountValidator, Validator
 
 
+@dataclass
 class IPRange:
     """
     A class representing IPv4 range for a EC2 Security Group.
     """
+    cidr_ip: str
+    description: Optional[str] = None
 
-    def __init__(self, cidr_ip: str, description: Optional[str] = None) -> None:
-        """
-        Initializes the IPRange object with specified parameters.
-        :param cidr_ip: The IPv4 CIDR range.
-        :type cidr_ip: str
-        :param description: The description for the IPv4 range.
-        :type description: str
-        """
-        Validation.validate_type(cidr_ip, str, 'cidr_ip should be a string.')
-        Validation.validate_type(description, Union[str, None], 'description should be a string.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._cidr_ip = cidr_ip
-        self._description = description
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['cidr_ip']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+        elif field_name in ['description']:
+            Validation.validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
 
-    @property
-    def cidr_ip(self) -> str:
-        """
-        Gets the IPv4 CIDR range.
-        :return: The IPv4 CIDR range.
-        :rtype: str
-        """
-        return self._cidr_ip
-
-    @cidr_ip.setter
-    def cidr_ip(self, value: str) -> None:
-        """
-        Sets the IPv4 CIDR range.
-        :param value: The IPv4 CIDR range.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'cidr_ip should be a string.')
-        self._cidr_ip = value
-
-    @property
-    def description(self) -> Optional[str]:
-        """
-        Gets the description of the IPv4 range.
-        :return: The description of the IPv4 range.
-        :rtype: str
-        """
-        return self._description
-
-    @description.setter
-    def description(self, value: Optional[str]) -> None:
-        """
-        Sets the description of the IPv4 range.
-        :param value: The description of the IPv4 range.
-        :type value: str
-        """
-        Validation.validate_type(value, Union[str, None], 'description should be a string.')
-        self._description = value
-
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the IPRange instance.
-        :return: String representation of the IPRange instance.
-        :rtype: str
-        """
-        description = f'"{self.description}"' if self.description else None
-
-        return (
-            f'IPRange('
-            f'cidr_ip="{self.cidr_ip}",'
-            f'description={description}'
-            f')'
-        )
-
-    def __repr__(self) -> str:
-        """
-        Returns a detailed string representation of the IPRange instance.
-        :return: Detailed string representation of the IPRange instance.
-        :rtype: str
-        """
-        return self.__str__()
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def to_dict(self) -> dict:
         """
