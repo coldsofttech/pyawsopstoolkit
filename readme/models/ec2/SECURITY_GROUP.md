@@ -34,8 +34,6 @@ A class representing an IPv6 range for an EC2 Security Group.
 
 ### Methods
 
-- `__str__() -> str`: Returns a string representation of the **IPv6Range** object.
-- `__repr__() -> str`: Returns a detailed string representation of the **IPv6Range** object.
 - `to_dict() -> dict`: Returns a dictionary representation of the **IPv6Range** object.
 
 ### Properties

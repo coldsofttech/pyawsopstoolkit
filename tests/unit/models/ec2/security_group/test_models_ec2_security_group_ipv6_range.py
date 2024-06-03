@@ -7,44 +7,69 @@ class TestIPv6Range(unittest.TestCase):
     """Unit test cases for IPv6Range."""
 
     def setUp(self) -> None:
-        self.cidr_ipv6 = '2001:db8::/32'
-        self.description = '2001:db8::/32 IPv6 Series'
-        self.ipv6_range = IPv6Range(self.cidr_ipv6)
-        self.ipv6_range_full = IPv6Range(self.cidr_ipv6, self.description)
+        self.maxDiff = None
+        self.params = {
+            'cidr_ipv6': '2001:db8::/32',
+            'description': '2001:db8::/32 IPv6 Series'
+        }
+        self.ipv6_range = self.create_ipv6_range()
+        self.ipv6_range_full = self.create_ipv6_range(description=self.params['description'])
+
+    def create_ipv6_range(self, **kwargs):
+        return IPv6Range(self.params['cidr_ipv6'], **kwargs)
 
     def test_initialization(self):
-        self.assertEqual(self.ipv6_range.cidr_ipv6, self.cidr_ipv6)
+        self.assertEqual(self.ipv6_range.cidr_ipv6, self.params['cidr_ipv6'])
         self.assertIsNone(self.ipv6_range.description)
 
-    def test_initialization_full(self):
-        self.assertEqual(self.ipv6_range_full.cidr_ipv6, self.cidr_ipv6)
-        self.assertEqual(self.ipv6_range_full.description, self.description)
+    def test_initialization_with_optional_params(self):
+        test_cases = [
+            (self.ipv6_range_full, self.params['description'])
+        ]
+        for ipv6_range, description in test_cases:
+            with self.subTest(ipv6_range=ipv6_range):
+                self.assertEqual(ipv6_range.cidr_ipv6, self.params['cidr_ipv6'])
+                self.assertEqual(ipv6_range.description, description)
 
-    def test_set_cidr_ipv6(self):
-        new_cidr_ipv6 = 'fd12:3456:789a::/48'
-        self.ipv6_range_full.cidr_ip = new_cidr_ipv6
-        self.assertEqual(self.ipv6_range_full.cidr_ip, new_cidr_ipv6)
+    def test_setters(self):
+        new_params = {
+            'cidr_ipv6': '2001:db8::/64',
+            'description': '2001:db8::/64 IPv6 Series'
+        }
 
-    def test_set_description(self):
-        new_description = 'New IP Series'
-        self.ipv6_range_full.description = new_description
-        self.assertEqual(self.ipv6_range_full.description, new_description)
+        self.ipv6_range_full.cidr_ipv6 = new_params['cidr_ipv6']
+        self.ipv6_range_full.description = new_params['description']
 
-    def test_str(self):
-        expected_str = (
-            f'IPv6Range('
-            f'cidr_ipv6="{self.cidr_ipv6}",'
-            f'description="{self.description}"'
-            f')'
-        )
-        self.assertEqual(str(self.ipv6_range_full), expected_str)
+        self.assertEqual(self.ipv6_range_full.cidr_ipv6, new_params['cidr_ipv6'])
+        self.assertEqual(self.ipv6_range_full.description, new_params['description'])
+
+    def test_invalid_types(self):
+        invalid_cidr = 123
+        invalid_description = 123
+
+        with self.assertRaises(TypeError):
+            IPv6Range(invalid_cidr)
+        with self.assertRaises(TypeError):
+            self.create_ipv6_range(description=invalid_description)
+
+        with self.assertRaises(TypeError):
+            self.ipv6_range_full.cidr_ipv6 = invalid_cidr
+        with self.assertRaises(TypeError):
+            self.ipv6_range_full.description = invalid_description
 
     def test_to_dict(self):
         expected_dict = {
-            "cidr_ipv6": self.cidr_ipv6,
-            "description": self.description
+            "cidr_ipv6": self.params['cidr_ipv6'],
+            "description": self.params['description']
         }
         self.assertDictEqual(self.ipv6_range_full.to_dict(), expected_dict)
+
+    def test_to_dict_with_missing_fields(self):
+        expected_dict = {
+            "cidr_ipv6": self.params['cidr_ipv6'],
+            "description": None
+        }
+        self.assertDictEqual(self.ipv6_range.to_dict(), expected_dict)
 
 
 if __name__ == "__main__":

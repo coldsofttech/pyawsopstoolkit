@@ -42,85 +42,29 @@ class IPRange:
         }
 
 
+@dataclass
 class IPv6Range:
     """
     A class representing IPv6 range for a EC2 Security Group.
     """
+    cidr_ipv6: str
+    description: Optional[str] = None
 
-    def __init__(self, cidr_ipv6: str, description: Optional[str] = None) -> None:
-        """
-        Initializes the IPv6Range object with specified parameters.
-        :param cidr_ipv6: The IPv6 CIDR range.
-        :type cidr_ipv6: str
-        :param description: The description of the IP range.
-        :type description: str
-        """
-        Validation.validate_type(cidr_ipv6, str, 'cidr_ipv6 should be a string.')
-        Validation.validate_type(description, Union[str, None], 'description should be a string.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._cidr_ipv6 = cidr_ipv6
-        self._description = description
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['cidr_ipv6']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+        elif field_name in ['description']:
+            Validation.validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
 
-    @property
-    def cidr_ipv6(self) -> str:
-        """
-        Gets the IPv6 CIDR range.
-        :return: The IPv6 CIDR range.
-        :rtype: str
-        """
-        return self._cidr_ipv6
-
-    @cidr_ipv6.setter
-    def cidr_ipv6(self, value: str) -> None:
-        """
-        Sets the IPv6 CIDR range.
-        :param value: The IPv6 CIDR range.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'cidr_ipv6 should be a string.')
-        self._cidr_ipv6 = value
-
-    @property
-    def description(self) -> Optional[str]:
-        """
-        Gets the description of the IPv6 range.
-        :return: The description of the IPv6 range.
-        :rtype: str
-        """
-        return self._description
-
-    @description.setter
-    def description(self, value: Optional[str]) -> None:
-        """
-        Sets the description of the IPv6 range.
-        :param value: The description of the IPv6 range.
-        :type value: str
-        """
-        Validation.validate_type(value, Union[str, None], 'description should be a string.')
-        self._description = value
-
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the IPv6Range instance.
-        :return: String representation of the IPv6Range instance.
-        :rtype: str
-        """
-        description = f'"{self.description}"' if self.description else None
-
-        return (
-            f'IPv6Range('
-            f'cidr_ipv6="{self.cidr_ipv6}",'
-            f'description={description}'
-            f')'
-        )
-
-    def __repr__(self) -> str:
-        """
-        Returns a detailed string representation of the IPv6Range instance.
-        :return: Detailed string representation of the IPv6Range instance.
-        :rtype: str
-        """
-        return self.__str__()
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def to_dict(self) -> dict:
         """
