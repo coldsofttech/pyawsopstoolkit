@@ -93,17 +93,16 @@ A class representing the IP Permissions for an EC2 Security Group.
 
 ### Methods
 
-- `__str__() -> str`: Returns a string representation of the **IPPermission** object.
 - `to_dict() -> dict`: Returns a dictionary representation of the **IPPermission** object.
 
 ### Properties
 
 - `from_port`: The starting port of an EC2 security group rule entry.
-- `to_port`: The ending port of an EC2 security group rule entry.
 - `ip_protocol`: The IP protocol of an EC2 security group rule entry.
 - `ip_ranges`: The list of IPv4 ranges for an EC2 security group rule entry.
 - `ipv6_ranges`: The list of IPv6 ranges for an EC2 security group rule entry.
-- `prefix_list_ids`: The list of prefix lists for an EC2 security group rule entry.
+- `prefix_lists`: The list of prefix lists for an EC2 security group rule entry.
+- `to_port`: The ending port of an EC2 security group rule entry.
 - `user_id_group_pairs`: The list of user ID group pairs for an EC2 security group rule entry.
 
 ## SecurityGroup

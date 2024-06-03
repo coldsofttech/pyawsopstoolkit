@@ -160,263 +160,46 @@ class UserIDGroupPair:
         }
 
 
+@dataclass
 class IPPermission:
     """
     A class representing the IP Permissions for a EC2 Security Group.
     """
+    from_port: int
+    to_port: int
+    ip_protocol: str
+    ip_ranges: Optional[list[IPRange]] = None
+    ipv6_ranges: Optional[list[IPv6Range]] = None
+    prefix_lists: Optional[list[PrefixList]] = None
+    user_id_group_pairs: Optional[list[UserIDGroupPair]] = None
 
-    def __init__(
-            self,
-            from_port: int,
-            to_port: int,
-            ip_protocol: str,
-            ip_ranges: Optional[list[IPRange]] = None,
-            ipv6_ranges: Optional[list[IPv6Range]] = None,
-            prefix_list_ids: Optional[list[PrefixList]] = None,
-            user_id_group_pairs: Optional[list[UserIDGroupPair]] = None
-    ) -> None:
-        """
-        Initializes a new IPPermission object with specified parameters.
-        :param from_port: The from port of an EC2 security group rule entry.
-        :type from_port: int
-        :param to_port: The to port of an EC2 security group rule entry.
-        :type to_port: int
-        :param ip_protocol: The IP protocol of an EC2 security group rule entry.
-        :type ip_protocol: str
-        :param ip_ranges: The list of IPv4 ranges of an EC2 security group rule entry.
-        :type ip_ranges: list
-        :param ipv6_ranges: The list of IPv6 ranges of an EC2 security group rule entry.
-        :type ipv6_ranges: list
-        :param prefix_list_ids: The list of prefix lists of an EC2 security group rule entry.
-        :type prefix_list_ids: list
-        :param user_id_group_pairs: The list of user id group pairs of an EC2 security group rule entry.
-        :type user_id_group_pairs: list
-        """
-        Validation.validate_type(from_port, int, 'from_port should be an integer.')
-        Validation.validate_type(to_port, int, 'to_port should be an integer.')
-        Validation.validate_type(ip_protocol, str, 'ip_protocol should be a string.')
-        Validation.validate_type(ip_ranges, Union[list, None], 'ip_ranges should be a list of IPRange.')
-        if ip_ranges is not None and len(ip_ranges) > 0:
-            all(
-                Validation.validate_type(ip_range, IPRange, 'ip_ranges should be a list of IPRange.')
-                for ip_range in ip_ranges
-            )
-        Validation.validate_type(ipv6_ranges, Union[list, None], 'ipv6_ranges should be a list of IPv6Range.')
-        if ipv6_ranges is not None and len(ipv6_ranges) > 0:
-            all(
-                Validation.validate_type(ip_range, IPv6Range, 'ipv6_ranges should be a list of IPv6Range.')
-                for ip_range in ipv6_ranges
-            )
-        Validation.validate_type(
-            prefix_list_ids, Union[list, None], 'prefix_list_ids should be a list of PrefixList.'
-        )
-        if prefix_list_ids is not None and len(prefix_list_ids) > 0:
-            all(
-                Validation.validate_type(
-                    prefix_list_id, PrefixList, 'prefix_list_ids should be a list of PrefixList.'
-                )
-                for prefix_list_id in prefix_list_ids
-            )
-        Validation.validate_type(
-            user_id_group_pairs, Union[list, None], 'user_id_group_pairs should be a list of UserIDGroupPair.'
-        )
-        if user_id_group_pairs is not None and len(user_id_group_pairs) > 0:
-            all(
-                Validation.validate_type(
-                    user_id_group_pair, UserIDGroupPair, 'user_id_group_pairs should be a list of UserIDGroupPair.'
-                )
-                for user_id_group_pair in user_id_group_pairs
-            )
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._from_port = from_port
-        self._to_port = to_port
-        self._ip_protocol = ip_protocol
-        self._ip_ranges = ip_ranges
-        self._ipv6_ranges = ipv6_ranges
-        self._prefix_list_ids = prefix_list_ids
-        self._user_id_group_pairs = user_id_group_pairs
+    def __validate__(self, field_name):
+        mappings = {
+            'ip_ranges': IPRange,
+            'ipv6_ranges': IPv6Range,
+            'prefix_lists': PrefixList,
+            'user_id_group_pairs': UserIDGroupPair
+        }
+        field_value = getattr(self, field_name)
+        if field_name in ['from_port', 'to_port']:
+            Validation.validate_type(field_value, int, f'{field_name} should be an integer.')
+        elif field_name in ['ip_protocol']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+        elif field_name in ['ip_ranges', 'ipv6_ranges', 'prefix_lists', 'user_id_group_pairs']:
+            field_type = mappings.get(field_name)
+            message = f'{field_name} should be of {field_type.__name__} type.'
+            Validation.validate_type(field_value, Union[list, None], message)
+            if field_value is not None and len(field_value) > 0:
+                all(Validation.validate_type(item, field_type, message) for item in field_value)
 
-    @property
-    def from_port(self) -> int:
-        """
-        Gets the from port of an EC2 security group rule entry.
-        :return: The from port of an EC2 security group rule entry.
-        :rtype: int
-        """
-        return self._from_port
-
-    @from_port.setter
-    def from_port(self, value: int) -> None:
-        """
-        Sets the from port of an EC2 security group rule entry.
-        :param value: The from port of an EC2 security group rule entry.
-        :type value: int
-        """
-        Validation.validate_type(value, int, 'from_port should be an integer.')
-        self._from_port = value
-
-    @property
-    def ip_protocol(self) -> str:
-        """
-        Gets the IP protocol of an EC2 security group rule entry.
-        :return: The IP protocol of an EC2 security group rule entry.
-        :rtype: str
-        """
-        return self._ip_protocol
-
-    @ip_protocol.setter
-    def ip_protocol(self, value: str) -> None:
-        """
-        Sets the IP protocol of an EC2 security group rule entry.
-        :param value: The IP protocol of an EC2 security group rule entry.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'ip_protocol should be a string.')
-        self._ip_protocol = value
-
-    @property
-    def ip_ranges(self) -> Optional[list[IPRange]]:
-        """
-        Gets the list of IPv4 ranges of an EC2 security group rule entry.
-        :return: The list of IPv4 ranges of an EC2 security group rule entry.
-        :rtype: list
-        """
-        return self._ip_ranges
-
-    @ip_ranges.setter
-    def ip_ranges(self, value: Optional[list[IPRange]]) -> None:
-        """
-        Sets the list of IPv4 ranges of an EC2 security group rule entry.
-        :param value: The list of IPv4 ranges of an EC2 security group rule entry.
-        :type value: list
-        """
-        Validation.validate_type(value, Union[list, None], 'ip_ranges should be a list of IPRange.')
-        if value is not None and len(value) > 0:
-            all(
-                Validation.validate_type(ip_range, IPRange, 'ip_ranges should be a list of IPRange.')
-                for ip_range in value
-            )
-        self._ip_ranges = value
-
-    @property
-    def ipv6_ranges(self) -> Optional[list[IPv6Range]]:
-        """
-        Gets the list of IPv6 ranges of an EC2 security group rule entry.
-        :return: The list of IPv6 ranges of an EC2 security group rule entry.
-        :rtype: list
-        """
-        return self._ipv6_ranges
-
-    @ipv6_ranges.setter
-    def ipv6_ranges(self, value: Optional[list[IPv6Range]]):
-        """
-        Sets the list of IPv6 ranges of an EC2 security group rule entry.
-        :param value: The list of IPv6 ranges of an EC2 security group rule entry.
-        :type value: list
-        """
-        Validation.validate_type(value, Union[list, None], 'ipv6_ranges should be a list of IPv6Range.')
-        if value is not None and len(value) > 0:
-            all(
-                Validation.validate_type(ip_range, IPv6Range, 'ipv6_ranges should be a list of IPv6Range.')
-                for ip_range in value
-            )
-        self._ipv6_ranges = value
-
-    @property
-    def prefix_list_ids(self) -> Optional[list[PrefixList]]:
-        """
-        Gets the list of prefix lists of an EC2 security group rule entry.
-        :return: The list of prefix lists of an EC2 security group rule entry.
-        :rtype: list
-        """
-        return self._prefix_list_ids
-
-    @prefix_list_ids.setter
-    def prefix_list_ids(self, value: Optional[list[PrefixList]]) -> None:
-        """
-        Sets the list of prefix lists of an EC2 security group rule entry.
-        :param value: The list of prefix lists of an EC2 security group rule entry.
-        :type value: list
-        """
-        Validation.validate_type(value, Union[list, None], 'prefix_list_ids should be a list of PrefixList.')
-        if value is not None and len(value) > 0:
-            all(
-                Validation.validate_type(
-                    prefix_list_id, PrefixList, 'prefix_list_ids should be a list of PrefixList.'
-                )
-                for prefix_list_id in value
-            )
-        self._prefix_list_ids = value
-
-    @property
-    def to_port(self) -> int:
-        """
-        Gets the to port of an EC2 security group rule entry.
-        :return: The to port of an EC2 security group rule entry.
-        :rtype: int
-        """
-        return self._to_port
-
-    @to_port.setter
-    def to_port(self, value: int) -> None:
-        """
-        Sets the to port of an EC2 security group rule entry.
-        :param value: The to port of an EC2 security group rule entry.
-        :type value: int
-        """
-        Validation.validate_type(value, int, 'to_port should be an integer.')
-        self._to_port = value
-
-    @property
-    def user_id_group_pairs(self) -> Optional[list[UserIDGroupPair]]:
-        """
-        Gets the list of user id group pairs of an EC2 security group rule entry.
-        :return: The list of user id group pairs of an EC2 security group rule entry.
-        :rtype: list
-        """
-        return self._user_id_group_pairs
-
-    @user_id_group_pairs.setter
-    def user_id_group_pairs(self, value: Optional[list[UserIDGroupPair]]) -> None:
-        """
-        Sets the list of user id group pairs of an EC2 security group rule entry.
-        :param value: The list of user id group pairs of an EC2 security group rule entry.
-        :type value: list
-        """
-        Validation.validate_type(value, Union[list, None], 'user_id_group_pairs should be a list of UserIDGroupPair.')
-        if value is not None and len(value) > 0:
-            all(
-                Validation.validate_type(
-                    user_id_group_pair, UserIDGroupPair, 'user_id_group_pairs should be a list of UserIDGroupPair.'
-                )
-                for user_id_group_pair in value
-            )
-        self._user_id_group_pairs = value
-
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the IPPermission instance.
-        :return: String representation of the IPPermission instance.
-        :rtype: str
-        """
-        ip_ranges = self.ip_ranges if self.ip_ranges and len(self.ip_ranges) > 0 else None
-        ipv6_ranges = self.ipv6_ranges if self.ipv6_ranges and len(self.ipv6_ranges) > 0 else None
-        prefix_list_ids = self.prefix_list_ids if self.prefix_list_ids and len(self.prefix_list_ids) > 0 else None
-        user_id_group_pairs = (
-            self.user_id_group_pairs if self.user_id_group_pairs and len(self.user_id_group_pairs) else None
-        )
-
-        return (
-            f'IPPermission('
-            f'from_port={self.from_port},'
-            f'to_port={self.to_port},'
-            f'ip_protocol="{self.ip_protocol}",'
-            f'ip_ranges={ip_ranges},'
-            f'ipv6_ranges={ipv6_ranges},'
-            f'prefix_list_ids={prefix_list_ids},'
-            f'user_id_group_pairs={user_id_group_pairs}'
-            f')'
-        )
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def to_dict(self) -> dict:
         """
@@ -424,27 +207,22 @@ class IPPermission:
         :return: Dictionary representation of the IPPermission instance.
         :rtype: dict
         """
-        ip_ranges = [
-            ip.to_dict() for ip in self.ip_ranges
-        ] if self.ip_ranges and len(self.ip_ranges) > 0 else None
-        ipv6_ranges = [
-            ip.to_dict() for ip in self.ipv6_ranges
-        ] if self.ipv6_ranges and len(self.ipv6_ranges) > 0 else None
-        prefix_list_ids = [
-            prefix.to_dict() for prefix in self.prefix_list_ids
-        ] if self.prefix_list_ids and len(self.prefix_list_ids) > 0 else None
-        user_id_group_pairs = [
-            pair.to_dict() for pair in self.user_id_group_pairs
-        ] if self.user_id_group_pairs and len(self.user_id_group_pairs) > 0 else None
-
         return {
             "from_port": self.from_port,
             "to_port": self.to_port,
             "ip_protocol": self.ip_protocol,
-            "ip_ranges": ip_ranges,
-            "ipv6_ranges": ipv6_ranges,
-            "prefix_list_ids": prefix_list_ids,
-            "user_id_group_pairs": user_id_group_pairs
+            "ip_ranges": [
+                ip.to_dict() for ip in self.ip_ranges
+            ] if self.ip_ranges and len(self.ip_ranges) > 0 else None,
+            "ipv6_ranges": [
+                ip.to_dict() for ip in self.ipv6_ranges
+            ] if self.ipv6_ranges and len(self.ipv6_ranges) > 0 else None,
+            "prefix_lists": [
+                prefix.to_dict() for prefix in self.prefix_lists
+            ] if self.prefix_lists and len(self.prefix_lists) > 0 else None,
+            "user_id_group_pairs": [
+                pair.to_dict() for pair in self.user_id_group_pairs
+            ] if self.user_id_group_pairs and len(self.user_id_group_pairs) > 0 else None
         }
 
 

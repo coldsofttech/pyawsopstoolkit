@@ -164,7 +164,7 @@ class TestSecurityGroup(unittest.TestCase):
                     cidr_ipv6=sg_data['IpPermissions'][0]['Ipv6Ranges'][0]['CidrIpv6'],
                     description=sg_data['IpPermissions'][0]['Ipv6Ranges'][0]['Description']
                 )],
-                prefix_list_ids=[PrefixList(
+                prefix_lists=[PrefixList(
                     id=sg_data['IpPermissions'][0]['PrefixListIds'][0]['PrefixListId'],
                     description=sg_data['IpPermissions'][0]['PrefixListIds'][0]['Description']
                 )],
@@ -190,7 +190,7 @@ class TestSecurityGroup(unittest.TestCase):
         self.assertEqual(result[0].ip_permissions[0].from_port, 80)
         self.assertEqual(result[0].ip_permissions[0].ip_ranges[0].cidr_ip, '0.0.0.0/0')
         self.assertEqual(result[0].ip_permissions[0].ipv6_ranges[0].cidr_ipv6, '::/0')
-        self.assertEqual(result[0].ip_permissions[0].prefix_list_ids[0].id, 'pl-12345abcde')
+        self.assertEqual(result[0].ip_permissions[0].prefix_lists[0].id, 'pl-12345abcde')
         self.assertEqual(result[0].ip_permissions[0].user_id_group_pairs[0].id, 'sg-67890fghij')
         self.assertIsNone(result[0].ip_permissions_egress)
         self.assertIsNone(result[0].tags)
@@ -277,7 +277,7 @@ class TestSecurityGroup(unittest.TestCase):
                     cidr_ipv6=sg_data['IpPermissionsEgress'][0]['Ipv6Ranges'][0]['CidrIpv6'],
                     description=sg_data['IpPermissionsEgress'][0]['Ipv6Ranges'][0]['Description']
                 )],
-                prefix_list_ids=[PrefixList(
+                prefix_lists=[PrefixList(
                     id=sg_data['IpPermissionsEgress'][0]['PrefixListIds'][0]['PrefixListId'],
                     description=sg_data['IpPermissionsEgress'][0]['PrefixListIds'][0]['Description']
                 )],
@@ -304,7 +304,7 @@ class TestSecurityGroup(unittest.TestCase):
         self.assertEqual(result[0].ip_permissions_egress[0].from_port, 80)
         self.assertEqual(result[0].ip_permissions_egress[0].ip_ranges[0].cidr_ip, '0.0.0.0/0')
         self.assertEqual(result[0].ip_permissions_egress[0].ipv6_ranges[0].cidr_ipv6, '::/0')
-        self.assertEqual(result[0].ip_permissions_egress[0].prefix_list_ids[0].id, 'pl-12345abcde')
+        self.assertEqual(result[0].ip_permissions_egress[0].prefix_lists[0].id, 'pl-12345abcde')
         self.assertEqual(result[0].ip_permissions_egress[0].user_id_group_pairs[0].id, 'sg-67890fghij')
         self.assertIsNone(result[0].tags)
 

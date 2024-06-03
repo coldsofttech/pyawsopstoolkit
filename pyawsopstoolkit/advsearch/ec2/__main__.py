@@ -81,7 +81,7 @@ class SecurityGroup:
                 for ip in perm.get('Ipv6Ranges', [])
             ]
 
-            ip_permission.prefix_list_ids = [
+            ip_permission.prefix_lists = [
                 PrefixList(id=prefix.get('PrefixListId', ''), description=prefix.get('Description', ''))
                 for prefix in perm.get('PrefixListIds', [])
             ]
