@@ -70,18 +70,16 @@ A class representing a User ID Group Pair for an EC2 Security Group.
 
 ### Methods
 
-- `__str__() -> str`: Returns a string representation of the **UserIDGroupPair** object.
-- `__repr__() -> str`: Returns a detailed string representation of the **UserIDGroupPair** object.
 - `to_dict() -> dict`: Returns a dictionary representation of the **UserIDGroupPair** object.
 
 ### Properties
 
+- `description`: The description of the user ID group pair.
 - `id`: The unique identifier of the user ID group pair.
 - `name`: The name of the user ID group pair.
 - `status`: The status of the user ID group pair.
 - `user_id`: The owner/user ID of the user ID group pair.
 - `vpc_id`: The VPC ID of the user ID group pair.
-- `description`: The description of the user ID group pair.
 - `vpc_peering_connection_id`: The VPC peering connection ID of the user ID group pair.
 
 ## IPPermission

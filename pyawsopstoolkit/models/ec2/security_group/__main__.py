@@ -114,217 +114,34 @@ class PrefixList:
         }
 
 
+@dataclass
 class UserIDGroupPair:
     """
     A class representing User ID Group Pair for a EC2 Security Group.
     """
+    id: str
+    name: str
+    status: str
+    user_id: str
+    vpc_id: str
+    description: Optional[str] = None
+    vpc_peering_connection_id: Optional[str] = None
 
-    def __init__(
-            self,
-            id: str,
-            name: str,
-            status: str,
-            user_id: str,
-            vpc_id: str,
-            description: Optional[str] = None,
-            vpc_peering_connection_id: Optional[str] = None
-    ) -> None:
-        """
-        Initializes a new UserIDGroupPair instance with specified parameters.
-        :param id: The unique identifier for the user id group pair.
-        :type id: str
-        :param name: The name for the user id group pair.
-        :type name: str
-        :param status: The status of the user id group pair.
-        :type status: str
-        :param user_id: The owner / user id of the user id group pair.
-        :type user_id: str
-        :param vpc_id: The VPC id of the user id group pair.
-        :type vpc_id: str
-        :param description: The description of the user id group pair.
-        :type description: str
-        :param vpc_peering_connection_id: The VPC peering connection id of the user id group pair.
-        :type vpc_peering_connection_id: str
-        """
-        Validation.validate_type(id, str, 'id should be a string.')
-        Validation.validate_type(name, str, 'name should be a string.')
-        Validation.validate_type(status, str, 'status should be a string.')
-        Validation.validate_type(user_id, str, 'user_id should be a string.')
-        Validation.validate_type(vpc_id, str, 'vpc_id should be a string.')
-        Validation.validate_type(description, Union[str, None], 'description should be a string.')
-        Validation.validate_type(
-            vpc_peering_connection_id, Union[str, None], 'vpc_peering_connection_id should be a string.'
-        )
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._id = id
-        self._name = name
-        self._status = status
-        self._user_id = user_id
-        self._vpc_id = vpc_id
-        self._description = description
-        self._vpc_peering_connection_id = vpc_peering_connection_id
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['id', 'name', 'status', 'user_id', 'vpc_id']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+        elif field_name in ['description', 'vpc_peering_connection_id']:
+            Validation.validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
 
-    @property
-    def description(self) -> Optional[str]:
-        """
-        Gets the description of the user id group pair.
-        :return: The description of the user id group pair.
-        :rtype: str
-        """
-        return self._description
-
-    @description.setter
-    def description(self, value: Optional[str]) -> None:
-        """
-        Sets the description of the user id group pair.
-        :param value: The description of the user id group pair.
-        :type value: str
-        """
-        Validation.validate_type(value, Union[str, None], 'description should be a string.')
-        self._description = value
-
-    @property
-    def id(self) -> str:
-        """
-        Gets the unique identifier of the user id group pair.
-        :return: The unique identifier of the user id group pair.
-        :rtype: str
-        """
-        return self._id
-
-    @id.setter
-    def id(self, value: str) -> None:
-        """
-        Sets the unique identifier of the user id group pair.
-        :param value: The unique identifier of the user id group pair.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'id should be a string.')
-        self._id = value
-
-    @property
-    def name(self) -> str:
-        """
-        Gets the name of the user id group pair.
-        :return: The name of the user id group pair.
-        :rtype: str
-        """
-        return self._name
-
-    @name.setter
-    def name(self, value: str) -> None:
-        """
-        Sets the name of the user id group pair.
-        :param value: The name of the user id group pair.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'name should be a string.')
-        self._name = value
-
-    @property
-    def status(self) -> str:
-        """
-        Gets the status of the user id group pair
-        :return: The status of the user id group pair
-        :rtype: str
-        """
-        return self._status
-
-    @status.setter
-    def status(self, value: str) -> None:
-        """
-        Sets the status of the user id group pair
-        :param value: The status of the user id group pair.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'status should be a string.')
-        self._status = value
-
-    @property
-    def user_id(self) -> str:
-        """
-        Gets the owner / user id of the user id group pair.
-        :return: The owner / user id of the user id group pair.
-        :rtype: str
-        """
-        return self._user_id
-
-    @user_id.setter
-    def user_id(self, value: str) -> None:
-        """
-        Sets the owner / user id of the user id group pair.
-        :param value: The owner / user id of the user id group pair.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'user_id should be a string.')
-        self._user_id = value
-
-    @property
-    def vpc_id(self) -> str:
-        """
-        Gets the VPC id of the user id group pair.
-        :return: The VPC id of the user id group pair.
-        :rtype: str
-        """
-        return self._vpc_id
-
-    @vpc_id.setter
-    def vpc_id(self, value: str) -> None:
-        """
-        Sets the VPC id of the user id group pair.
-        :param value: The VPC id of the user id group pair.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'vpc_id should be a string.')
-        self._vpc_id = value
-
-    @property
-    def vpc_peering_connection_id(self) -> Optional[str]:
-        """
-        Gets the VPC peering connection id of the user id group pair.
-        :return: The VPC peering connection id of the user id group pair.
-        :rtype: str
-        """
-        return self._vpc_peering_connection_id
-
-    @vpc_peering_connection_id.setter
-    def vpc_peering_connection_id(self, value: Optional[str]) -> None:
-        """
-        Sets the VPC peering connection id of the user id group pair.
-        :param value: The VPC peering connection id of the user id group pair.
-        :type value: str
-        """
-        Validation.validate_type(value, Union[str, None], 'vpc_peering_connection_id should be a string.')
-        self._vpc_peering_connection_id = value
-
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the UserIDGroupPair instance.
-        :return: String representation of the UserIDGroupPair instance.
-        :rtype: str
-        """
-        description = f'"{self.description}"' if self.description else None
-        vpc_peering_connection_id = f'"{self.vpc_peering_connection_id}"' if self.vpc_peering_connection_id else None
-
-        return (
-            f'UserIDGroupPair('
-            f'id="{self.id}",'
-            f'name="{self.name}",'
-            f'status="{self.status}",'
-            f'user_id="{self.user_id}",'
-            f'vpc_id="{self.vpc_id}",'
-            f'description={description},'
-            f'vpc_peering_connection_id={vpc_peering_connection_id}'
-            f')'
-        )
-
-    def __repr__(self) -> str:
-        """
-        Returns a detailed string representation of the UserIDGroupPair instance.
-        :return: Detailed string representation of the UserIDGroupPair instance.
-        :rtype: str
-        """
-        return self.__str__()
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def to_dict(self) -> dict:
         """
