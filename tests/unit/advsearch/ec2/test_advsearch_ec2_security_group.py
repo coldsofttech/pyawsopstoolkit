@@ -132,7 +132,7 @@ class TestSecurityGroup(unittest.TestCase):
             self, mock_validation, mock_list_security_groups, mock_get_session, mock_session
     ):
         from pyawsopstoolkit.models.ec2.security_group import SecurityGroup, IPPermission, IPRange, IPv6Range, \
-            PrefixListID, UserIDGroupPair
+            PrefixList, UserIDGroupPair
 
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
@@ -164,7 +164,7 @@ class TestSecurityGroup(unittest.TestCase):
                     cidr_ipv6=sg_data['IpPermissions'][0]['Ipv6Ranges'][0]['CidrIpv6'],
                     description=sg_data['IpPermissions'][0]['Ipv6Ranges'][0]['Description']
                 )],
-                prefix_list_ids=[PrefixListID(
+                prefix_list_ids=[PrefixList(
                     id=sg_data['IpPermissions'][0]['PrefixListIds'][0]['PrefixListId'],
                     description=sg_data['IpPermissions'][0]['PrefixListIds'][0]['Description']
                 )],
@@ -245,7 +245,7 @@ class TestSecurityGroup(unittest.TestCase):
             self, mock_validation, mock_list_security_groups, mock_get_session, mock_session
     ):
         from pyawsopstoolkit.models.ec2.security_group import SecurityGroup, IPPermission, IPRange, IPv6Range, \
-            PrefixListID, UserIDGroupPair
+            PrefixList, UserIDGroupPair
 
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
@@ -277,7 +277,7 @@ class TestSecurityGroup(unittest.TestCase):
                     cidr_ipv6=sg_data['IpPermissionsEgress'][0]['Ipv6Ranges'][0]['CidrIpv6'],
                     description=sg_data['IpPermissionsEgress'][0]['Ipv6Ranges'][0]['Description']
                 )],
-                prefix_list_ids=[PrefixListID(
+                prefix_list_ids=[PrefixList(
                     id=sg_data['IpPermissionsEgress'][0]['PrefixListIds'][0]['PrefixListId'],
                     description=sg_data['IpPermissionsEgress'][0]['PrefixListIds'][0]['Description']
                 )],

@@ -78,90 +78,34 @@ class IPv6Range:
         }
 
 
-class PrefixListID:
+@dataclass
+class PrefixList:
     """
     A class representing Prefix List for a EC2 Security Group.
     """
+    id: str
+    description: Optional[str] = None
 
-    def __init__(self, id: str, description: Optional[str] = None) -> None:
-        """
-        Initializes a new PrefixListID instance with specified parameters.
-        :param id: The unique identifier for the prefix list.
-        :type id: str
-        :param description: The description of the prefix list.
-        :type description: str
-        """
-        Validation.validate_type(id, str, 'id should be a string.')
-        Validation.validate_type(description, Union[str, None], 'description should be a string.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._id = id
-        self._description = description
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['id']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+        elif field_name in ['description']:
+            Validation.validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
 
-    @property
-    def id(self) -> str:
-        """
-        Gets the unique identifier of the prefix list.
-        :return: The unique identifier of the prefix list.
-        :rtype: str
-        """
-        return self._id
-
-    @id.setter
-    def id(self, value: str) -> None:
-        """
-        Sets the unique identifier of the prefix list.
-        :param value: The unique identifier of the prefix list.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'id should be a string.')
-        self._id = value
-
-    @property
-    def description(self) -> Optional[str]:
-        """
-        Gets the description of the prefix list.
-        :return: The description of the prefix list.
-        :rtype: str
-        """
-        return self._description
-
-    @description.setter
-    def description(self, value: Optional[str]) -> None:
-        """
-        Sets the description of the prefix list.
-        :param value: The description of the prefix list.
-        :type value: str
-        """
-        Validation.validate_type(value, Union[str, None], 'description should be a string.')
-        self._description = value
-
-    def __str__(self) -> str:
-        """
-        Returns a string representation of the PrefixListID instance.
-        :return: String representation of the PrefixListID instance.
-        :rtype: str
-        """
-        description = f'"{self.description}"' if self.description else None
-
-        return (
-            f'PrefixListID('
-            f'id="{self.id}",'
-            f'description={description}'
-            f')'
-        )
-
-    def __repr__(self) -> str:
-        """
-        Returns a detailed string representation of the PrefixListID instance.
-        :return: Detailed string representation of the PrefixListID instance.
-        :rtype: str
-        """
-        return self.__str__()
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def to_dict(self) -> dict:
         """
-        Returns a dictionary representation of the PrefixListID instance.
-        :return: Dictionary representation of the PrefixListID instance.
+        Returns a dictionary representation of the PrefixList instance.
+        :return: Dictionary representation of the PrefixList instance.
         :rtype: dict
         """
         return {
@@ -411,7 +355,7 @@ class IPPermission:
             ip_protocol: str,
             ip_ranges: Optional[list[IPRange]] = None,
             ipv6_ranges: Optional[list[IPv6Range]] = None,
-            prefix_list_ids: Optional[list[PrefixListID]] = None,
+            prefix_list_ids: Optional[list[PrefixList]] = None,
             user_id_group_pairs: Optional[list[UserIDGroupPair]] = None
     ) -> None:
         """
@@ -447,12 +391,12 @@ class IPPermission:
                 for ip_range in ipv6_ranges
             )
         Validation.validate_type(
-            prefix_list_ids, Union[list, None], 'prefix_list_ids should be a list of PrefixListID.'
+            prefix_list_ids, Union[list, None], 'prefix_list_ids should be a list of PrefixList.'
         )
         if prefix_list_ids is not None and len(prefix_list_ids) > 0:
             all(
                 Validation.validate_type(
-                    prefix_list_id, PrefixListID, 'prefix_list_ids should be a list of PrefixListID.'
+                    prefix_list_id, PrefixList, 'prefix_list_ids should be a list of PrefixList.'
                 )
                 for prefix_list_id in prefix_list_ids
             )
@@ -562,7 +506,7 @@ class IPPermission:
         self._ipv6_ranges = value
 
     @property
-    def prefix_list_ids(self) -> Optional[list[PrefixListID]]:
+    def prefix_list_ids(self) -> Optional[list[PrefixList]]:
         """
         Gets the list of prefix lists of an EC2 security group rule entry.
         :return: The list of prefix lists of an EC2 security group rule entry.
@@ -571,17 +515,17 @@ class IPPermission:
         return self._prefix_list_ids
 
     @prefix_list_ids.setter
-    def prefix_list_ids(self, value: Optional[list[PrefixListID]]) -> None:
+    def prefix_list_ids(self, value: Optional[list[PrefixList]]) -> None:
         """
         Sets the list of prefix lists of an EC2 security group rule entry.
         :param value: The list of prefix lists of an EC2 security group rule entry.
         :type value: list
         """
-        Validation.validate_type(value, Union[list, None], 'prefix_list_ids should be a list of PrefixListID.')
+        Validation.validate_type(value, Union[list, None], 'prefix_list_ids should be a list of PrefixList.')
         if value is not None and len(value) > 0:
             all(
                 Validation.validate_type(
-                    prefix_list_id, PrefixListID, 'prefix_list_ids should be a list of PrefixListID.'
+                    prefix_list_id, PrefixList, 'prefix_list_ids should be a list of PrefixList.'
                 )
                 for prefix_list_id in value
             )

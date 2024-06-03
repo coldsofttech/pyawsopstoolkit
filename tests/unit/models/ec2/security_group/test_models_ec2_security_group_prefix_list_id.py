@@ -1,50 +1,75 @@
 import unittest
 
-from pyawsopstoolkit.models.ec2.security_group import PrefixListID
+from pyawsopstoolkit.models.ec2.security_group import PrefixList
 
 
-class TestPrefixListID(unittest.TestCase):
-    """Unit test cases for PrefixListID."""
+class TestPrefixList(unittest.TestCase):
+    """Unit test cases for PrefixList."""
 
     def setUp(self) -> None:
-        self.id = 'pl-12345678'
-        self.description = 'Sample Prefix List'
-        self.prefix_list = PrefixListID(self.id)
-        self.prefix_list_with_desc = PrefixListID(self.id, self.description)
+        self.maxDiff = None
+        self.params = {
+            'id': 'pl-12345678',
+            'description': 'Sample Prefix List'
+        }
+        self.prefix_list = self.create_prefix_list()
+        self.prefix_list_full = self.create_prefix_list(description=self.params['description'])
+
+    def create_prefix_list(self, **kwargs):
+        return PrefixList(self.params['id'], **kwargs)
 
     def test_initialization(self):
-        self.assertEqual(self.prefix_list.id, self.id)
+        self.assertEqual(self.prefix_list.id, self.params['id'])
         self.assertIsNone(self.prefix_list.description)
 
-    def test_initialization_with_desc(self):
-        self.assertEqual(self.prefix_list_with_desc.id, self.id)
-        self.assertEqual(self.prefix_list_with_desc.description, self.description)
+    def test_initialization_with_optional_params(self):
+        test_cases = [
+            (self.prefix_list_full, self.params['description'])
+        ]
+        for prefix_list, description in test_cases:
+            with self.subTest(prefix_list=prefix_list):
+                self.assertEqual(prefix_list.id, self.params['id'])
+                self.assertEqual(prefix_list.description, description)
 
-    def test_set_id(self):
-        new_id = 'pl-87654321'
-        self.prefix_list_with_desc.id = new_id
-        self.assertEqual(self.prefix_list_with_desc.id, new_id)
+    def test_setters(self):
+        new_params = {
+            'id': 'pl-87654321',
+            'description': 'Updated Prefix List'
+        }
 
-    def test_set_description(self):
-        new_description = 'New Prefix List'
-        self.prefix_list_with_desc.description = new_description
-        self.assertEqual(self.prefix_list_with_desc.description, new_description)
+        self.prefix_list_full.id = new_params['id']
+        self.prefix_list_full.description = new_params['description']
 
-    def test_str(self):
-        expected_str = (
-            f'PrefixListID('
-            f'id="{self.id}",'
-            f'description="{self.description}"'
-            f')'
-        )
-        self.assertEqual(str(self.prefix_list_with_desc), expected_str)
+        self.assertEqual(self.prefix_list_full.id, new_params['id'])
+        self.assertEqual(self.prefix_list_full.description, new_params['description'])
+
+    def test_invalid_types(self):
+        invalid_id = 123
+        invalid_description = 123
+
+        with self.assertRaises(TypeError):
+            PrefixList(invalid_id)
+        with self.assertRaises(TypeError):
+            self.create_prefix_list(description=invalid_description)
+
+        with self.assertRaises(TypeError):
+            self.prefix_list_full.id = invalid_id
+        with self.assertRaises(TypeError):
+            self.prefix_list_full.description = invalid_description
 
     def test_to_dict(self):
         expected_dict = {
-            "id": self.id,
-            "description": self.description
+            "id": self.params['id'],
+            "description": self.params['description']
         }
-        self.assertDictEqual(self.prefix_list_with_desc.to_dict(), expected_dict)
+        self.assertDictEqual(self.prefix_list_full.to_dict(), expected_dict)
+
+    def test_to_dict_with_missing_fields(self):
+        expected_dict = {
+            "id": self.params['id'],
+            "description": None
+        }
+        self.assertDictEqual(self.prefix_list.to_dict(), expected_dict)
 
 
 if __name__ == "__main__":

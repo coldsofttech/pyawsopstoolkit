@@ -41,20 +41,18 @@ A class representing an IPv6 range for an EC2 Security Group.
 - `cidr_ipv6`: The IPv6 CIDR range.
 - `description`: The description of the IPv6 CIDR range.
 
-## PrefixListID
+## PrefixList
 
 A class representing a Prefix List for an EC2 Security Group.
 
 ### Constructors
 
-- `PrefixListID(id: str, description: Optional[str] = None) -> None`: Initializes a new **PrefixListID** object with the
+- `PrefixList(id: str, description: Optional[str] = None) -> None`: Initializes a new **PrefixList** object with the
   specified parameters.
 
 ### Methods
 
-- `__str__() -> str`: Returns a string representation of the **PrefixListID** object.
-- `__repr__() -> str`: Returns a detailed string representation of the **PrefixListID** object.
-- `to_dict() -> dict`: Returns a dictionary representation of the **PrefixListID** object.
+- `to_dict() -> dict`: Returns a dictionary representation of the **PrefixList** object.
 
 ### Properties
 

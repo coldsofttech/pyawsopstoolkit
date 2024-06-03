@@ -1,6 +1,6 @@
 import unittest
 
-from pyawsopstoolkit.models.ec2.security_group import IPRange, IPv6Range, PrefixListID, UserIDGroupPair, IPPermission
+from pyawsopstoolkit.models.ec2.security_group import IPRange, IPv6Range, PrefixList, UserIDGroupPair, IPPermission
 
 
 class TestIPPermission(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestIPPermission(unittest.TestCase):
             IPv6Range('::/0', 'Allow all IPv6 traffic')
         ]
         self.prefix_list_ids = [
-            PrefixListID('pl-12345678', 'Allow traffic from specific AWS services')
+            PrefixList('pl-12345678', 'Allow traffic from specific AWS services')
         ]
         self.user_id_group_pairs = [
             UserIDGroupPair('sg-12345678', 'load-balancer-sg', 'active', '123456789012', 'vpc-abcdefgh')
@@ -123,7 +123,7 @@ class TestIPPermission(unittest.TestCase):
 
     def test_set_prefix_list_ids(self):
         new_lists = [
-            PrefixListID('pl-87654321')
+            PrefixList('pl-87654321')
         ]
         self.ip_permission_full.prefix_list_ids = new_lists
         self.assertEqual(self.ip_permission_full.prefix_list_ids, new_lists)

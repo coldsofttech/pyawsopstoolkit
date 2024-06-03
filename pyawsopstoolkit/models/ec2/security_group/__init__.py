@@ -1,7 +1,7 @@
 __all__ = [
     "IPRange",
     "IPv6Range",
-    "PrefixListID",
+    "PrefixList",
     "UserIDGroupPair",
     "IPPermission",
     "SecurityGroup"
@@ -13,5 +13,5 @@ tailored for the Elastic Compute Cloud (EC2) security groups of AWS (Amazon Web 
 the efficient handling and manipulation of EC2 security groups, ensuring seamless integration and interaction.
 """
 
-from pyawsopstoolkit.models.ec2.security_group.__main__ import IPRange, IPv6Range, PrefixListID, UserIDGroupPair, \
+from pyawsopstoolkit.models.ec2.security_group.__main__ import IPRange, IPv6Range, PrefixList, UserIDGroupPair, \
     IPPermission, SecurityGroup
