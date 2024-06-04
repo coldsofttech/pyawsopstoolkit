@@ -23,29 +23,13 @@ class ICredentials(ABC):
         raise NotImplementedError(_method_message)
 
 
+@dataclass
 class IAccount(ABC):
     """
     This module serves as an interface for implementing the Account class, offering a blueprint for defining
     the structure and behavior of an AWS account within the application.
     """
-
-    @abstractmethod
-    def __init__(self, number: str) -> None:
-        raise NotImplementedError(_method_message)
-
-    @property
-    @abstractmethod
-    def number(self) -> str:
-        raise NotImplementedError(_property_message)
-
-    @number.setter
-    @abstractmethod
-    def number(self, value: str) -> None:
-        raise NotImplementedError(_property_message)
-
-    @abstractmethod
-    def __str__(self) -> str:
-        raise NotImplementedError(_method_message)
+    number: str
 
     @abstractmethod
     def to_dict(self) -> dict:

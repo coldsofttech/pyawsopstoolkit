@@ -113,8 +113,11 @@ interface, providing basic functionality for managing an AWS account.
 
 #### Methods
 
-- `__str__() -> str`: Returns a string representation of the **Account** object.
 - `to_dict(self) -> dict`: Returns a dictionary representation of the **Account** object.
+
+#### Properties
+
+- `number`: The AWS account number.
 
 #### Usage
 

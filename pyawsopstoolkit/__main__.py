@@ -50,52 +50,27 @@ class Credentials(ICredentials):
         }
 
 
+@dataclass
 class Account(IAccount):
     """
     Represents an AWS account with various attributes. This class implements the IAccount interface, providing basic
     functionality for managing an AWS account.
     """
+    number: str
 
-    def __init__(self, number: str) -> None:
-        """
-        Initializes an Account object with a given account number.
-        :param number: The account number to be set.
-        :type number: str
-        """
-        AccountValidator.number(number)
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._number = number
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['number']:
+            AccountValidator.number(field_value, True)
 
-    @property
-    def number(self) -> str:
-        """
-        Getter method to retrieve the account number.
-        :return: The account number.
-        :rtype: str
-        """
-        return self._number
-
-    @number.setter
-    def number(self, value: str) -> None:
-        """
-        Setter method to set the account number.
-        :param value: The account number to be set.
-        :type value: str
-        """
-        AccountValidator.number(value)
-        self._number = value
-
-    def __str__(self) -> str:
-        """
-        Return a string representation of the Account object.
-        :return: String representation of the IAMRole object.
-        :rtype: str
-        """
-        return (
-            f'Account('
-            f'number="{self.number}"'
-            f')'
-        )
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def to_dict(self) -> dict:
         """

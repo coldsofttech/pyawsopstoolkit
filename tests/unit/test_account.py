@@ -7,28 +7,36 @@ class TestAccount(unittest.TestCase):
     """Unit test cases for Account."""
 
     def setUp(self) -> None:
-        self.number = '123456789012'
-        self.account = Account(self.number)
+        self.maxDiff = None
+        self.params = {
+            'number': '123456789012'
+        }
+        self.account = Account(self.params['number'])
 
     def test_initialization(self):
-        self.assertEqual(self.account.number, self.number)
+        self.assertEqual(self.account.number, self.params['number'])
 
-    def test_set_number(self):
-        new_number = '987654321012'
-        self.account.number = new_number
-        self.assertEqual(self.account.number, new_number)
+    def test_setters(self):
+        new_params = {
+            'number': '987654321012'
+        }
 
-    def test_str(self):
-        expected_str = (
-            f'Account('
-            f'number="{self.number}"'
-            f')'
-        )
-        self.assertEqual(str(self.account), expected_str)
+        self.account.number = new_params['number']
+        self.assertEqual(self.account.number, new_params['number'])
+
+    def test_invalid_types(self):
+        invalid_params = {
+            'number': 123
+        }
+
+        with self.assertRaises(TypeError):
+            Account(invalid_params['number'])
+        with self.assertRaises(TypeError):
+            self.account.number = invalid_params['number']
 
     def test_to_dict(self):
         expected_dict = {
-            "number": self.number
+            "number": self.params['number']
         }
         self.assertDictEqual(self.account.to_dict(), expected_dict)
 
