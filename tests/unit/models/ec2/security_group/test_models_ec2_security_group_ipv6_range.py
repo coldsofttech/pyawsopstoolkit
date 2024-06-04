@@ -44,18 +44,20 @@ class TestIPv6Range(unittest.TestCase):
         self.assertEqual(self.ipv6_range_full.description, new_params['description'])
 
     def test_invalid_types(self):
-        invalid_cidr = 123
-        invalid_description = 123
+        invalid_params = {
+            'cidr_ipv6': 123,
+            'description': 123
+        }
 
         with self.assertRaises(TypeError):
-            IPv6Range(invalid_cidr)
+            IPv6Range(invalid_params['cidr_ipv6'])
         with self.assertRaises(TypeError):
-            self.create_ipv6_range(description=invalid_description)
+            self.create_ipv6_range(description=invalid_params['description'])
 
         with self.assertRaises(TypeError):
-            self.ipv6_range_full.cidr_ipv6 = invalid_cidr
+            self.ipv6_range_full.cidr_ipv6 = invalid_params['cidr_ipv6']
         with self.assertRaises(TypeError):
-            self.ipv6_range_full.description = invalid_description
+            self.ipv6_range_full.description = invalid_params['description']
 
     def test_to_dict(self):
         expected_dict = {

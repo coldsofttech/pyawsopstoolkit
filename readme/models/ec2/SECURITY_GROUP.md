@@ -116,16 +116,15 @@ A class representing an EC2 Security Group.
 
 ### Methods
 
-- `__str__() -> str`: Returns a string representation of the **SecurityGroup** object.
 - `to_dict() -> dict`: Returns a dictionary representation of the **SecurityGroup** object.
 
 ### Properties
 
+- `description`: The description of the EC2 security group.
 - `id`: The unique identifier of the EC2 security group.
+- `ip_permissions_egress`: The list of outbound rule entries for the EC2 security group.
+- `ip_permissions`: The list of inbound rule entries for the EC2 security group.
 - `name`: The name of the EC2 security group.
 - `owner_id`: The owner ID of the EC2 security group.
-- `vpc_id`: The VPC ID of the EC2 security group.
-- `ip_permissions`: The list of inbound rule entries for the EC2 security group.
-- `ip_permissions_egress`: The list of outbound rule entries for the EC2 security group.
-- `description`: The description of the EC2 security group.
 - `tags`: The tags associated with the EC2 security group.
+- `vpc_id`: The VPC ID of the EC2 security group.

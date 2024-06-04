@@ -133,9 +133,35 @@ class TestIPPermission(unittest.TestCase):
             'user_id_group_pairs': [123]
         }
 
-        for key, invalid_value in invalid_params.items():
-            with self.assertRaises(TypeError, msg=f"Expected TypeError for {key}"):
-                self.create_ip_permission(**{key: invalid_value})
+        with self.assertRaises(TypeError):
+            IPPermission(invalid_params['from_port'], self.params['to_port'], self.params['ip_protocol'])
+        with self.assertRaises(TypeError):
+            IPPermission(self.params['from_port'], invalid_params['to_port'], self.params['ip_protocol'])
+        with self.assertRaises(TypeError):
+            IPPermission(self.params['from_port'], self.params['to_port'], invalid_params['ip_protocol'])
+        with self.assertRaises(TypeError):
+            self.create_ip_permission(ip_ranges=invalid_params['ip_ranges'])
+        with self.assertRaises(TypeError):
+            self.create_ip_permission(ipv6_ranges=invalid_params['ipv6_ranges'])
+        with self.assertRaises(TypeError):
+            self.create_ip_permission(prefix_lists=invalid_params['prefix_lists'])
+        with self.assertRaises(TypeError):
+            self.create_ip_permission(user_id_group_pairs=invalid_params['user_id_group_pairs'])
+
+        with self.assertRaises(TypeError):
+            self.ip_permission_full.from_port = invalid_params['from_port']
+        with self.assertRaises(TypeError):
+            self.ip_permission_full.to_port = invalid_params['to_port']
+        with self.assertRaises(TypeError):
+            self.ip_permission_full.ip_protocol = invalid_params['ip_protocol']
+        with self.assertRaises(TypeError):
+            self.ip_permission_full.ip_ranges = invalid_params['ip_ranges']
+        with self.assertRaises(TypeError):
+            self.ip_permission_full.ipv6_ranges = invalid_params['ipv6_ranges']
+        with self.assertRaises(TypeError):
+            self.ip_permission_full.prefix_lists = invalid_params['prefix_lists']
+        with self.assertRaises(TypeError):
+            self.ip_permission_full.user_id_group_pairs = invalid_params['user_id_group_pairs']
 
     def test_to_dict(self):
         expected_dict = {

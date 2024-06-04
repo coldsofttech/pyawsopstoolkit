@@ -36,18 +36,20 @@ class TestPermissionsBoundary(unittest.TestCase):
         self.assertEqual(self.permissions_boundary.arn, new_params['arn'])
 
     def test_invalid_types(self):
-        invalid_type = 123
-        invalid_arn = 'invalid-arn'
+        invalid_params = {
+            'type': 123,
+            'arn': 'invalid-arn'
+        }
 
         with self.assertRaises(TypeError):
-            PermissionsBoundary(invalid_type, self.params['arn'])
+            PermissionsBoundary(invalid_params['type'], self.params['arn'])
         with self.assertRaises(ValidationError):
-            PermissionsBoundary(self.params['type'], invalid_arn)
+            PermissionsBoundary(self.params['type'], invalid_params['arn'])
 
         with self.assertRaises(TypeError):
-            self.permissions_boundary.type = invalid_type
+            self.permissions_boundary.type = invalid_params['type']
         with self.assertRaises(ValidationError):
-            self.permissions_boundary.arn = invalid_arn
+            self.permissions_boundary.arn = invalid_params['arn']
 
     def test_to_dict(self):
         expected_dict = {

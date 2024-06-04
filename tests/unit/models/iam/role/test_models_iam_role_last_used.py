@@ -54,18 +54,20 @@ class TestLastUsed(unittest.TestCase):
         self.assertEqual(self.last_used.region, new_params['region'])
 
     def test_invalid_types(self):
-        invalid_date = '2024-02-06'
-        invalid_region = 'Ohio'
+        invalid_params = {
+            'used_date': '2024-02-06',
+            'region': 'Ohio'
+        }
 
         with self.assertRaises(TypeError):
-            self.create_last_used(used_date=invalid_date)
+            self.create_last_used(used_date=invalid_params['used_date'])
         with self.assertRaises(ValidationError):
-            self.create_last_used(region=invalid_region)
+            self.create_last_used(region=invalid_params['region'])
 
         with self.assertRaises(TypeError):
-            self.last_used.used_date = invalid_date
+            self.last_used.used_date = invalid_params['used_date']
         with self.assertRaises(ValidationError):
-            self.last_used.region = invalid_region
+            self.last_used.region = invalid_params['region']
 
     def test_to_dict(self):
         expected_dict = {

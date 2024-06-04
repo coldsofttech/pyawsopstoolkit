@@ -44,18 +44,20 @@ class TestPrefixList(unittest.TestCase):
         self.assertEqual(self.prefix_list_full.description, new_params['description'])
 
     def test_invalid_types(self):
-        invalid_id = 123
-        invalid_description = 123
+        invalid_params = {
+            'id': 123,
+            'description': 123
+        }
 
         with self.assertRaises(TypeError):
-            PrefixList(invalid_id)
+            PrefixList(invalid_params['id'])
         with self.assertRaises(TypeError):
-            self.create_prefix_list(description=invalid_description)
+            self.create_prefix_list(description=invalid_params['description'])
 
         with self.assertRaises(TypeError):
-            self.prefix_list_full.id = invalid_id
+            self.prefix_list_full.id = invalid_params['id']
         with self.assertRaises(TypeError):
-            self.prefix_list_full.description = invalid_description
+            self.prefix_list_full.description = invalid_params['description']
 
     def test_to_dict(self):
         expected_dict = {

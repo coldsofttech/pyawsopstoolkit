@@ -92,17 +92,19 @@ class TestUserIDGroupPair(unittest.TestCase):
         )
 
     def test_invalid_types(self):
-        invalid_id = 123
-        invalid_name = 123
-        invalid_status = 123
-        invalid_user_id = 123
-        invalid_vpc_id = 123
-        invalid_description = 123
-        invalid_peering = 123
+        invalid_params = {
+            'id': 123,
+            'name': 123,
+            'status': 123,
+            'user_id': 123,
+            'vpc_id': 123,
+            'description': 123,
+            'vpc_peering_connection_id': 123
+        }
 
         with self.assertRaises(TypeError):
             UserIDGroupPair(
-                id=invalid_id,
+                id=invalid_params['id'],
                 name=self.params['name'],
                 status=self.params['status'],
                 user_id=self.params['user_id'],
@@ -111,7 +113,7 @@ class TestUserIDGroupPair(unittest.TestCase):
         with self.assertRaises(TypeError):
             UserIDGroupPair(
                 id=self.params['id'],
-                name=invalid_name,
+                name=invalid_params['name'],
                 status=self.params['status'],
                 user_id=self.params['user_id'],
                 vpc_id=self.params['vpc_id']
@@ -120,7 +122,7 @@ class TestUserIDGroupPair(unittest.TestCase):
             UserIDGroupPair(
                 id=self.params['id'],
                 name=self.params['name'],
-                status=invalid_status,
+                status=invalid_params['status'],
                 user_id=self.params['user_id'],
                 vpc_id=self.params['vpc_id']
             )
@@ -129,7 +131,7 @@ class TestUserIDGroupPair(unittest.TestCase):
                 id=self.params['id'],
                 name=self.params['name'],
                 status=self.params['status'],
-                user_id=invalid_user_id,
+                user_id=invalid_params['user_id'],
                 vpc_id=self.params['vpc_id']
             )
         with self.assertRaises(TypeError):
@@ -138,27 +140,27 @@ class TestUserIDGroupPair(unittest.TestCase):
                 name=self.params['name'],
                 status=self.params['status'],
                 user_id=self.params['user_id'],
-                vpc_id=invalid_vpc_id
+                vpc_id=invalid_params['vpc_id']
             )
         with self.assertRaises(TypeError):
-            self.create_user_id_group_pair(description=invalid_description)
+            self.create_user_id_group_pair(description=invalid_params['description'])
         with self.assertRaises(TypeError):
-            self.create_user_id_group_pair(vpc_peering_connection_id=invalid_peering)
+            self.create_user_id_group_pair(vpc_peering_connection_id=invalid_params['vpc_peering_connection_id'])
 
         with self.assertRaises(TypeError):
-            self.user_id_group_pair_full.id = invalid_id
+            self.user_id_group_pair_full.id = invalid_params['id']
         with self.assertRaises(TypeError):
-            self.user_id_group_pair_full.name = invalid_name
+            self.user_id_group_pair_full.name = invalid_params['name']
         with self.assertRaises(TypeError):
-            self.user_id_group_pair_full.status = invalid_status
+            self.user_id_group_pair_full.status = invalid_params['status']
         with self.assertRaises(TypeError):
-            self.user_id_group_pair_full.user_id = invalid_user_id
+            self.user_id_group_pair_full.user_id = invalid_params['user_id']
         with self.assertRaises(TypeError):
-            self.user_id_group_pair_full.vpc_id = invalid_vpc_id
+            self.user_id_group_pair_full.vpc_id = invalid_params['vpc_id']
         with self.assertRaises(TypeError):
-            self.user_id_group_pair_full.description = invalid_description
+            self.user_id_group_pair_full.description = invalid_params['description']
         with self.assertRaises(TypeError):
-            self.user_id_group_pair_full.vpc_peering_connection_id = invalid_peering
+            self.user_id_group_pair_full.vpc_peering_connection_id = invalid_params['vpc_peering_connection_id']
 
     def test_to_dict(self):
         expected_dict = {

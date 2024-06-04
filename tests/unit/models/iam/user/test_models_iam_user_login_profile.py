@@ -53,18 +53,20 @@ class TestLoginProfile(unittest.TestCase):
         self.assertEqual(self.login_profile.password_reset_required, new_params['pwd_reset'])
 
     def test_invalid_types(self):
-        invalid_created_date = '2024-02-06'
-        invalid_pwd_reset = 1
+        invalid_params = {
+            'created_date': '2024-05-06',
+            'pwd_reset': 1
+        }
 
         with self.assertRaises(TypeError):
-            LoginProfile(created_date=invalid_created_date)
+            LoginProfile(created_date=invalid_params['created_date'])
         with self.assertRaises(TypeError):
-            LoginProfile(password_reset_required=invalid_pwd_reset)
+            LoginProfile(password_reset_required=invalid_params['pwd_reset'])
 
         with self.assertRaises(TypeError):
-            self.login_profile.created_date = invalid_created_date
+            self.login_profile.created_date = invalid_params['created_date']
         with self.assertRaises(TypeError):
-            self.login_profile.password_reset_required = invalid_pwd_reset
+            self.login_profile.password_reset_required = invalid_params['pwd_reset']
 
     def test_to_dict(self):
         expected_dict = {

@@ -35,18 +35,20 @@ class TestIPRange(unittest.TestCase):
         self.assertEqual(self.ip_range_full.description, new_params['description'])
 
     def test_invalid_types(self):
-        invalid_cidr_ip = 123
-        invalid_description = 123
+        invalid_params = {
+            'cidr_ip': 123,
+            'description': 123
+        }
 
         with self.assertRaises(TypeError):
-            IPRange(invalid_cidr_ip)
+            IPRange(invalid_params['cidr_ip'])
         with self.assertRaises(TypeError):
-            self.create_ip_range(description=invalid_description)
+            self.create_ip_range(description=invalid_params['description'])
 
         with self.assertRaises(TypeError):
-            self.ip_range_full.cidr_ip = invalid_cidr_ip
+            self.ip_range_full.cidr_ip = invalid_params['cidr_ip']
         with self.assertRaises(TypeError):
-            self.ip_range_full.description = invalid_description
+            self.ip_range_full.description = invalid_params['description']
 
     def test_initialization_with_optional_params(self):
         test_cases = [

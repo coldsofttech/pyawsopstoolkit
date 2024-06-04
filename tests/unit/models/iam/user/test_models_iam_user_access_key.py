@@ -90,38 +90,40 @@ class TestAccessKey(unittest.TestCase):
         self.assertEqual(self.access_key_full.last_used_region, new_params['last_region'])
 
     def test_invalid_types(self):
-        invalid_id = 123
-        invalid_status = 123
-        invalid_created_date = '2025-02-06'
-        invalid_last_date = '2025-02-06'
-        invalid_service = 123
-        invalid_region = 'Ohio'
+        invalid_params = {
+            'id': 123,
+            'status': 123,
+            'created_date': '2023-02-06',
+            'last_date': '2023-04-05',
+            'last_service': 123,
+            'last_region': 'Ohio'
+        }
 
         with self.assertRaises(TypeError):
-            AccessKey(invalid_id, self.params['status'])
+            AccessKey(invalid_params['id'], self.params['status'])
         with self.assertRaises(TypeError):
-            AccessKey(self.params['id'], invalid_status)
+            AccessKey(self.params['id'], invalid_params['status'])
         with self.assertRaises(TypeError):
-            self.create_access_key(created_date=invalid_created_date)
+            self.create_access_key(created_date=invalid_params['created_date'])
         with self.assertRaises(TypeError):
-            self.create_access_key(last_used_date=invalid_last_date)
+            self.create_access_key(last_used_date=invalid_params['last_date'])
         with self.assertRaises(TypeError):
-            self.create_access_key(last_used_service=invalid_service)
+            self.create_access_key(last_used_service=invalid_params['last_service'])
         with self.assertRaises(ValidationError):
-            self.create_access_key(last_used_region=invalid_region)
+            self.create_access_key(last_used_region=invalid_params['last_region'])
 
         with self.assertRaises(TypeError):
-            self.access_key_full.id = invalid_id
+            self.access_key_full.id = invalid_params['id']
         with self.assertRaises(TypeError):
-            self.access_key_full.status = invalid_status
+            self.access_key_full.status = invalid_params['status']
         with self.assertRaises(TypeError):
-            self.access_key_full.created_date = invalid_created_date
+            self.access_key_full.created_date = invalid_params['created_date']
         with self.assertRaises(TypeError):
-            self.access_key_full.last_used_date = invalid_last_date
+            self.access_key_full.last_used_date = invalid_params['last_date']
         with self.assertRaises(TypeError):
-            self.access_key_full.last_used_service = invalid_service
+            self.access_key_full.last_used_service = invalid_params['last_service']
         with self.assertRaises(ValidationError):
-            self.access_key_full.last_used_region = invalid_region
+            self.access_key_full.last_used_region = invalid_params['last_region']
 
     def test_to_dict(self):
         expected_dict = {
