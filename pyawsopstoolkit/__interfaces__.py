@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Union
 
@@ -6,61 +7,16 @@ _property_message: str = 'This property should be implemented in child class.'
 _method_message: str = 'This method should be implemented in child class.'
 
 
+@dataclass
 class ICredentials(ABC):
     """
     This module serves as an interface for implementing the Credentials class, providing a blueprint
     for defining the structure and behavior of credential management within the application.
     """
-
-    @abstractmethod
-    def __init__(
-            self,
-            access_key: str,
-            secret_access_key: str,
-            token: Optional[str] = None,
-            expiry: Optional[datetime] = None
-    ) -> None:
-        raise NotImplementedError(_method_message)
-
-    @property
-    @abstractmethod
-    def access_key(self) -> str:
-        raise NotImplementedError(_property_message)
-
-    @access_key.setter
-    @abstractmethod
-    def access_key(self, value: str) -> None:
-        raise NotImplementedError(_property_message)
-
-    @property
-    @abstractmethod
-    def secret_access_key(self) -> str:
-        raise NotImplementedError(_property_message)
-
-    @secret_access_key.setter
-    @abstractmethod
-    def secret_access_key(self, value: str) -> None:
-        raise NotImplementedError(_property_message)
-
-    @property
-    @abstractmethod
-    def token(self) -> str:
-        raise NotImplementedError(_property_message)
-
-    @token.setter
-    @abstractmethod
-    def token(self, value: str) -> None:
-        raise NotImplementedError(_property_message)
-
-    @property
-    @abstractmethod
-    def expiry(self) -> Optional[datetime]:
-        raise NotImplementedError(_property_message)
-
-    @expiry.setter
-    @abstractmethod
-    def expiry(self, value: Optional[datetime] = None) -> None:
-        raise NotImplementedError(_property_message)
+    access_key: str
+    secret_access_key: str
+    token: Optional[str] = None
+    expiry: Optional[datetime] = None
 
     @abstractmethod
     def to_dict(self) -> dict:

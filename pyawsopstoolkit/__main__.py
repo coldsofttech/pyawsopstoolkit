@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Union
 
@@ -7,140 +8,33 @@ from pyawsopstoolkit.exceptions import AssumeRoleError
 from pyawsopstoolkit.validators import ArnValidator, PolicyValidator, TagValidator, AccountValidator, Validator
 
 
+@dataclass
 class Credentials(ICredentials):
     """
     Represents a set of credentials including an access key, secret access key, token, and optional expiry datetime.
-    :param access_key: Access key string.
-    :type access_key: str
-    :param secret_access_key: Secret access key string.
-    :type secret_access_key: str
-    :param token: Token string.
-    :type token: str
-    :param expiry: Optional expiry datetime. Defaults to None.
-    :type expiry: datetime
     """
+    access_key: str
+    secret_access_key: str
+    token: Optional[str] = None
+    expiry: Optional[datetime] = None
 
-    def __init__(
-            self,
-            access_key: str,
-            secret_access_key: str,
-            token: Optional[str] = None,
-            expiry: Optional[datetime] = None
-    ) -> None:
-        """
-        Initialize Credentials object.
-        :param access_key: Access key string.
-        :type access_key: str
-        :param secret_access_key: Secret access key string.
-        :type secret_access_key: str
-        :param token: Token string.
-        :type token: str
-        :param expiry: Optional expiry datetime.
-        :type expiry: datetime
-        """
-        Validation.validate_type(access_key, str, 'access_key should be a string.')
-        Validation.validate_type(secret_access_key, str, 'secret_access_key should be a string.')
-        Validation.validate_type(token, Union[str, None], 'token should be a string.')
-        Validation.validate_type(expiry, Union[datetime, None], 'expiry should be a datetime.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._access_key = access_key
-        self._secret_access_key = secret_access_key
-        self._token = token
-        self._expiry = expiry
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['access_key', 'secret_access_key']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+        elif field_name in ['token']:
+            Validation.validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
+        elif field_name in ['expiry']:
+            Validation.validate_type(field_value, Union[datetime, None], f'{field_name} should be a datetime.')
 
-    @property
-    def access_key(self) -> str:
-        """
-        Get access key.
-        :return: Access key string.
-        :rtype: str
-        """
-        return self._access_key
-
-    @access_key.setter
-    def access_key(self, value: str) -> None:
-        """
-        Set access key.
-        :param value: New access key.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'access_key should be a string.')
-        self._access_key = value
-
-    @property
-    def secret_access_key(self) -> str:
-        """
-        Get secret access key.
-        :return: Secret access key string.
-        :rtype: str
-        """
-        return self._secret_access_key
-
-    @secret_access_key.setter
-    def secret_access_key(self, value: str) -> None:
-        """
-        Set secret access key.
-        :param value: New secret access key.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'secret_access_key should be a string.')
-        self._secret_access_key = value
-
-    @property
-    def token(self) -> str:
-        """
-        Get token.
-        :return: Token string.
-        :rtype: str
-        """
-        return self._token
-
-    @token.setter
-    def token(self, value: str) -> None:
-        """
-        Set token.
-        :param value: New token.
-        :type value: str
-        """
-        Validation.validate_type(value, str, 'token should be a string.')
-        self._token = value
-
-    @property
-    def expiry(self) -> Optional[datetime]:
-        """
-        Get expiry datetime.
-        :return: Expiry datetime.
-        :rtype: datetime
-        """
-        return self._expiry
-
-    @expiry.setter
-    def expiry(self, value: Optional[datetime] = None) -> None:
-        """
-        Set expiry datetime.
-        :param value: New expiry datetime.
-        :type value: datetime
-        """
-        Validation.validate_type(value, Union[datetime, None], 'expiry should be a datetime.')
-        self._expiry = value
-
-    def __str__(self) -> str:
-        """
-        Convert Credentials object to string.
-        :return: String representation of Credentials object.
-        :rtype: str
-        """
-        token = f'"{self.token}"' if self.token else None
-        expiry = f'{self.expiry.isoformat()}' if self.expiry else None
-
-        return (
-            f'Credentials('
-            f'access_key="{self.access_key}",'
-            f'secret_access_key="{self.secret_access_key}",'
-            f'token={token},'
-            f'expiry={expiry}'
-            f')'
-        )
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def to_dict(self) -> dict:
         """
@@ -151,8 +45,8 @@ class Credentials(ICredentials):
         return {
             "access_key": self.access_key,
             "secret_access_key": self.secret_access_key,
-            "token": self.token if self.token else None,
-            "expiry": self.expiry.isoformat() if self.expiry else None
+            "token": self.token if self.token is not None else None,
+            "expiry": self.expiry.isoformat() if self.expiry is not None else None
         }
 
 

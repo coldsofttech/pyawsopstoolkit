@@ -65,8 +65,14 @@ optional expiry datetime.
 
 #### Methods
 
-- `__str__() -> str`: Returns a string representation of the **Credentials** object.
 - `to_dict() -> dict`: Returns a dictionary representation of the **Credentials** object.
+
+#### Properties
+
+- `access_key`: The access key string.
+- `expiry`: The token expiry datetime.
+- `secret_access_key`: The secret access key string.
+- `token`: The token string.
 
 #### Usage
 
@@ -82,11 +88,11 @@ print(creds.secret_access_key)  # Output: secret_access_key
 print(creds.token)  # Output: token
 
 # Print the Credentials object
-print(
-    creds)  # Output: Credentials(access_key="access_key",secret_access_key="secret_access_key",token="token",expiry=None)
+print(creds)
+# Output: Credentials(access_key="access_key",secret_access_key="secret_access_key",token="token",expiry=None)
 
 # Convert Credentials object to dictionary
-print(creds.__dict__())
+print(creds.to_dict())
 # Output:
 # {
 #     "access_key": "access_key",
