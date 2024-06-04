@@ -36,50 +36,15 @@ class IAccount(ABC):
         raise NotImplementedError(_method_message)
 
 
+@dataclass
 class ISession(ABC):
     """
     This module serves as an interface for implementing the Session class, providing a blueprint for defining
     the structure and behavior of AWS session management within the application.
     """
-
-    @abstractmethod
-    def __init__(
-            self,
-            profile_name: Optional[str] = None,
-            credentials: Optional[ICredentials] = None,
-            region_code: Optional[str] = 'eu-west-1'
-    ) -> None:
-        raise NotImplementedError(_method_message)
-
-    @property
-    @abstractmethod
-    def profile_name(self) -> str:
-        raise NotImplementedError(_property_message)
-
-    @profile_name.setter
-    @abstractmethod
-    def profile_name(self, value: Optional[str] = None) -> None:
-        raise NotImplementedError(_property_message)
-
-    @property
-    @abstractmethod
-    def credentials(self) -> ICredentials:
-        raise NotImplementedError(_property_message)
-
-    @credentials.setter
-    @abstractmethod
-    def credentials(self, value: Optional[ICredentials] = None) -> None:
-        raise NotImplementedError(_property_message)
-
-    @property
-    @abstractmethod
-    def region_code(self) -> str:
-        raise NotImplementedError(_property_message)
-
-    @region_code.setter
-    @abstractmethod
-    def region_code(self, value: Optional[str] = 'eu-west-1') -> None:
-        raise NotImplementedError(_property_message)
+    profile_name: Optional[str] = None
+    credentials: Optional[ICredentials] = None
+    region_code: Optional[str] = 'eu-west-1'
 
     @abstractmethod
     def get_session(self):

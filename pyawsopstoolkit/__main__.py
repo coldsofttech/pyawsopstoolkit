@@ -83,106 +83,40 @@ class Account(IAccount):
         }
 
 
+@dataclass
 class Session(ISession):
     """
     This class represents a boto3 Session with various attributes. It implements the ISession interface, offering
     functionality to manage sessions. Additionally, it provides the option to assume a session.
     """
+    profile_name: Optional[str] = None
+    credentials: Optional[ICredentials] = None
+    region_code: Optional[str] = 'eu-west-1'
 
-    def __init__(
-            self,
-            profile_name: Optional[str] = None,
-            credentials: Optional[ICredentials] = None,
-            region_code: Optional[str] = 'eu-west-1'
-    ) -> None:
-        """
-        Initializes a Session object for AWS.
-        :param profile_name: The name of the AWS profile to be used for authentication.
-        :type profile_name: str
-        :param credentials: An object containing AWS credentials, including access key, secret access key, and token.
-        :type credentials: Credentials
-        :param region_code: The code representing the AWS region to operate in, e.g., "eu-west-1".
-        :type region_code: str
-        """
-        if (profile_name is not None) == (credentials is not None):
+    def __post_init__(self):
+        if (self.profile_name is not None) == (self.credentials is not None):
             raise ValueError('Either profile_name or credentials should be provided, but not both.')
-
-        if profile_name:
-            Validation.validate_type(profile_name, str, 'profile_name should be a string.')
-            self._profile_name = profile_name
-            self._credentials = None
-        elif credentials:
-            Validation.validate_type(credentials, Credentials, 'credentials should be of Credentials type.')
-            self._profile_name = None
-            self._credentials = credentials
-        else:
+        elif (self.profile_name is None) == (self.credentials is None):
             raise ValueError('At least profile_name or credentials is required.')
 
-        Validator.region(region_code)
-        self._region_code = region_code
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-    @property
-    def profile_name(self) -> str:
-        """
-        Getter for the profile name.
-        :return: The name of the AWS profile.
-        :rtype: str
-        """
-        return self._profile_name
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['profile_name']:
+            Validation.validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
+        elif field_name in ['region_code']:
+            Validator.region(field_value, True)
+        elif field_name in ['credentials']:
+            Validation.validate_type(
+                field_value, Union[ICredentials, None], f'{field_name} should be of ICredentials type.'
+            )
 
-    @profile_name.setter
-    def profile_name(self, value: Optional[str] = None) -> None:
-        """
-        Setter for updating the profile name.
-        :param value: The new name of the AWS profile.
-        :type value: str
-        """
-        if self.credentials is not None:
-            raise ValueError('Either profile_name or credentials should be provided, but not both.')
-
-        Validation.validate_type(value, str, 'profile_name should be a string.')
-        self._profile_name = value
-
-    @property
-    def credentials(self) -> ICredentials:
-        """
-        Getter for the AWS credentials.
-        :return: Credentials object for AWS.
-        :rtype: Credentials
-        """
-        return self._credentials
-
-    @credentials.setter
-    def credentials(self, value: Optional[ICredentials] = None) -> None:
-        """
-        Setter for updating the AWS credentials.
-        :param value: The new AWS credentials object to be set.
-        :type value: Credentials
-        """
-        if self.profile_name is not None:
-            raise ValueError('Either profile_name or credentials should be provided, but not both.')
-
-        Validation.validate_type(value, Credentials, 'credentials should be of Credentials type.')
-        self._credentials = value
-
-    @property
-    def region_code(self) -> str:
-        """
-        Getter for the region code.
-        :return: The region code.
-        :rtype: str
-        """
-        return self._region_code
-
-    @region_code.setter
-    def region_code(self, value: Optional[str] = 'eu-west-1') -> None:
-        """
-        Setter for updating the region code.
-        :param value: The new region code to be set.
-        :type value: str
-        """
-        Validator.region(value)
-        self._region_code = value
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def get_session(self):
         """
@@ -319,17 +253,11 @@ class Session(ISession):
                 "DurationSeconds": duration_seconds
             }
             if policy_arns:
-                params.update({
-                    "PolicyArns": policy_arns
-                })
+                params.update({"PolicyArns": policy_arns})
             if policy:
-                params.update({
-                    "Policy": policy
-                })
+                params.update({"Policy": policy})
             if tags:
-                params.update({
-                    "Tags": tags
-                })
+                params.update({"Tags": tags})
             response = sts_client.assume_role(**params)
             if response:
                 creds = response.get('Credentials', {})

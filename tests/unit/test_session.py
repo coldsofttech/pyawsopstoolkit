@@ -6,51 +6,76 @@ import botocore.config
 from botocore.exceptions import ProfileNotFound, ClientError
 
 from pyawsopstoolkit import Credentials, Session
-from pyawsopstoolkit.exceptions import AssumeRoleError
+from pyawsopstoolkit.exceptions import AssumeRoleError, ValidationError
 
 
 class TestSession(unittest.TestCase):
     """Unit test cases for Session."""
 
     def setUp(self) -> None:
-        self.profile_name = 'temp'
-        self.credentials = Credentials('access_key', 'secret_access_key', 'token')
-        self.region_code = 'us-east-1'
-        self.session_with_profile = Session(profile_name=self.profile_name)
-        self.session_with_creds = Session(credentials=self.credentials)
+        self.maxDiff = None
+        self.params = {
+            'profile_name': 'temp',
+            'credentials': Credentials('access_key', 'secret_access_key', 'token'),
+            'region_code': 'us-east-1'
+        }
+        self.session_with_profile = Session(profile_name=self.params['profile_name'])
+        self.session_with_creds = Session(credentials=self.params['credentials'])
+        self.session_with_region_code = Session(
+            profile_name=self.params['profile_name'], region_code=self.params['region_code']
+        )
 
-    def test_initialization_empty(self):
+    def test_initialization(self):
         with self.assertRaises(ValueError):
             Session()
 
-    def test_initialization_with_profile_and_credentials(self):
-        with self.assertRaises(ValueError):
-            Session(profile_name=self.profile_name, credentials=self.credentials)
+    def test_initialization_with_optional_params(self):
+        test_cases = [
+            (self.session_with_profile, self.params['profile_name'], None, 'eu-west-1'),
+            (self.session_with_creds, None, self.params['credentials'], 'eu-west-1'),
+            (self.session_with_region_code, self.params['profile_name'], None, 'us-east-1')
+        ]
+        for session, profile_name, credentials, region in test_cases:
+            with self.subTest(session=session):
+                self.assertEqual(session.profile_name, profile_name)
+                self.assertEqual(session.credentials, credentials)
+                self.assertEqual(session.region_code, region)
 
-    def test_initialization_with_profile(self):
-        self.assertEqual(self.session_with_profile.profile_name, self.profile_name)
-        self.assertIsNone(self.session_with_profile.credentials)
-        self.assertEqual(self.session_with_profile.region_code, 'eu-west-1')
+    def test_setters(self):
+        new_params = {
+            'profile_name': 'default',
+            'credentials': Credentials('valid_access_key', 'valid_secret_access_key', 'valid_token'),
+            'region_code': 'us-east-2'
+        }
 
-    def test_initialization_with_credentials(self):
-        self.assertIsNone(self.session_with_creds.profile_name)
-        self.assertEqual(self.session_with_creds.credentials, self.credentials)
-        self.assertEqual(self.session_with_creds.region_code, 'eu-west-1')
+        self.session_with_profile.profile_name = new_params['profile_name']
+        self.session_with_creds.credentials = new_params['credentials']
+        self.session_with_region_code.region_code = new_params['region_code']
 
-    def test_set_profile_name(self):
-        new_profile_name = 'sample'
-        self.session_with_profile.profile_name = new_profile_name
-        self.assertEqual(self.session_with_profile.profile_name, new_profile_name)
+        self.assertEqual(self.session_with_profile.profile_name, new_params['profile_name'])
+        self.assertEqual(self.session_with_creds.credentials, new_params['credentials'])
+        self.assertEqual(self.session_with_region_code.region_code, new_params['region_code'])
 
-    def test_set_credentials(self):
-        new_credentials = Credentials('new_access_key', 'new_secret_access_key', 'new_token')
-        self.session_with_creds.credentials = new_credentials
-        self.assertEqual(self.session_with_creds.credentials, new_credentials)
+    def test_invalid_types(self):
+        invalid_params = {
+            'profile_name': 123,
+            'credentials': 123,
+            'region_code': 'Ohio'
+        }
 
-    def test_set_region_code(self):
-        new_region = 'us-east-2'
-        self.session_with_creds.region_code = new_region
-        self.assertEqual(self.session_with_creds.region_code, new_region)
+        with self.assertRaises(TypeError):
+            Session(profile_name=invalid_params['profile_name'])
+        with self.assertRaises(TypeError):
+            Session(credentials=invalid_params['credentials'])
+        with self.assertRaises(ValidationError):
+            Session(profile_name=self.params['profile_name'], region_code=invalid_params['region_code'])
+
+        with self.assertRaises(TypeError):
+            self.session_with_profile.profile_name = invalid_params['profile_name']
+        with self.assertRaises(TypeError):
+            self.session_with_creds.credentials = invalid_params['credentials']
+        with self.assertRaises(ValidationError):
+            self.session_with_region_code.region_code = invalid_params['region_code']
 
     @patch('boto3.Session')
     def test_get_session_with_profile_name(self, mock_session):
@@ -58,7 +83,7 @@ class TestSession(unittest.TestCase):
         session_instance.client.return_value.list_buckets.return_value = {}
 
         self.assertIsNotNone(self.session_with_profile.get_session())
-        mock_session.assert_called_once_with(profile_name=self.profile_name)
+        mock_session.assert_called_once_with(profile_name=self.params['profile_name'])
 
     @patch('boto3.Session')
     def test_get_session_with_credentials(self, mock_session):
@@ -67,9 +92,9 @@ class TestSession(unittest.TestCase):
 
         self.assertIsNotNone(self.session_with_creds.get_session())
         mock_session.assert_called_once_with(
-            aws_access_key_id=self.credentials.access_key,
-            aws_secret_access_key=self.credentials.secret_access_key,
-            aws_session_token=self.credentials.token
+            aws_access_key_id=self.params['credentials'].access_key,
+            aws_secret_access_key=self.params['credentials'].secret_access_key,
+            aws_session_token=self.params['credentials'].token
         )
 
     @patch('boto3.Session')
@@ -84,7 +109,7 @@ class TestSession(unittest.TestCase):
     @patch('boto3.Session')
     def test_get_session_profile_not_found(self, mock_session):
         session_instance = mock_session.return_value
-        session_instance.client.side_effect = ProfileNotFound(profile=self.profile_name)
+        session_instance.client.side_effect = ProfileNotFound(profile=self.params['profile_name'])
 
         with self.assertRaises(ValueError):
             self.session_with_profile.get_session()
@@ -141,7 +166,7 @@ class TestSession(unittest.TestCase):
     @patch('boto3.Session')
     def test_get_credentials_for_profile_profile_not_found(self, mock_session):
         mock_session_instance = mock_session.return_value
-        mock_session_instance.get_credentials.side_effect = ProfileNotFound(profile=self.profile_name)
+        mock_session_instance.get_credentials.side_effect = ProfileNotFound(profile=self.params['profile_name'])
 
         with self.assertRaises(ValueError):
             self.session_with_profile.get_credentials_for_profile()

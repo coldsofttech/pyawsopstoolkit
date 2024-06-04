@@ -155,6 +155,13 @@ offering functionality to manage sessions. Additionally, it provides the option 
 - `assume_role(role_arn: str, role_session_name: Optional[str] = 'AssumeSession', policy_arns: Optional[list] = None, policy: Optional[Union[str, dict]] = None, duration_seconds: Optional[int] = 3600, tags: Optional[list] = None) -> ISession`:
   Returns the **ISession** object for the assumed role based on the specified parameters.
 
+#### Properties
+
+- `credentials`: The object containing AWS credentials, including access key, secret access key, and optional token and
+  expiry.
+- `profile_name`: The name of the AWS profile to be used for authentication.
+- `region_code`: The code representing the AWS region to operate in, e.g., 'us-east-2'. Defaults to 'eu-west-1'.
+
 #### Usage
 
 ```python
@@ -178,8 +185,8 @@ print(config)  # Output: <botocore.config.Config object at 0x0000022097630040>
 
 # Get credentials for profile
 creds = session.get_credentials_for_profile()
-print(
-    creds)  # Output: Credentials(access_key="access_key",secret_access_key="secret_access_key",token=None,expiry=None)
+print(creds)
+# Output: Credentials(access_key="access_key",secret_access_key="secret_access_key",token=None,expiry=None)
 ```
 
 ## pyawsopstoolkit.advsearch
