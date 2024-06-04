@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime
 
 from pyawsopstoolkit import Account
+from pyawsopstoolkit.exceptions import ValidationError
 from pyawsopstoolkit.models.iam import PermissionsBoundary
 from pyawsopstoolkit.models.iam.user import LoginProfile, AccessKey, User
 
@@ -11,56 +12,52 @@ class TestUser(unittest.TestCase):
 
     def setUp(self) -> None:
         self.maxDiff = None
-        self.account = Account('123456789012')
-        self.name = 'test_user'
-        self.id = 'AID2MAB8DPLSRHEXAMPLE'
-        self.arn = f'arn:aws:iam::{self.account.number}:user/{self.name}'
-        self.path = '/test/'
-        self.created_date = datetime(2023, 5, 18)
-        self.pwd_used_date = datetime(2023, 6, 18)
-        self.permissions_boundary = PermissionsBoundary(
-            type='Policy',
-            arn=f'arn:aws:iam::{self.account.number}:policy/ExamplePolicy'
+        self.params = {
+            'account': Account('123456789012'),
+            'name': 'test_user',
+            'id': 'AID2MAB8DPLSRHEXAMPLE',
+            'arn': 'arn:aws:iam::123456789012:user/test_user',
+            'path': '/test/',
+            'created_date': datetime(2023, 5, 18),
+            'pwd_used_date': datetime(2023, 6, 18),
+            'permissions_boundary': PermissionsBoundary('Policy', 'arn:aws:iam::123456789012:policy/ExamplePolicy'),
+            'login_profile': LoginProfile(datetime(2023, 5, 18)),
+            'access_keys': [AccessKey('ID', 'Active')],
+            'tags': [{'Key': 'test_key', 'Value': 'test_value'}]
+        }
+        self.user = self.create_user()
+        self.user_with_path = self.create_user(path=self.params['path'])
+        self.user_with_date = self.create_user(created_date=self.params['created_date'])
+        self.user_with_pwd_date = self.create_user(password_last_used_date=self.params['pwd_used_date'])
+        self.user_with_permissions_boundary = self.create_user(permissions_boundary=self.params['permissions_boundary'])
+        self.user_with_login_profile = self.create_user(login_profile=self.params['login_profile'])
+        self.user_with_access_keys = self.create_user(access_keys=self.params['access_keys'])
+        self.user_with_tags = self.create_user(tags=self.params['tags'])
+        self.user_full = self.create_user(
+            path=self.params['path'],
+            created_date=self.params['created_date'],
+            password_last_used_date=self.params['pwd_used_date'],
+            permissions_boundary=self.params['permissions_boundary'],
+            login_profile=self.params['login_profile'],
+            access_keys=self.params['access_keys'],
+            tags=self.params['tags']
         )
-        self.login_profile = LoginProfile(
-            created_date=datetime(2023, 5, 18)
-        )
-        self.access_keys = [
-            AccessKey('ID', 'Active')
-        ]
-        self.tags = [
-            {'Key': 'test_key', 'Value': 'test_value'}
-        ]
-        self.user = User(self.account, self.name, self.id, self.arn, self.path)
-        self.user_with_date = User(
-            self.account, self.name, self.id, self.arn, self.path, created_date=self.created_date
-        )
-        self.user_with_pwd_date = User(
-            self.account, self.name, self.id, self.arn, self.path, password_last_used_date=self.pwd_used_date
-        )
-        self.user_with_permissions_boundary = User(
-            self.account, self.name, self.id, self.arn, self.path, permissions_boundary=self.permissions_boundary
-        )
-        self.user_with_login_profile = User(
-            self.account, self.name, self.id, self.arn, self.path, login_profile=self.login_profile
-        )
-        self.user_with_access_keys = User(
-            self.account, self.name, self.id, self.arn, self.path, access_keys=self.access_keys
-        )
-        self.user_with_tags = User(
-            self.account, self.name, self.id, self.arn, self.path, tags=self.tags
-        )
-        self.user_full = User(
-            self.account, self.name, self.id, self.arn, self.path, self.created_date, self.pwd_used_date,
-            self.permissions_boundary, self.login_profile, self.access_keys, self.tags
+
+    def create_user(self, **kwargs):
+        return User(
+            account=self.params['account'],
+            name=self.params['name'],
+            id=self.params['id'],
+            arn=self.params['arn'],
+            **kwargs
         )
 
     def test_initialization(self):
-        self.assertEqual(self.user.account, self.account)
-        self.assertEqual(self.user.name, self.name)
-        self.assertEqual(self.user.id, self.id)
-        self.assertEqual(self.user.arn, self.arn)
-        self.assertEqual(self.user.path, self.path)
+        self.assertEqual(self.user.account, self.params['account'])
+        self.assertEqual(self.user.name, self.params['name'])
+        self.assertEqual(self.user.id, self.params['id'])
+        self.assertEqual(self.user.arn, self.params['arn'])
+        self.assertEqual(self.user.path, '/')
         self.assertIsNone(self.user.created_date)
         self.assertIsNone(self.user.password_last_used_date)
         self.assertIsNone(self.user.permissions_boundary)
@@ -68,195 +65,238 @@ class TestUser(unittest.TestCase):
         self.assertIsNone(self.user.access_keys)
         self.assertIsNone(self.user.tags)
 
-    def test_initialization_with_date(self):
-        self.assertEqual(self.user_with_date.account, self.account)
-        self.assertEqual(self.user_with_date.name, self.name)
-        self.assertEqual(self.user_with_date.id, self.id)
-        self.assertEqual(self.user_with_date.arn, self.arn)
-        self.assertEqual(self.user_with_date.path, self.path)
-        self.assertEqual(self.user_with_date.created_date, self.created_date)
-        self.assertIsNone(self.user_with_date.password_last_used_date)
-        self.assertIsNone(self.user_with_date.permissions_boundary)
-        self.assertIsNone(self.user_with_date.login_profile)
-        self.assertIsNone(self.user_with_date.access_keys)
-        self.assertIsNone(self.user_with_date.tags)
-
-    def test_initialization_with_pwd_date(self):
-        self.assertEqual(self.user_with_pwd_date.account, self.account)
-        self.assertEqual(self.user_with_pwd_date.name, self.name)
-        self.assertEqual(self.user_with_pwd_date.id, self.id)
-        self.assertEqual(self.user_with_pwd_date.arn, self.arn)
-        self.assertEqual(self.user_with_pwd_date.path, self.path)
-        self.assertIsNone(self.user_with_pwd_date.created_date)
-        self.assertEqual(self.user_with_pwd_date.password_last_used_date, self.pwd_used_date)
-        self.assertIsNone(self.user_with_pwd_date.permissions_boundary)
-        self.assertIsNone(self.user_with_pwd_date.login_profile)
-        self.assertIsNone(self.user_with_pwd_date.access_keys)
-        self.assertIsNone(self.user_with_pwd_date.tags)
-
-    def test_initialization_with_permissions_boundary(self):
-        self.assertEqual(self.user_with_permissions_boundary.account, self.account)
-        self.assertEqual(self.user_with_permissions_boundary.name, self.name)
-        self.assertEqual(self.user_with_permissions_boundary.id, self.id)
-        self.assertEqual(self.user_with_permissions_boundary.arn, self.arn)
-        self.assertEqual(self.user_with_permissions_boundary.path, self.path)
-        self.assertIsNone(self.user_with_permissions_boundary.created_date)
-        self.assertIsNone(self.user_with_permissions_boundary.password_last_used_date)
-        self.assertEqual(self.user_with_permissions_boundary.permissions_boundary, self.permissions_boundary)
-        self.assertIsNone(self.user_with_permissions_boundary.login_profile)
-        self.assertIsNone(self.user_with_permissions_boundary.access_keys)
-        self.assertIsNone(self.user_with_permissions_boundary.tags)
-
-    def test_initialization_with_login_profile(self):
-        self.assertEqual(self.user_with_login_profile.account, self.account)
-        self.assertEqual(self.user_with_login_profile.name, self.name)
-        self.assertEqual(self.user_with_login_profile.id, self.id)
-        self.assertEqual(self.user_with_login_profile.arn, self.arn)
-        self.assertEqual(self.user_with_login_profile.path, self.path)
-        self.assertIsNone(self.user_with_login_profile.created_date)
-        self.assertIsNone(self.user_with_login_profile.password_last_used_date)
-        self.assertIsNone(self.user_with_login_profile.permissions_boundary)
-        self.assertEqual(self.user_with_login_profile.login_profile, self.login_profile)
-        self.assertIsNone(self.user_with_login_profile.access_keys)
-        self.assertIsNone(self.user_with_login_profile.tags)
-
-    def test_initialization_with_access_keys(self):
-        self.assertEqual(self.user_with_access_keys.account, self.account)
-        self.assertEqual(self.user_with_access_keys.name, self.name)
-        self.assertEqual(self.user_with_access_keys.id, self.id)
-        self.assertEqual(self.user_with_access_keys.arn, self.arn)
-        self.assertEqual(self.user_with_access_keys.path, self.path)
-        self.assertIsNone(self.user_with_access_keys.created_date)
-        self.assertIsNone(self.user_with_access_keys.password_last_used_date)
-        self.assertIsNone(self.user_with_access_keys.permissions_boundary)
-        self.assertIsNone(self.user_with_access_keys.login_profile)
-        self.assertEqual(self.user_with_access_keys.access_keys, self.access_keys)
-        self.assertIsNone(self.user_with_access_keys.tags)
-
-    def test_initialization_with_tags(self):
-        self.assertEqual(self.user_with_tags.account, self.account)
-        self.assertEqual(self.user_with_tags.name, self.name)
-        self.assertEqual(self.user_with_tags.id, self.id)
-        self.assertEqual(self.user_with_tags.arn, self.arn)
-        self.assertEqual(self.user_with_tags.path, self.path)
-        self.assertIsNone(self.user_with_tags.created_date)
-        self.assertIsNone(self.user_with_tags.password_last_used_date)
-        self.assertIsNone(self.user_with_tags.permissions_boundary)
-        self.assertIsNone(self.user_with_tags.login_profile)
-        self.assertIsNone(self.user_with_tags.access_keys)
-        self.assertEqual(self.user_with_tags.tags, self.tags)
-
-    def test_initialization_full(self):
-        self.assertEqual(self.user_full.account, self.account)
-        self.assertEqual(self.user_full.name, self.name)
-        self.assertEqual(self.user_full.id, self.id)
-        self.assertEqual(self.user_full.arn, self.arn)
-        self.assertEqual(self.user_full.path, self.path)
-        self.assertEqual(self.user_full.created_date, self.created_date)
-        self.assertEqual(self.user_full.password_last_used_date, self.pwd_used_date)
-        self.assertEqual(self.user_full.permissions_boundary, self.permissions_boundary)
-        self.assertEqual(self.user_full.login_profile, self.login_profile)
-        self.assertEqual(self.user_full.access_keys, self.access_keys)
-        self.assertEqual(self.user_full.tags, self.tags)
-
-    def test_set_account(self):
-        new_account = Account('987654321012')
-        self.user_full.account = new_account
-        self.assertEqual(self.user_full.account, new_account)
-
-    def test_set_name(self):
-        new_name = 'test_user2'
-        self.user_full.name = new_name
-        self.assertEqual(self.user_full.name, new_name)
-
-    def test_set_id(self):
-        new_id = 'NEW_ID'
-        self.user_full.id = new_id
-        self.assertEqual(self.user_full.id, new_id)
-
-    def test_set_arn(self):
-        new_arn = 'arn:aws:iam::987654321012:user/test_user2'
-        self.user_full.arn = new_arn
-        self.assertEqual(self.user_full.arn, new_arn)
-
-    def test_set_path(self):
-        new_path = '/test1/'
-        self.user_full.path = new_path
-        self.assertEqual(self.user_full.path, new_path)
-
-    def test_set_created_date(self):
-        new_date = datetime.today()
-        self.user_full.created_date = new_date
-        self.assertEqual(self.user_full.created_date, new_date)
-
-    def test_set_password_last_used_date(self):
-        new_date = datetime.today()
-        self.user_full.password_last_used_date = new_date
-        self.assertEqual(self.user_full.password_last_used_date, new_date)
-
-    def test_set_permissions_boundary(self):
-        new_permissions_boundary = PermissionsBoundary(
-            type='ManagedPolicy',
-            arn='arn:aws:iam::987654321012:policy/ManagedPolicy'
-        )
-        self.user_full.permissions_boundary = new_permissions_boundary
-        self.assertEqual(self.user_full.permissions_boundary, new_permissions_boundary)
-
-    def test_set_login_profile(self):
-        new_login_profile = LoginProfile(
-            created_date=datetime.today()
-        )
-        self.user_full.login_profile = new_login_profile
-        self.assertEqual(self.user_full.login_profile, new_login_profile)
-
-    def test_set_access_keys(self):
-        new_access_keys = [
-            AccessKey('ID1', 'Active'),
-            AccessKey('ID2', 'Inactive')
+    def test_initialization_with_optional_params(self):
+        test_cases = [
+            (self.user_with_path, self.params['path'], None, None, None, None, None, None),
+            (self.user_with_date, '/', self.params['created_date'], None, None, None, None, None),
+            (self.user_with_pwd_date, '/', None, self.params['pwd_used_date'], None, None, None, None),
+            (
+                self.user_with_permissions_boundary,
+                '/', None, None, self.params['permissions_boundary'], None, None, None
+            ),
+            (self.user_with_login_profile, '/', None, None, None, self.params['login_profile'], None, None),
+            (self.user_with_access_keys, '/', None, None, None, None, self.params['access_keys'], None),
+            (self.user_with_tags, '/', None, None, None, None, None, self.params['tags']),
+            (
+                self.user_full,
+                self.params['path'],
+                self.params['created_date'],
+                self.params['pwd_used_date'],
+                self.params['permissions_boundary'],
+                self.params['login_profile'],
+                self.params['access_keys'],
+                self.params['tags']
+            )
         ]
-        self.user_full.access_keys = new_access_keys
-        self.assertEqual(self.user_full.access_keys, new_access_keys)
+        for user, path, created_date, pwd_used_date, boundary, login_profile, access_keys, tags in test_cases:
+            with self.subTest(user=user):
+                self.assertEqual(user.account, self.params['account'])
+                self.assertEqual(user.name, self.params['name'])
+                self.assertEqual(user.id, self.params['id'])
+                self.assertEqual(user.arn, self.params['arn'])
+                self.assertEqual(user.path, path)
+                self.assertEqual(user.created_date, created_date)
+                self.assertEqual(user.password_last_used_date, pwd_used_date)
+                self.assertEqual(user.permissions_boundary, boundary)
+                self.assertEqual(user.login_profile, login_profile)
+                self.assertEqual(user.access_keys, access_keys)
+                self.assertEqual(user.tags, tags)
 
-    def test_set_tags(self):
-        new_tags = [
-            {'Key': 'test_key1', 'Value': 'test_value1'}
-        ]
-        self.user_full.tags = new_tags
-        self.assertEqual(self.user_full.tags, new_tags)
+    def test_setters(self):
+        new_params = {
+            'account': Account('987654321012'),
+            'name': 'test_user2',
+            'id': 'AID2MAB8DPLSRHEXAMPL1',
+            'arn': 'arn:aws:iam::987654321012:user/test_user2',
+            'path': '/test_app/',
+            'created_date': datetime(2024, 5, 18),
+            'pwd_used_date': datetime(2024, 6, 18),
+            'permissions_boundary': PermissionsBoundary(
+                'ManagedPolicy', 'arn:aws:iam::987654321012:policy/ExamplePolicy'
+            ),
+            'login_profile': LoginProfile(datetime(2024, 5, 18)),
+            'access_keys': [AccessKey('ID1', 'Inactive')],
+            'tags': [{'Key': 'test_key1', 'Value': 'test_value1'}]
+        }
 
-    def test_str(self):
-        expected_str = (
-            f'User('
-            f'account={self.account},'
-            f'path="{self.path}",'
-            f'name="{self.name}",'
-            f'id="{self.id}",'
-            f'arn="{self.arn}",'
-            f'created_date={self.created_date.isoformat()},'
-            f'password_last_used_date={self.pwd_used_date.isoformat()},'
-            f'permissions_boundary={self.permissions_boundary},'
-            f'login_profile={self.login_profile},'
-            f'access_keys={self.access_keys},'
-            f'tags={self.tags}'
-            f')'
-        )
-        self.assertEqual(str(self.user_full), expected_str)
+        self.user_full.account = new_params['account']
+        self.user_full.name = new_params['name']
+        self.user_full.id = new_params['id']
+        self.user_full.arn = new_params['arn']
+        self.user_full.path = new_params['path']
+        self.user_full.created_date = new_params['created_date']
+        self.user_full.password_last_used_date = new_params['pwd_used_date']
+        self.user_full.permissions_boundary = new_params['permissions_boundary']
+        self.user_full.login_profile = new_params['login_profile']
+        self.user_full.access_keys = new_params['access_keys']
+        self.user_full.tags = new_params['tags']
+
+        self.assertEqual(self.user_full.account, new_params['account'])
+        self.assertEqual(self.user_full.name, new_params['name'])
+        self.assertEqual(self.user_full.id, new_params['id'])
+        self.assertEqual(self.user_full.arn, new_params['arn'])
+        self.assertEqual(self.user_full.path, new_params['path'])
+        self.assertEqual(self.user_full.created_date, new_params['created_date'])
+        self.assertEqual(self.user_full.password_last_used_date, new_params['pwd_used_date'])
+        self.assertEqual(self.user_full.permissions_boundary, new_params['permissions_boundary'])
+        self.assertEqual(self.user_full.login_profile, new_params['login_profile'])
+        self.assertEqual(self.user_full.access_keys, new_params['access_keys'])
+        self.assertEqual(self.user_full.tags, new_params['tags'])
+
+    def test_invalid_types(self):
+        invalid_params = {
+            'account': '123456789012',
+            'name': 123,
+            'id': 123,
+            'arn': 'ivnalid-arn',
+            'path': 123,
+            'created_date': '2024-05-06',
+            'pwd_used_date': '2024-05-06',
+            'permissions_boundary': 'arn:aws:iam::123456789012:policy/ExamplePolicy',
+            'login_profile': 'login_profile',
+            'access_keys': [123],
+            'tags': 'tag_key=tag_value'
+        }
+
+        with self.assertRaises(TypeError):
+            User(
+                account=invalid_params['account'],
+                name=self.params['name'],
+                id=self.params['id'],
+                arn=self.params['arn']
+            )
+        with self.assertRaises(TypeError):
+            User(
+                account=self.params['account'],
+                name=invalid_params['name'],
+                id=self.params['id'],
+                arn=self.params['arn']
+            )
+        with self.assertRaises(TypeError):
+            User(
+                account=self.params['account'],
+                name=self.params['name'],
+                id=invalid_params['id'],
+                arn=self.params['arn']
+            )
+        with self.assertRaises(ValidationError):
+            User(
+                account=self.params['account'],
+                name=self.params['name'],
+                id=self.params['id'],
+                arn=invalid_params['arn']
+            )
+        with self.assertRaises(TypeError):
+            User(
+                account=self.params['account'],
+                name=self.params['name'],
+                id=self.params['id'],
+                arn=self.params['arn'],
+                path=invalid_params['path']
+            )
+        with self.assertRaises(TypeError):
+            User(
+                account=self.params['account'],
+                name=self.params['name'],
+                id=self.params['id'],
+                arn=self.params['arn'],
+                created_date=invalid_params['created_date']
+            )
+        with self.assertRaises(TypeError):
+            User(
+                account=self.params['account'],
+                name=self.params['name'],
+                id=self.params['id'],
+                arn=self.params['arn'],
+                password_last_used_date=invalid_params['pwd_used_date']
+            )
+        with self.assertRaises(TypeError):
+            User(
+                account=self.params['account'],
+                name=self.params['name'],
+                id=self.params['id'],
+                arn=self.params['arn'],
+                permissions_boundary=invalid_params['permissions_boundary']
+            )
+        with self.assertRaises(TypeError):
+            User(
+                account=self.params['account'],
+                name=self.params['name'],
+                id=self.params['id'],
+                arn=self.params['arn'],
+                login_profile=invalid_params['login_profile']
+            )
+        with self.assertRaises(TypeError):
+            User(
+                account=self.params['account'],
+                name=self.params['name'],
+                id=self.params['id'],
+                arn=self.params['arn'],
+                access_keys=invalid_params['access_keys']
+            )
+        with self.assertRaises(TypeError):
+            User(
+                account=self.params['account'],
+                name=self.params['name'],
+                id=self.params['id'],
+                arn=self.params['arn'],
+                tags=invalid_params['tags']
+            )
+
+        with self.assertRaises(TypeError):
+            self.user_full.account = invalid_params['account']
+        with self.assertRaises(TypeError):
+            self.user_full.name = invalid_params['name']
+        with self.assertRaises(TypeError):
+            self.user_full.id = invalid_params['id']
+        with self.assertRaises(ValidationError):
+            self.user_full.arn = invalid_params['arn']
+        with self.assertRaises(TypeError):
+            self.user_full.path = invalid_params['path']
+        with self.assertRaises(TypeError):
+            self.user_full.created_date = invalid_params['created_date']
+        with self.assertRaises(TypeError):
+            self.user_full.password_last_used_date = invalid_params['pwd_used_date']
+        with self.assertRaises(TypeError):
+            self.user_full.permissions_boundary = invalid_params['permissions_boundary']
+        with self.assertRaises(TypeError):
+            self.user_full.login_profile = invalid_params['login_profile']
+        with self.assertRaises(TypeError):
+            self.user_full.access_keys = invalid_params['access_keys']
+        with self.assertRaises(TypeError):
+            self.user_full.tags = invalid_params['tags']
 
     def test_to_dict(self):
         expected_dict = {
-            "account": self.account.to_dict(),
-            "path": self.path,
-            "name": self.name,
-            "id": self.id,
-            "arn": self.arn,
-            "created_date": self.created_date.isoformat(),
-            "password_last_used_date": self.pwd_used_date.isoformat(),
-            "permissions_boundary": self.permissions_boundary.to_dict(),
-            "login_profile": self.login_profile.to_dict(),
-            "access_keys": [key.to_dict() for key in self.access_keys],
-            "tags": self.tags
+            "account": self.params['account'].to_dict(),
+            "path": self.params['path'],
+            "name": self.params['name'],
+            "id": self.params['id'],
+            "arn": self.params['arn'],
+            "created_date": self.params['created_date'].isoformat(),
+            "password_last_used_date": self.params['pwd_used_date'].isoformat(),
+            "permissions_boundary": self.params['permissions_boundary'].to_dict(),
+            "login_profile": self.params['login_profile'].to_dict(),
+            "access_keys": [key.to_dict() for key in self.params['access_keys']],
+            "tags": self.params['tags']
         }
         self.assertDictEqual(self.user_full.to_dict(), expected_dict)
+
+    def test_to_dict_with_missing_fields(self):
+        expected_dict = {
+            "account": self.params['account'].to_dict(),
+            "path": "/",
+            "name": self.params['name'],
+            "id": self.params['id'],
+            "arn": self.params['arn'],
+            "created_date": None,
+            "password_last_used_date": None,
+            "permissions_boundary": None,
+            "login_profile": None,
+            "access_keys": None,
+            "tags": None
+        }
+        self.assertDictEqual(self.user.to_dict(), expected_dict)
 
 
 if __name__ == "__main__":

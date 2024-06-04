@@ -56,7 +56,6 @@ A class representing an IAM user.
 
 ### Methods
 
-- `__str__() -> str`: Returns a string representation of the **User** object.
 - `to_dict() -> dict`: Returns a dictionary representation of the **User** object.
 
 ### Properties
@@ -68,7 +67,7 @@ A class representing an IAM user.
 - `id`: The unique ID of the IAM user.
 - `login_profile`: The login profile associated with the IAM user.
 - `name`: The name of the IAM user.
-- `path`: The path of the IAM user within the AWS IAM hierarchy.
 - `password_last_used_date`: The last date the IAM user's password was used.
+- `path`: The path of the IAM user within the AWS IAM hierarchy.
 - `permissions_boundary`: The permissions boundary associated with the IAM user.
 - `tags`: A list of tags associated with the IAM user, useful for organization and management purposes.
