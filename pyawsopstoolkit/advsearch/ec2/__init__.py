@@ -3,7 +3,7 @@ __all__ = [
 ]
 __name__ = "pyawsopstoolkit.advsearch.ec2"
 __description__ = """
-This subpakcage of pyawsopstoolkit.advsearch offers sophisticated search capabilities specifically designed for
+This subpackage of pyawsopstoolkit.advsearch offers sophisticated search capabilities specifically designed for
 AWS (Amazon Web Services) Elastic Compute Cloud (EC2).
 """
 

@@ -1,6 +1,7 @@
 import unittest
 
 from pyawsopstoolkit import Account
+from pyawsopstoolkit.exceptions import ValidationError
 from pyawsopstoolkit.models.ec2.security_group import IPPermission, SecurityGroup
 
 
@@ -8,202 +9,248 @@ class TestSecurityGroup(unittest.TestCase):
     """Unit test cases for SecurityGroup."""
 
     def setUp(self) -> None:
-        self.account = Account('123456789012')
-        self.region = 'eu-west-1'
-        self.id = 'sg-12345678'
-        self.name = 'web-servers-sg'
-        self.owner_id = '123456789012'
-        self.vpc_id = 'vpc-abcdefgh'
-        self.ip_permissions = [
-            IPPermission(80, 80, 'tcp')
-        ]
-        self.ip_permissions_egress = [
-            IPPermission(443, 443, 'tcp')
-        ]
-        self.description = 'Primary security group for web servers'
-        self.tags = [
-            {'Key': 'test_key', 'Value': 'test_value'}
-        ]
-        self.security_group = SecurityGroup(self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id)
-        self.security_group_with_ip_permissions = SecurityGroup(
-            self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id, self.ip_permissions
+        self.maxDiff = None
+        self.params = {
+            'account': Account('123456789012'),
+            'region': 'eu-west-1',
+            'id': 'sg-12345678',
+            'name': 'web-servers-sg',
+            'owner_id': '123456789012',
+            'vpc_id': 'vpc-abcdefgh',
+            'ip_permissions': [IPPermission(80, 80, 'tcp')],
+            'ip_permissions_egress': [IPPermission(443, 443, 'tcp')],
+            'description': 'Primary security group for web servers',
+            'tags': [{'Key': 'test_key', 'Value': 'test_value'}]
+        }
+        self.security_group = self.create_security_group()
+        self.security_group_with_ip_permissions = self.create_security_group(
+            ip_permissions=self.params['ip_permissions']
         )
-        self.security_group_with_ip_permissions_egress = SecurityGroup(
-            self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id,
-            ip_permissions_egress=self.ip_permissions_egress
+        self.security_group_with_ip_permissions_egress = self.create_security_group(
+            ip_permissions_egress=self.params['ip_permissions_egress']
         )
-        self.security_group_with_desc = SecurityGroup(
-            self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id, description=self.description
+        self.security_group_with_desc = self.create_security_group(description=self.params['description'])
+        self.security_group_with_tags = self.create_security_group(tags=self.params['tags'])
+        self.security_group_full = self.create_security_group(
+            ip_permissions=self.params['ip_permissions'],
+            ip_permissions_egress=self.params['ip_permissions_egress'],
+            description=self.params['description'],
+            tags=self.params['tags']
         )
-        self.security_group_with_tags = SecurityGroup(
-            self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id, tags=self.tags
-        )
-        self.security_group_full = SecurityGroup(
-            self.account, self.region, self.id, self.name, self.owner_id, self.vpc_id, self.ip_permissions,
-            self.ip_permissions_egress, self.description, self.tags
+
+    def create_security_group(self, **kwargs):
+        return SecurityGroup(
+            account=self.params['account'],
+            region=self.params['region'],
+            id=self.params['id'],
+            name=self.params['name'],
+            owner_id=self.params['owner_id'],
+            vpc_id=self.params['vpc_id'],
+            **kwargs
         )
 
     def test_initialization(self):
-        self.assertEqual(self.security_group.account, self.account)
-        self.assertEqual(self.security_group.region, self.region)
-        self.assertEqual(self.security_group.id, self.id)
-        self.assertEqual(self.security_group.name, self.name)
-        self.assertEqual(self.security_group.owner_id, self.owner_id)
-        self.assertEqual(self.security_group.vpc_id, self.vpc_id)
+        self.assertEqual(self.security_group.account, self.params['account'])
+        self.assertEqual(self.security_group.region, self.params['region'])
+        self.assertEqual(self.security_group.id, self.params['id'])
+        self.assertEqual(self.security_group.name, self.params['name'])
+        self.assertEqual(self.security_group.owner_id, self.params['owner_id'])
+        self.assertEqual(self.security_group.vpc_id, self.params['vpc_id'])
         self.assertIsNone(self.security_group.ip_permissions)
         self.assertIsNone(self.security_group.ip_permissions_egress)
         self.assertIsNone(self.security_group.description)
         self.assertIsNone(self.security_group.tags)
 
-    def test_initialization_with_ip_permissions(self):
-        self.assertEqual(self.security_group_with_ip_permissions.account, self.account)
-        self.assertEqual(self.security_group_with_ip_permissions.region, self.region)
-        self.assertEqual(self.security_group_with_ip_permissions.id, self.id)
-        self.assertEqual(self.security_group_with_ip_permissions.name, self.name)
-        self.assertEqual(self.security_group_with_ip_permissions.owner_id, self.owner_id)
-        self.assertEqual(self.security_group_with_ip_permissions.vpc_id, self.vpc_id)
-        self.assertEqual(self.security_group_with_ip_permissions.ip_permissions, self.ip_permissions)
-        self.assertIsNone(self.security_group_with_ip_permissions.ip_permissions_egress)
-        self.assertIsNone(self.security_group_with_ip_permissions.description)
-        self.assertIsNone(self.security_group_with_ip_permissions.tags)
-
-    def test_initialization_with_ip_permissions_egress(self):
-        self.assertEqual(self.security_group_with_ip_permissions_egress.account, self.account)
-        self.assertEqual(self.security_group_with_ip_permissions_egress.region, self.region)
-        self.assertEqual(self.security_group_with_ip_permissions_egress.id, self.id)
-        self.assertEqual(self.security_group_with_ip_permissions_egress.name, self.name)
-        self.assertEqual(self.security_group_with_ip_permissions_egress.owner_id, self.owner_id)
-        self.assertEqual(self.security_group_with_ip_permissions_egress.vpc_id, self.vpc_id)
-        self.assertIsNone(self.security_group_with_ip_permissions_egress.ip_permissions)
-        self.assertEqual(
-            self.security_group_with_ip_permissions_egress.ip_permissions_egress, self.ip_permissions_egress
-        )
-        self.assertIsNone(self.security_group_with_ip_permissions_egress.description)
-        self.assertIsNone(self.security_group_with_ip_permissions_egress.tags)
-
-    def test_initialization_with_desc(self):
-        self.assertEqual(self.security_group_with_desc.account, self.account)
-        self.assertEqual(self.security_group_with_desc.region, self.region)
-        self.assertEqual(self.security_group_with_desc.id, self.id)
-        self.assertEqual(self.security_group_with_desc.name, self.name)
-        self.assertEqual(self.security_group_with_desc.owner_id, self.owner_id)
-        self.assertEqual(self.security_group_with_desc.vpc_id, self.vpc_id)
-        self.assertIsNone(self.security_group_with_desc.ip_permissions)
-        self.assertIsNone(self.security_group_with_desc.ip_permissions_egress)
-        self.assertEqual(self.security_group_with_desc.description, self.description)
-        self.assertIsNone(self.security_group_with_desc.tags)
-
-    def test_initialization_with_tags(self):
-        self.assertEqual(self.security_group_with_tags.account, self.account)
-        self.assertEqual(self.security_group_with_tags.region, self.region)
-        self.assertEqual(self.security_group_with_tags.id, self.id)
-        self.assertEqual(self.security_group_with_tags.name, self.name)
-        self.assertEqual(self.security_group_with_tags.owner_id, self.owner_id)
-        self.assertEqual(self.security_group_with_tags.vpc_id, self.vpc_id)
-        self.assertIsNone(self.security_group_with_tags.ip_permissions)
-        self.assertIsNone(self.security_group_with_tags.ip_permissions_egress)
-        self.assertIsNone(self.security_group_with_tags.description)
-        self.assertEqual(self.security_group_with_tags.tags, self.tags)
-
-    def test_initialization_full(self):
-        self.assertEqual(self.security_group_full.account, self.account)
-        self.assertEqual(self.security_group_full.region, self.region)
-        self.assertEqual(self.security_group_full.id, self.id)
-        self.assertEqual(self.security_group_full.name, self.name)
-        self.assertEqual(self.security_group_full.owner_id, self.owner_id)
-        self.assertEqual(self.security_group_full.vpc_id, self.vpc_id)
-        self.assertEqual(self.security_group_full.ip_permissions, self.ip_permissions)
-        self.assertEqual(self.security_group_full.ip_permissions_egress, self.ip_permissions_egress)
-        self.assertEqual(self.security_group_full.description, self.description)
-        self.assertEqual(self.security_group_full.tags, self.tags)
-
-    def test_set_account(self):
-        new_account = Account('987654321012')
-        self.security_group_full.account = new_account
-        self.assertEqual(self.security_group_full.account, new_account)
-
-    def test_set_region(self):
-        new_region = 'us-east-2'
-        self.security_group_full.region = new_region
-        self.assertEqual(self.security_group_full.region, new_region)
-
-    def test_set_id(self):
-        new_id = 'sg-87654321'
-        self.security_group_full.id = new_id
-        self.assertEqual(self.security_group_full.id, new_id)
-
-    def test_set_name(self):
-        new_name = 'Test Security Group'
-        self.security_group_full.name = new_name
-        self.assertEqual(self.security_group_full.name, new_name)
-
-    def test_set_owner_id(self):
-        new_owner = '987654321012'
-        self.security_group_full.owner_id = new_owner
-        self.assertEqual(self.security_group_full.owner_id, new_owner)
-
-    def test_set_vpc_id(self):
-        new_vpc = 'vpc-hgfedcba'
-        self.security_group_full.vpc_id = new_vpc
-        self.assertEqual(self.security_group_full.vpc_id, new_vpc)
-
-    def test_set_ip_permissions(self):
-        new_permissions = [
-            IPPermission(443, 443, 'tcp')
+    def test_initialization_with_optional_params(self):
+        test_cases = [
+            (self.security_group_with_ip_permissions, self.params['ip_permissions'], None, None, None),
+            (self.security_group_with_ip_permissions_egress, None, self.params['ip_permissions_egress'], None, None),
+            (self.security_group_with_desc, None, None, self.params['description'], None),
+            (self.security_group_with_tags, None, None, None, self.params['tags']),
+            (
+                self.security_group_full,
+                self.params['ip_permissions'],
+                self.params['ip_permissions_egress'],
+                self.params['description'],
+                self.params['tags']
+            )
         ]
-        self.security_group_full.ip_permissions = new_permissions
-        self.assertEqual(self.security_group_full.ip_permissions, new_permissions)
+        for security_group, ip_permissions, ip_permissions_egress, description, tags in test_cases:
+            with self.subTest(security_group=security_group):
+                self.assertEqual(security_group.account, self.params['account'])
+                self.assertEqual(security_group.region, self.params['region'])
+                self.assertEqual(security_group.id, self.params['id'])
+                self.assertEqual(security_group.name, self.params['name'])
+                self.assertEqual(security_group.owner_id, self.params['owner_id'])
+                self.assertEqual(security_group.vpc_id, self.params['vpc_id'])
+                self.assertEqual(security_group.ip_permissions, ip_permissions)
+                self.assertEqual(security_group.ip_permissions_egress, ip_permissions_egress)
+                self.assertEqual(security_group.description, description)
+                self.assertEqual(security_group.tags, tags)
 
-    def test_set_ip_permissions_egress(self):
-        new_permissions = [
-            IPPermission(80, 80, 'tcp')
-        ]
-        self.security_group_full.ip_permissions_egress = new_permissions
-        self.assertEqual(self.security_group_full.ip_permissions_egress, new_permissions)
+    def test_setters(self):
+        new_params = {
+            'account': Account('987654321012'),
+            'region': 'us-east-2',
+            'id': 'sg-87654321',
+            'name': 'load-balancers-sg',
+            'owner_id': '987654321012',
+            'vpc_id': 'vpc-hgfedcba',
+            'ip_permissions': [IPPermission(443, 443, 'tcp')],
+            'ip_permissions_egress': [IPPermission(80, 80, 'tcp')],
+            'description': 'Primary security group for load balancers',
+            'tags': [{'Key': 'test_key1', 'Value': 'test_value1'}]
+        }
 
-    def test_set_description(self):
-        new_description = 'Updated security group for web servers'
-        self.security_group_full.description = new_description
-        self.assertEqual(self.security_group_full.description, new_description)
+        self.security_group_full.account = new_params['account']
+        self.security_group_full.region = new_params['region']
+        self.security_group_full.id = new_params['id']
+        self.security_group_full.name = new_params['name']
+        self.security_group_full.owner_id = new_params['owner_id']
+        self.security_group_full.vpc_id = new_params['vpc_id']
+        self.security_group_full.ip_permissions = new_params['ip_permissions']
+        self.security_group_full.ip_permissions_egress = new_params['ip_permissions_egress']
+        self.security_group_full.description = new_params['description']
+        self.security_group_full.tags = new_params['tags']
 
-    def test_set_tags(self):
-        new_tags = [
-            {'Key': 'test_key1', 'Value': 'test_value1'}
-        ]
-        self.security_group_full.tags = new_tags
-        self.assertEqual(self.security_group_full.tags, new_tags)
+        self.assertEqual(self.security_group_full.account, new_params['account'])
+        self.assertEqual(self.security_group_full.region, new_params['region'])
+        self.assertEqual(self.security_group_full.id, new_params['id'])
+        self.assertEqual(self.security_group_full.name, new_params['name'])
+        self.assertEqual(self.security_group_full.owner_id, new_params['owner_id'])
+        self.assertEqual(self.security_group_full.vpc_id, new_params['vpc_id'])
+        self.assertEqual(self.security_group_full.ip_permissions, new_params['ip_permissions'])
+        self.assertEqual(self.security_group_full.ip_permissions_egress, new_params['ip_permissions_egress'])
+        self.assertEqual(self.security_group_full.description, new_params['description'])
+        self.assertEqual(self.security_group_full.tags, new_params['tags'])
 
-    def test_str(self):
-        expected_str = (
-            f'SecurityGroup('
-            f'account={self.account},'
-            f'region="{self.region}",'
-            f'id="{self.id}",'
-            f'name="{self.name}",'
-            f'owner_id="{self.owner_id}",'
-            f'vpc_id="{self.vpc_id}",'
-            f'ip_permissions={self.ip_permissions},'
-            f'ip_permissions_egress={self.ip_permissions_egress},'
-            f'description="{self.description}",'
-            f'tags={self.tags}'
-            f')'
-        )
-        self.assertEqual(str(self.security_group_full), expected_str)
+    def test_invalid_types(self):
+        invalid_params = {
+            'account': '123456789012',
+            'region': 'Ireland',
+            'id': 123,
+            'name': 123,
+            'owner_id': 123,
+            'vpc_id': 123,
+            'ip_permissions': [80],
+            'ip_permissions_egress': [443],
+            'description': 123,
+            'tags': 'tag_key=tag_value'
+        }
+
+        with self.assertRaises(TypeError):
+            SecurityGroup(
+                account=invalid_params['account'],
+                region=self.params['region'],
+                id=self.params['id'],
+                name=self.params['name'],
+                owner_id=self.params['owner_id'],
+                vpc_id=self.params['vpc_id']
+            )
+        with self.assertRaises(ValidationError):
+            SecurityGroup(
+                account=self.params['account'],
+                region=invalid_params['region'],
+                id=self.params['id'],
+                name=self.params['name'],
+                owner_id=self.params['owner_id'],
+                vpc_id=self.params['vpc_id']
+            )
+        with self.assertRaises(TypeError):
+            SecurityGroup(
+                account=self.params['account'],
+                region=self.params['region'],
+                id=invalid_params['id'],
+                name=self.params['name'],
+                owner_id=self.params['owner_id'],
+                vpc_id=self.params['vpc_id']
+            )
+        with self.assertRaises(TypeError):
+            SecurityGroup(
+                account=self.params['account'],
+                region=self.params['region'],
+                id=self.params['id'],
+                name=invalid_params['name'],
+                owner_id=self.params['owner_id'],
+                vpc_id=self.params['vpc_id']
+            )
+        with self.assertRaises(TypeError):
+            SecurityGroup(
+                account=self.params['account'],
+                region=self.params['region'],
+                id=self.params['id'],
+                name=self.params['name'],
+                owner_id=invalid_params['owner_id'],
+                vpc_id=self.params['vpc_id']
+            )
+        with self.assertRaises(TypeError):
+            SecurityGroup(
+                account=self.params['account'],
+                region=self.params['region'],
+                id=self.params['id'],
+                name=self.params['name'],
+                owner_id=self.params['owner_id'],
+                vpc_id=invalid_params['vpc_id']
+            )
+        with self.assertRaises(TypeError):
+            self.create_security_group(ip_permissions=invalid_params['ip_permissions'])
+        with self.assertRaises(TypeError):
+            self.create_security_group(ip_permissions_egress=invalid_params['ip_permissions_egress'])
+        with self.assertRaises(TypeError):
+            self.create_security_group(description=invalid_params['description'])
+        with self.assertRaises(TypeError):
+            self.create_security_group(tags=invalid_params['tags'])
+
+        with self.assertRaises(TypeError):
+            self.security_group_full.account = invalid_params['account']
+        with self.assertRaises(ValidationError):
+            self.security_group_full.region = invalid_params['region']
+        with self.assertRaises(TypeError):
+            self.security_group_full.id = invalid_params['id']
+        with self.assertRaises(TypeError):
+            self.security_group_full.name = invalid_params['name']
+        with self.assertRaises(TypeError):
+            self.security_group_full.owner_id = invalid_params['owner_id']
+        with self.assertRaises(TypeError):
+            self.security_group_full.vpc_id = invalid_params['vpc_id']
+        with self.assertRaises(TypeError):
+            self.security_group_full.ip_permissions = invalid_params['ip_permissions']
+        with self.assertRaises(TypeError):
+            self.security_group_full.ip_permissions_egress = invalid_params['ip_permissions_egress']
+        with self.assertRaises(TypeError):
+            self.security_group_full.description = invalid_params['description']
+        with self.assertRaises(TypeError):
+            self.security_group_full.tags = invalid_params['tags']
 
     def test_to_dict(self):
         expected_dict = {
-            "account": self.account.to_dict(),
-            "region": self.region,
-            "id": self.id,
-            "name": self.name,
-            "owner_id": self.owner_id,
-            "vpc_id": self.vpc_id,
-            "ip_permissions": [ip_perm.to_dict() for ip_perm in self.ip_permissions],
-            "ip_permissions_egress": [ip_perm.to_dict() for ip_perm in self.ip_permissions_egress],
-            "description": self.description,
-            "tags": self.tags
+            "account": self.params['account'].to_dict(),
+            "region": self.params['region'],
+            "id": self.params['id'],
+            "name": self.params['name'],
+            "owner_id": self.params['owner_id'],
+            "vpc_id": self.params['vpc_id'],
+            "ip_permissions": [ip_perm.to_dict() for ip_perm in self.params['ip_permissions']],
+            "ip_permissions_egress": [ip_perm.to_dict() for ip_perm in self.params['ip_permissions_egress']],
+            "description": self.params['description'],
+            "tags": self.params['tags']
         }
         self.assertDictEqual(self.security_group_full.to_dict(), expected_dict)
+
+    def test_to_dict_with_missing_fields(self):
+        expected_dict = {
+            "account": self.params['account'].to_dict(),
+            "region": self.params['region'],
+            "id": self.params['id'],
+            "name": self.params['name'],
+            "owner_id": self.params['owner_id'],
+            "vpc_id": self.params['vpc_id'],
+            "ip_permissions": None,
+            "ip_permissions_egress": None,
+            "description": None,
+            "tags": None
+        }
+        self.assertDictEqual(self.security_group.to_dict(), expected_dict)
 
 
 if __name__ == "__main__":

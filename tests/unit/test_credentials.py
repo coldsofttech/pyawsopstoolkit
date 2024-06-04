@@ -8,78 +8,111 @@ class TestCredentials(unittest.TestCase):
     """Unit test cases for Credentials."""
 
     def setUp(self) -> None:
-        self.access_key = "valid_access_key"
-        self.secret_access_key = "valid_secret_access_key"
-        self.token = "valid_token"
-        self.expiry = datetime(2023, 5, 18)
-        self.creds = Credentials(self.access_key, self.secret_access_key)
-        self.creds_with_token = Credentials(self.access_key, self.secret_access_key, self.token)
-        self.creds_with_expiry = Credentials(self.access_key, self.secret_access_key, expiry=self.expiry)
-        self.creds_full = Credentials(self.access_key, self.secret_access_key, self.token, self.expiry)
+        self.maxDiff = None
+        self.params = {
+            'access_key': 'valid_access_key',
+            'secret_access_key': 'valid_secret_access_key',
+            'token': 'valid_token',
+            'expiry': datetime(2023, 5, 18)
+        }
+        self.creds = self.create_credentials()
+        self.creds_with_token = self.create_credentials(token=self.params['token'])
+        self.creds_with_expiry = self.create_credentials(expiry=self.params['expiry'])
+        self.creds_full = self.create_credentials(token=self.params['token'], expiry=self.params['expiry'])
+
+    def create_credentials(self, **kwargs):
+        return Credentials(
+            access_key=self.params['access_key'],
+            secret_access_key=self.params['secret_access_key'],
+            **kwargs
+        )
 
     def test_initialization(self):
-        self.assertEqual(self.creds.access_key, self.access_key)
-        self.assertEqual(self.creds.secret_access_key, self.secret_access_key)
+        self.assertEqual(self.creds.access_key, self.params['access_key'])
+        self.assertEqual(self.creds.secret_access_key, self.params['secret_access_key'])
         self.assertIsNone(self.creds.token)
         self.assertIsNone(self.creds.expiry)
 
-    def test_initialization_with_token(self):
-        self.assertEqual(self.creds_with_token.access_key, self.access_key)
-        self.assertEqual(self.creds_with_token.secret_access_key, self.secret_access_key)
-        self.assertEqual(self.creds_with_token.token, self.token)
-        self.assertIsNone(self.creds_with_token.expiry)
+    def test_initialization_with_optional_params(self):
+        test_cases = [
+            (self.creds_with_token, self.params['token'], None),
+            (self.creds_with_expiry, None, self.params['expiry']),
+            (self.creds_full, self.params['token'], self.params['expiry'])
+        ]
+        for creds, token, expiry in test_cases:
+            with self.subTest(creds=creds):
+                self.assertEqual(creds.access_key, self.params['access_key'])
+                self.assertEqual(creds.secret_access_key, self.params['secret_access_key'])
+                self.assertEqual(creds.token, token)
+                self.assertEqual(creds.expiry, expiry)
 
-    def test_initialization_with_expiry(self):
-        self.assertEqual(self.creds_with_expiry.access_key, self.access_key)
-        self.assertEqual(self.creds_with_expiry.secret_access_key, self.secret_access_key)
-        self.assertIsNone(self.creds_with_expiry.token)
-        self.assertEqual(self.creds_with_expiry.expiry, self.expiry)
+    def test_setters(self):
+        new_params = {
+            'access_key': 'access_key',
+            'secret_access_key': 'secret_access_key',
+            'token': 'token',
+            'expiry': datetime.today()
+        }
 
-    def test_initialization_full(self):
-        self.assertEqual(self.creds_full.access_key, self.access_key)
-        self.assertEqual(self.creds_full.secret_access_key, self.secret_access_key)
-        self.assertEqual(self.creds_full.token, self.token)
-        self.assertEqual(self.creds_full.expiry, self.expiry)
+        self.creds_full.access_key = new_params['access_key']
+        self.creds_full.secret_access_key = new_params['secret_access_key']
+        self.creds_full.token = new_params['token']
+        self.creds_full.expiry = new_params['expiry']
 
-    def test_set_access_key(self):
-        new_access_key = 'new_access_key'
-        self.creds_full.access_key = new_access_key
-        self.assertEqual(self.creds_full.access_key, new_access_key)
+        self.assertEqual(self.creds_full.access_key, new_params['access_key'])
+        self.assertEqual(self.creds_full.secret_access_key, new_params['secret_access_key'])
+        self.assertEqual(self.creds_full.token, new_params['token'])
+        self.assertEqual(self.creds_full.expiry, new_params['expiry'])
 
-    def test_set_secret_access_key(self):
-        new_secret_access_key = 'new_secret_access_key'
-        self.creds_full.secret_access_key = new_secret_access_key
-        self.assertEqual(self.creds_full.secret_access_key, new_secret_access_key)
+    def test_invalid_types(self):
+        invalid_params = {
+            'access_key': 123,
+            'secret_access_key': 123,
+            'token': 123,
+            'expiry': '2024-05-06'
+        }
 
-    def test_set_token(self):
-        new_token = 'new_token'
-        self.creds_full.token = new_token
-        self.assertEqual(self.creds_full.token, new_token)
+        with self.assertRaises(TypeError):
+            Credentials(
+                access_key=invalid_params['access_key'],
+                secret_access_key=self.params['secret_access_key']
+            )
+        with self.assertRaises(TypeError):
+            Credentials(
+                access_key=self.params['access_key'],
+                secret_access_key=invalid_params['secret_access_key']
+            )
+        with self.assertRaises(TypeError):
+            self.create_credentials(token=invalid_params['token'])
+        with self.assertRaises(TypeError):
+            self.create_credentials(expiry=invalid_params['expiry'])
 
-    def test_set_expiry(self):
-        new_expiry = datetime.today()
-        self.creds_full.expiry = new_expiry
-        self.assertEqual(self.creds_full.expiry, new_expiry)
-
-    def test_str(self):
-        expected_str = (
-            f'Credentials('
-            f'access_key="{self.access_key}",'
-            f'secret_access_key="{self.secret_access_key}",'
-            f'token="{self.token}",'
-            f'expiry={self.expiry.isoformat()}'
-            f')'
-        )
-        self.assertEqual(str(self.creds_full), expected_str)
+        with self.assertRaises(TypeError):
+            self.creds_full.access_key = invalid_params['access_key']
+        with self.assertRaises(TypeError):
+            self.creds_full.secret_access_key = invalid_params['secret_access_key']
+        with self.assertRaises(TypeError):
+            self.creds_full.token = invalid_params['token']
+        with self.assertRaises(TypeError):
+            self.creds_full.expiry = invalid_params['expiry']
 
     def test_to_dict(self):
         expected_dict = {
-            "access_key": self.access_key,
-            "secret_access_key": self.secret_access_key,
-            "token": self.token,
-            "expiry": self.expiry.isoformat()
+            "access_key": self.params['access_key'],
+            "secret_access_key": self.params['secret_access_key'],
+            "token": self.params['token'],
+            "expiry": self.params['expiry'].isoformat()
         }
         self.assertDictEqual(self.creds_full.to_dict(), expected_dict)
+
+    def test_to_dict_with_missing_fields(self):
+        expected_dict = {
+            "access_key": self.params['access_key'],
+            "secret_access_key": self.params['secret_access_key'],
+            "token": None,
+            "expiry": None
+        }
+        self.assertDictEqual(self.creds.to_dict(), expected_dict)
 
 
 if __name__ == "__main__":

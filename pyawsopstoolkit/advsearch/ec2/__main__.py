@@ -62,7 +62,7 @@ class SecurityGroup:
         :rtype: pyawsopstoolkit.models.ec2.security_group.SecurityGroup
         """
         from pyawsopstoolkit.models.ec2.security_group import SecurityGroup, IPPermission, IPRange, IPv6Range, \
-            PrefixListID, UserIDGroupPair
+            PrefixList, UserIDGroupPair
 
         def _create_ip_permission(perm):
             ip_permission = IPPermission(
@@ -81,8 +81,8 @@ class SecurityGroup:
                 for ip in perm.get('Ipv6Ranges', [])
             ]
 
-            ip_permission.prefix_list_ids = [
-                PrefixListID(id=prefix.get('PrefixListId', ''), description=prefix.get('Description', ''))
+            ip_permission.prefix_lists = [
+                PrefixList(id=prefix.get('PrefixListId', ''), description=prefix.get('Description', ''))
                 for prefix in perm.get('PrefixListIds', [])
             ]
 
