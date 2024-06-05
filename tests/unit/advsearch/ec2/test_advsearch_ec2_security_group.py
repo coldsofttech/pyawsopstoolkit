@@ -18,10 +18,18 @@ class TestSecurityGroup(unittest.TestCase):
     def test_initialization(self):
         self.assertEqual(self.security_group.session, self.session)
 
-    def test_set_session(self):
+    def test_setters(self):
         new_session = Session(profile_name='sample')
         self.security_group.session = new_session
         self.assertEqual(self.security_group.session, new_session)
+
+    def test_invalid_types(self):
+        invalid_session = 123
+
+        with self.assertRaises(TypeError):
+            SecurityGroup(session=invalid_session)
+        with self.assertRaises(TypeError):
+            self.security_group.session = invalid_session
 
     @patch('boto3.Session')
     def test_search_security_groups_empty_kwargs(self, mock_session):

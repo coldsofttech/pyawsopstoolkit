@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 
 from pyawsopstoolkit.__globals__ import MAX_WORKERS
 from pyawsopstoolkit.__interfaces__ import ISession, IAccount
@@ -11,40 +12,26 @@ from pyawsopstoolkit.exceptions import AdvanceSearchError
 from pyawsopstoolkit.validators import Validator
 
 
+@dataclass
 class SecurityGroup:
     """
     A class representing advance search features related with EC2 security groups.
     """
+    session: ISession
 
-    def __init__(self, session: ISession) -> None:
-        """
-        Initializes the constructor of the SecurityGroup class.
-        :param session: An ISession object providing access to AWS services.
-        :type session: ISession
-        """
-        Validation.validate_type(session, ISession, 'session should be of ISession type.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._session = session
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['session']:
+            Validation.validate_type(field_value, ISession, f'{field_name} should be of ISession type.')
 
-    @property
-    def session(self) -> ISession:
-        """
-        Gets the ISession object which provides access to AWS services.
-        :return: The ISession object which provide access to AWS services.
-        :rtype: ISession
-        """
-        return self._session
-
-    @session.setter
-    def session(self, value: ISession) -> None:
-        """
-        Sets the ISession object which provides access to AWS services.
-        :param value: The ISession object which provides access to AWS services.
-        :type value: ISession
-        """
-        Validation.validate_type(value, ISession, 'session should be of ISession type.')
-
-        self._session = value
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     @staticmethod
     def _convert_to_ec2_security_group(account: IAccount, region: str, sg: dict):
