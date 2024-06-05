@@ -17,30 +17,34 @@ A class representing advanced search features related to IAM roles.
   using advanced search features supported by the specified arguments. For details on supported kwargs, please refer to
   the section below.
 
+### Properties
+
+- `session`: An ISession object providing access to AWS services.
+
 #### `search_roles` Supported Keyword Arguments
 
 The **search_roles** function allows you to search for IAM roles using various keyword arguments. Below are the
 supported keyword arguments:
 
-- `path`: Specifies the path of the IAM role. Example: `path='/service-role/'`.
-- `name`: Specifies the name of the IAM role. Example: `name='test_role'`.
-- `id`: Specifies the ID of the IAM role. Example: `id='AIDACKCEVSQ6C2EXAMPLE'`.
 - `arn`: Specifies the ARN of the IAM role. Example: `arn='arn:aws:iam::111122223333:role/role-name'`.
+- `created_date`: Specifies the created date of the IAM role (datetime format).
+  Example: `created_date={GREATER_THAN: datetime(2024, 10, 15)}`.
 - `description`: Specifies the description of the IAM role. Example: `description='test'`.
-- `permissions_boundary_type`: Specifies the type of permissions boundary for the IAM role.
-  Example: `permissions_boundary_type='Policy'`.
+- `id`: Specifies the ID of the IAM role. Example: `id='AIDACKCEVSQ6C2EXAMPLE'`.
+- `last_used_date`: Specifies the last used date of the IAM role (datetime format).
+  Example: `last_used_date={BETWEEN: [datetime(2023, 10, 15), datetime(2024, 10, 15)]}`.
+- `last_used_region`: Specifies the region where the IAM role was last used. Example: `last_used_region='eu-west-1'`.
+- `max_session_duration`: Specifies the maximum session duration of the IAM role (in seconds, integer type).
+  Example: `max_session_duration={LESS_THAN: 3600}`.
+- `name`: Specifies the name of the IAM role. Example: `name='test_role'`.
+- `path`: Specifies the path of the IAM role. Example: `path='/service-role/'`.
 - `permissions_boundary_arn`: Specifies the ARN of the permissions boundary for the IAM role.
   Example: `permissions_boundary_arn='arn:aws:iam::111122223333:policy/policy-name'`.
-- `last_used_region`: Specifies the region where the IAM role was last used. Example: `last_used_region='eu-west-1'`.
+- `permissions_boundary_type`: Specifies the type of permissions boundary for the IAM role.
+  Example: `permissions_boundary_type='Policy'`.
 - `tag_key`: Specifies the tag key associated with the IAM role. Example: `tag_key='test_key'`.
 - `tag`: Specifies the tag key and value combination associated with the IAM role (dictionary format).
   Example: `tag={'key': 'test_key', 'value': 'test_value'}`.
-- `max_session_duration`: Specifies the maximum session duration of the IAM role (in seconds, integer type).
-  Example: `max_session_duration={LESS_THAN: 3600}`.
-- `created_date`: Specifies the created date of the IAM role (datetime format).
-  Example: `created_date={GREATER_THAN: datetime(2024, 10, 15)}`.
-- `last_used_date`: Specifies the last used date of the IAM role (datetime format).
-  Example: `last_used_date={BETWEEN: [datetime(2023, 10, 15), datetime(2024, 10, 15)]}`.
 
 All the above arguments support string types and accept regular expression patterns. Additionally,
 the `max_session_duration`, `created_date`, and `last_used_date` arguments support conditions such as less than, greater
