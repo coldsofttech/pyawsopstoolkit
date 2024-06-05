@@ -1,4 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
@@ -12,40 +13,26 @@ from pyawsopstoolkit.advsearch.iam.__handlers__ import _get_role, _list_roles, _
 from pyawsopstoolkit.exceptions import SearchAttributeError, AdvanceSearchError
 
 
+@dataclass
 class Role:
     """
     A class representing advance search features related with IAM roles.
     """
+    session: ISession
 
-    def __init__(self, session: ISession) -> None:
-        """
-        Initializes the constructor of the Role class.
-        :param session: An ISession object providing access to AWS services.
-        :type session: ISession
-        """
-        Validation.validate_type(session, ISession, 'session should be of ISession type.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._session = session
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['session']:
+            Validation.validate_type(field_value, ISession, f'{field_name} should be of ISession type.')
 
-    @property
-    def session(self) -> ISession:
-        """
-        Gets the ISession object which provides access to AWS services.
-        :return: The ISession object which provide access to AWS services.
-        :rtype: ISession
-        """
-        return self._session
-
-    @session.setter
-    def session(self, value: ISession) -> None:
-        """
-        Sets the ISession object which provides access to AWS services.
-        :param value: The ISession object which provides access to AWS services.
-        :type value: ISession
-        """
-        Validation.validate_type(value, ISession, 'session should be of ISession type.')
-
-        self._session = value
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     @staticmethod
     def _convert_to_iam_role(account: IAccount, role: dict):
@@ -229,40 +216,26 @@ class Role:
         return roles_to_return
 
 
+@dataclass
 class User:
     """
     A class representing advance search features related with IAM users.
     """
+    session: ISession
 
-    def __init__(self, session: ISession) -> None:
-        """
-        Initializes the constructor of the User class.
-        :param session: An ISession object providing access to AWS services.
-        :type session: ISession
-        """
-        Validation.validate_type(session, ISession, 'session should be of ISession type.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._session = session
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['session']:
+            Validation.validate_type(field_value, ISession, f'{field_name} should be of ISession type.')
 
-    @property
-    def session(self) -> ISession:
-        """
-        Gets the ISession object which provides access to AWS services.
-        :return: The ISession object which provide access to AWS services.
-        :rtype: ISession
-        """
-        return self._session
-
-    @session.setter
-    def session(self, value: ISession) -> None:
-        """
-        Sets the ISession object which provides access to AWS services.
-        :param value: The ISession object which provides access to AWS services.
-        :type value: ISession
-        """
-        Validation.validate_type(value, ISession, 'session should be of ISession type.')
-
-        self._session = value
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     @staticmethod
     def _convert_to_iam_user(

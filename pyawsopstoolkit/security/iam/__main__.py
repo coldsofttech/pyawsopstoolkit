@@ -1,43 +1,30 @@
 import re
+from dataclasses import dataclass
 
 from pyawsopstoolkit.__interfaces__ import ISession
 from pyawsopstoolkit.__validations__ import Validation
 
 
+@dataclass
 class Role:
     """
     A class representing security risks and vulnerabilities related with IAM roles.
     """
+    session: ISession
 
-    def __init__(self, session: ISession) -> None:
-        """
-        Initializes the constructor of the Role class.
-        :param session: An ISession object providing access to AWS services.
-        :type session: ISession
-        """
-        Validation.validate_type(session, ISession, 'session should be of Session type.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._session = session
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['session']:
+            Validation.validate_type(field_value, ISession, f'{field_name} should be of ISession type.')
 
-    @property
-    def session(self) -> ISession:
-        """
-        Gets the ISession object which provides access to AWS services.
-        :return: The ISession object which provide access to AWS services.
-        :rtype: ISession
-        """
-        return self._session
-
-    @session.setter
-    def session(self, value: ISession) -> None:
-        """
-        Sets the ISession object which provides access to AWS services.
-        :param value: The ISession object which provides access to AWS services.
-        :type value: ISession
-        """
-        Validation.validate_type(value, ISession, 'session should be of Session type.')
-
-        self._session = value
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def roles_without_permissions_boundary(self) -> list:
         """
@@ -63,40 +50,26 @@ class Role:
         return roles_without_permissions_boundary
 
 
+@dataclass
 class User:
     """
     A class representing security risks and vulnerabilities related with IAM users.
     """
+    session: ISession
 
-    def __init__(self, session: ISession) -> None:
-        """
-        Initializes the constructor of the User class.
-        :param session: An ISession object providing access to AWS services.
-        :type session: ISession
-        """
-        Validation.validate_type(session, ISession, 'session should be of Session type.')
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
 
-        self._session = session
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['session']:
+            Validation.validate_type(field_value, ISession, f'{field_name} should be of ISession type.')
 
-    @property
-    def session(self) -> ISession:
-        """
-        Gets the ISession object which provides access to AWS services.
-        :return: The ISession object which provide access to AWS services.
-        :rtype: ISession
-        """
-        return self._session
-
-    @session.setter
-    def session(self, value: ISession) -> None:
-        """
-        Sets the ISession object which provides access to AWS services.
-        :param value: The ISession object which provides access to AWS services.
-        :type value: ISession
-        """
-        Validation.validate_type(value, ISession, 'session should be of Session type.')
-
-        self._session = value
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
 
     def users_without_permissions_boundary(self) -> list:
         """
