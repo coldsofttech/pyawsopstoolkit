@@ -16,6 +16,10 @@ A class representing security risks and vulnerabilities related to IAM roles.
 - `roles_without_permissions_boundary() -> list`: Retrieves a list of IAM roles lacking associated permissions
   boundaries, facilitating targeted risk assessment and mitigation.
 
+### Properties
+
+- `session`: An ISession object providing access to AWS services.
+
 ### Usage
 
 ```python
