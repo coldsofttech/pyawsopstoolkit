@@ -17,6 +17,10 @@ The **Role** class represents insights related to IAM roles.
 - `unused_roles(no_of_days: Optional[int] = 90, include_newly_created: Optional[bool] = False) -> list`: Returns a list
   of unused IAM roles based on the specified parameters.
 
+### Properties
+
+- `session`: An ISession object providing access to AWS services.
+
 ### Usage
 
 ```python
