@@ -3,7 +3,8 @@ __all__ = [
     "Attachment",
     "Group",
     "IPv6Address",
-    "PrivateIPAddress"
+    "PrivateIPAddress",
+    "IPPrefix"
 ]
 __name__ = "pyawsopstoolkit.models.ec2.network_interface"
 __description__ = """
@@ -13,4 +14,4 @@ the efficient handling and manipulation of EC2 network interfaces, ensuring seam
 """
 
 from pyawsopstoolkit.models.ec2.network_interface.__main__ import Association, Attachment, Group, IPv6Address, \
-    PrivateIPAddress
+    PrivateIPAddress, IPPrefix

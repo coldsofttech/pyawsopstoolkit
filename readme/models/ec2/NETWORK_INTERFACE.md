@@ -111,3 +111,22 @@ The **PrivateIPAddress** class represents the IPv4 private address associated wi
 - `dns_name`: The DNS name associated with the EC2 network interface.
 - `is_primary`: A boolean flag indicating whether this IPv4 private address is the primary address for the EC2 network
   interface.
+
+## IPPrefix
+
+The **IPPrefix** class represents the IP prefix associated with the EC2 network interface.
+
+### Constructors
+
+- `IPPrefix(prefix: str, is_ipv6: Optional[bool] = False) -> None`: Initializes a new **IPPrefix** object with specified
+  parameters.
+
+### Methods
+
+- `to_dict() -> dict`: Returns a dictionary representation of the **IPPrefix** object.
+
+### Properties
+
+- `is_ipv6`: A boolean flag indicating whether the provided prefix is an IPv6 prefix.
+- `prefix`: The IP prefix associated with the EC2 network interface. This property supports both IPv4 and IPv6 prefixes,
+  indicating the network range for the associated IP addresses.

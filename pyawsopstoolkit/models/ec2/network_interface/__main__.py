@@ -219,3 +219,39 @@ class PrivateIPAddress:
             "is_primary": self.is_primary,
             "association": self.association.to_dict() if self.association is not None else None
         }
+
+
+@dataclass
+class IPPrefix:
+    """
+    A class representing the IP prefix associated with EC2 network interface.
+    """
+    prefix: str
+    is_ipv6: Optional[bool] = False
+
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
+
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['prefix']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+        elif field_name in ['is_ipv6']:
+            Validation.validate_type(field_value, Union[bool, None], f'{field_name} should be a boolean.')
+
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
+
+    def to_dict(self) -> dict:
+        """
+        Returns a dictionary representation of the IPPrefix instance.
+        :return: Dictionary representation of the IPPrefix instance.
+        :rtype: dict
+        """
+        return {
+            "prefix": self.prefix,
+            "is_ipv6": self.is_ipv6
+        }
