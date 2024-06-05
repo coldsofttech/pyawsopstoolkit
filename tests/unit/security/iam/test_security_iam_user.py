@@ -17,10 +17,18 @@ class TestUser(unittest.TestCase):
     def test_initialization(self):
         self.assertEqual(self.user.session, self.session)
 
-    def test_set_session(self):
+    def test_setters(self):
         new_session = Session(profile_name='sample')
         self.user.session = new_session
         self.assertEqual(self.user.session, new_session)
+
+    def test_invalid_types(self):
+        invalid_session = 123
+
+        with self.assertRaises(TypeError):
+            User(session=invalid_session)
+        with self.assertRaises(TypeError):
+            self.user.session = invalid_session
 
     @patch('boto3.Session')
     def test_users_without_permissions_boundary_no_iam_users_returned(self, mock_session):

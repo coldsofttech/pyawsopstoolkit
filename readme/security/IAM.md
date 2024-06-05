@@ -57,6 +57,10 @@ A class representing security risks and vulnerabilities related to IAM users.
 - `users_without_permissions_boundary() -> list`: Retrieves a list of IAM users lacking associated permissions
   boundaries, facilitating targeted risk assessment and mitigation.
 
+### Properties
+
+- `session`: An ISession object providing access to AWS services.
+
 ### Usage
 
 ```python
