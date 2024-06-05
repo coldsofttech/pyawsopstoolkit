@@ -139,3 +139,39 @@ class Group:
             "id": self.id,
             "name": self.name
         }
+
+
+@dataclass
+class IPv6Address:
+    """
+    A class representing the IPv6 address associated with EC2 network interface.
+    """
+    address: str
+    is_primary: Optional[bool] = False
+
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
+
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['address']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+        elif field_name in ['is_primary']:
+            Validation.validate_type(field_value, Union[bool, None], f'{field_name} should be a boolean.')
+
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
+
+    def to_dict(self) -> dict:
+        """
+        Returns a dictionary representation of the IPv6Address instance.
+        :return: Dictionary representation of the IPv6Address instance.
+        :rtype: dict
+        """
+        return {
+            "address": self.address,
+            "is_primary": self.is_primary
+        }

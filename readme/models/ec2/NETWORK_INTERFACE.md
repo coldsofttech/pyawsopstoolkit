@@ -71,3 +71,22 @@ The **Group** class represents the security group associated with EC2 network in
 
 - `id`: The unique identifier of the security group associated with the EC2 network interface.
 - `name`: The name of the security group associated with the EC2 network interface.
+
+## IPv6Address
+
+The **IPv6Address** class represents the IPv6 address associated with EC2 network interface.
+
+### Constructors
+
+- `IPv6Address(address: str, is_primary: Optional[bool] = False) -> None`: Initializes a new **IPv6Address** object with
+  specified parameters.
+
+### Methods
+
+- `to_dict() -> dict`: Returns a dictionary representation of the **IPv6Address** object.
+
+### Properties
+
+- `address`: The IPv6 address associated with the EC2 network interface.
+- `is_primary`: A boolean flag indicating whether this IPv6 address is the primary address for the EC2 network
+  interface.
