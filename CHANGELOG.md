@@ -1,6 +1,9 @@
 # Version History
 
-- 0.1.14: Enhanced classes of [pyawsopstoolkit.models](pyawsopstoolkit/models) package. (latest)
+- 0.1.15: Enhanced classes
+  of [pyawsopstoolkit.advsearch](pyawsopstoolkit/advsearch), [pyawsopstoolkit.insights](pyawsopstoolkit/insights),
+  and [pyawsopstoolkit.security](pyawsopstoolkit/security) packages. (latest)
+- 0.1.14: Enhanced classes of [pyawsopstoolkit.models](pyawsopstoolkit/models) package.
 - 0.1.13: Added [pyawsopstoolkit.advsearch.ec2](pyawsopstoolkit/advsearch/ec2) package.
 - 0.1.12: Added [pyawsopstoolkit.models.ec2](pyawsopstoolkit/models/ec2) package.
 - 0.1.11:
