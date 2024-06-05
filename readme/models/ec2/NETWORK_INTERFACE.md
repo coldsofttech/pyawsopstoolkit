@@ -90,3 +90,24 @@ The **IPv6Address** class represents the IPv6 address associated with EC2 networ
 - `address`: The IPv6 address associated with the EC2 network interface.
 - `is_primary`: A boolean flag indicating whether this IPv6 address is the primary address for the EC2 network
   interface.
+
+## PrivateIPAddress
+
+The **PrivateIPAddress** class represents the IPv4 private address associated with EC2 network interface.
+
+### Constructors
+
+- `PrivateIPAddress(address: str, dns_name: str, is_primary: Optional[bool] = False, association: Optional[Association] = None) -> None`:
+  Initializes a new **PrivateIPAddress** object with specified parameters.
+
+### Methods
+
+- `to_dict() -> dict`: Returns a dictionary representation of the **PrivateIPAddress** object.
+
+### Properties
+
+- `address`: The IPv4 private address associated with the EC2 network interface.
+- `association`: The **Association** object representing any linked public IP information for the EC2 network interface.
+- `dns_name`: The DNS name associated with the EC2 network interface.
+- `is_primary`: A boolean flag indicating whether this IPv4 private address is the primary address for the EC2 network
+  interface.

@@ -175,3 +175,47 @@ class IPv6Address:
             "address": self.address,
             "is_primary": self.is_primary
         }
+
+
+@dataclass
+class PrivateIPAddress:
+    """
+    A class representing the private IP address associated with EC2 network interface.
+    """
+    address: str
+    dns_name: str
+    is_primary: Optional[bool] = False
+    association: Optional[Association] = None
+
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
+
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['address', 'dns_name']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+        elif field_name in ['is_primary']:
+            Validation.validate_type(field_value, Union[bool, None], f'{field_name} should be a boolean.')
+        elif field_name in ['association']:
+            Validation.validate_type(
+                field_value, Union[Association, None], f'{field_name} should be of Association type.'
+            )
+
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
+
+    def to_dict(self) -> dict:
+        """
+        Returns a dictionary representation of the PrivateIPAddress instance.
+        :return: Dictionary representation of the PrivateIPAddress instance.
+        :rtype: dict
+        """
+        return {
+            "address": self.address,
+            "dns_name": self.dns_name,
+            "is_primary": self.is_primary,
+            "association": self.association.to_dict() if self.association is not None else None
+        }
