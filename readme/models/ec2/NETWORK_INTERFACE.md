@@ -38,7 +38,7 @@ The **Attachment** class represents the attachment of an EC2 network interface.
 
 ### Methods
 
-- `to_dict() -> dict`: Returns a dictionary representation of the **Association** object.
+- `to_dict() -> dict`: Returns a dictionary representation of the **Attachment** object.
 
 ### Properties
 
@@ -54,3 +54,20 @@ The **Attachment** class represents the attachment of an EC2 network interface.
   with multiple network cards.
 - `status`: The current status of the EC2 network interface attachment, reflecting whether it is attaching, attached,
   detaching, or detached.
+
+## Group
+
+The **Group** class represents the security group associated with EC2 network interface.
+
+### Constructors
+
+- `Group(id: str, name: str) -> None`: Initializes a new **Group** object with specified parameters.
+
+### Methods
+
+- `to_dict() -> dict`: Returns a dictionary representation of the **Group** object.
+
+### Properties
+
+- `id`: The unique identifier of the security group associated with the EC2 network interface.
+- `name`: The name of the security group associated with the EC2 network interface.

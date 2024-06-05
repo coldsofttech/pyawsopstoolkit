@@ -105,3 +105,37 @@ class Attachment:
             "instance_id": self.instance_id,
             "instance_owner_id": self.instance_owner_id
         }
+
+
+@dataclass
+class Group:
+    """
+    A class representing the security group associated with EC2 network interface.
+    """
+    id: str
+    name: str
+
+    def __post_init__(self):
+        for field_name, field_value in self.__dataclass_fields__.items():
+            self.__validate__(field_name)
+
+    def __validate__(self, field_name):
+        field_value = getattr(self, field_name)
+        if field_name in ['id', 'name']:
+            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
+
+    def __setattr__(self, key, value):
+        super().__setattr__(key, value)
+        if key in self.__dataclass_fields__:
+            self.__validate__(key)
+
+    def to_dict(self) -> dict:
+        """
+        Returns a dictionary representation of the Group instance.
+        :return: Dictionary representation of the Group instance.
+        :rtype: dict
+        """
+        return {
+            "id": self.id,
+            "name": self.name
+        }
