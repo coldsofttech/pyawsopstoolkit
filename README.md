@@ -138,7 +138,7 @@ offering functionality to manage sessions. Additionally, it provides the option 
 
 #### Constructors
 
-- `Session(profile_name: Optional[str] = None, credentials: Optional[ICredentials] = None, region_code: Optional[str] = 'eu-west-1') -> None`:
+- `Session(profile_name: Optional[str] = None, credentials: Optional[ICredentials] = None, region_code: Optional[str] = 'eu-west-1', cert_path: Optional[str] = None) -> None`:
   Initializes a **Session** object for AWS with optional parameters for profile name, credentials, and region code.
 
 #### Methods
@@ -161,6 +161,8 @@ offering functionality to manage sessions. Additionally, it provides the option 
   expiry.
 - `profile_name`: The name of the AWS profile to be used for authentication.
 - `region_code`: The code representing the AWS region to operate in, e.g., 'us-east-2'. Defaults to 'eu-west-1'.
+- 'cert_path': The certificate path to avoid SSL CERTIFICATE VERIFY FAILED error. For more information, refer
+  to https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-troubleshooting.html#tshoot-certificate-verify-failed.
 
 #### Usage
 
