@@ -17,13 +17,15 @@ class TestSession(unittest.TestCase):
         self.params = {
             'profile_name': 'temp',
             'credentials': Credentials('access_key', 'secret_access_key', 'token'),
-            'region_code': 'us-east-1'
+            'region_code': 'us-east-1',
+            'cert_path': '/sample/path/sample.crt'
         }
         self.session_with_profile = Session(profile_name=self.params['profile_name'])
         self.session_with_creds = Session(credentials=self.params['credentials'])
         self.session_with_region_code = Session(
             profile_name=self.params['profile_name'], region_code=self.params['region_code']
         )
+        self.session_with_cert = Session(credentials=self.params['credentials'], cert_path=self.params['cert_path'])
 
     def test_initialization(self):
         with self.assertRaises(ValueError):
@@ -31,36 +33,42 @@ class TestSession(unittest.TestCase):
 
     def test_initialization_with_optional_params(self):
         test_cases = [
-            (self.session_with_profile, self.params['profile_name'], None, 'eu-west-1'),
-            (self.session_with_creds, None, self.params['credentials'], 'eu-west-1'),
-            (self.session_with_region_code, self.params['profile_name'], None, 'us-east-1')
+            (self.session_with_profile, self.params['profile_name'], None, 'eu-west-1', None),
+            (self.session_with_creds, None, self.params['credentials'], 'eu-west-1', None),
+            (self.session_with_region_code, self.params['profile_name'], None, 'us-east-1', None),
+            (self.session_with_cert, None, self.params['credentials'], 'eu-west-1', self.params['cert_path'])
         ]
-        for session, profile_name, credentials, region in test_cases:
+        for session, profile_name, credentials, region, cert_path in test_cases:
             with self.subTest(session=session):
                 self.assertEqual(session.profile_name, profile_name)
                 self.assertEqual(session.credentials, credentials)
                 self.assertEqual(session.region_code, region)
+                self.assertEqual(session.cert_path, cert_path)
 
     def test_setters(self):
         new_params = {
             'profile_name': 'default',
             'credentials': Credentials('valid_access_key', 'valid_secret_access_key', 'valid_token'),
-            'region_code': 'us-east-2'
+            'region_code': 'us-east-2',
+            'cert_path': '/new/path/new.crt'
         }
 
         self.session_with_profile.profile_name = new_params['profile_name']
         self.session_with_creds.credentials = new_params['credentials']
         self.session_with_region_code.region_code = new_params['region_code']
+        self.session_with_cert.cert_path = new_params['cert_path']
 
         self.assertEqual(self.session_with_profile.profile_name, new_params['profile_name'])
         self.assertEqual(self.session_with_creds.credentials, new_params['credentials'])
         self.assertEqual(self.session_with_region_code.region_code, new_params['region_code'])
+        self.assertEqual(self.session_with_cert.cert_path, new_params['cert_path'])
 
     def test_invalid_types(self):
         invalid_params = {
             'profile_name': 123,
             'credentials': 123,
-            'region_code': 'Ohio'
+            'region_code': 'Ohio',
+            'cert_path': 123
         }
 
         with self.assertRaises(TypeError):
@@ -69,6 +77,8 @@ class TestSession(unittest.TestCase):
             Session(credentials=invalid_params['credentials'])
         with self.assertRaises(ValidationError):
             Session(profile_name=self.params['profile_name'], region_code=invalid_params['region_code'])
+        with self.assertRaises(TypeError):
+            Session(credentials=self.params['credentials'], cert_path=invalid_params['cert_path'])
 
         with self.assertRaises(TypeError):
             self.session_with_profile.profile_name = invalid_params['profile_name']
@@ -76,6 +86,8 @@ class TestSession(unittest.TestCase):
             self.session_with_creds.credentials = invalid_params['credentials']
         with self.assertRaises(ValidationError):
             self.session_with_region_code.region_code = invalid_params['region_code']
+        with self.assertRaises(TypeError):
+            self.session_with_cert.cert_path = invalid_params['cert_path']
 
     @patch('boto3.Session')
     def test_get_session_with_profile_name(self, mock_session):
