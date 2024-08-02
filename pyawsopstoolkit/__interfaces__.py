@@ -45,7 +45,6 @@ class ISession(ABC):
     profile_name: Optional[str] = None
     credentials: Optional[ICredentials] = None
     region_code: Optional[str] = 'eu-west-1'
-    cert_path: Optional[str] = None
 
     @abstractmethod
     def get_session(self):

@@ -1,6 +1,7 @@
 # Version History
 
-- 0.1.16: Fixed SSL CERTIFICATE VERIFY FAILED issue (latest)
+- 0.1.17: Reverted fix for SSL CERTIFICATE VERIFY FAILED issue & Added Troubleshooting Document. (latest)
+- 0.1.16: Fixed SSL CERTIFICATE VERIFY FAILED issue.
 - 0.1.15: Enhanced classes
   of [pyawsopstoolkit.advsearch](pyawsopstoolkit/advsearch), [pyawsopstoolkit.insights](pyawsopstoolkit/insights),
   and [pyawsopstoolkit.security](pyawsopstoolkit/security) packages.

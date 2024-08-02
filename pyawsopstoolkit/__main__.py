@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Union
@@ -93,7 +92,6 @@ class Session(ISession):
     profile_name: Optional[str] = None
     credentials: Optional[ICredentials] = None
     region_code: Optional[str] = 'eu-west-1'
-    cert_path: Optional[str] = None
 
     def __post_init__(self):
         if (self.profile_name is not None) == (self.credentials is not None):
@@ -104,12 +102,9 @@ class Session(ISession):
         for field_name, field_value in self.__dataclass_fields__.items():
             self.__validate__(field_name)
 
-        if self.cert_path is not None:
-            os.environ['AWS_CA_BUNDLE'] = self.cert_path
-
     def __validate__(self, field_name):
         field_value = getattr(self, field_name)
-        if field_name in ['profile_name', 'cert_path']:
+        if field_name in ['profile_name']:
             Validation.validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
         elif field_name in ['region_code']:
             Validator.region(field_value, True)
@@ -272,6 +267,6 @@ class Session(ISession):
                         secret_access_key=creds.get('SecretAccessKey', ''),
                         token=creds.get('SessionToken', ''),
                         expiry=creds.get('Expiration', datetime.utcnow())
-                    ), cert_path=self.cert_path)
+                    ))
         except ClientError as e:
             raise AssumeRoleError(role_arn=role_arn, exception=e)
