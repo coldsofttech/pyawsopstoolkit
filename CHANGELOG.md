@@ -1,6 +1,7 @@
 # Version History
 
-- 0.1.18: Revamped pyawsopstoolkit. Subpackages are moved to their own repos. (latest)
+- 0.1.19: Introduced fix for SSL Certificate Error. (latest)
+- 0.1.18: Revamped pyawsopstoolkit. Subpackages are moved to their own repos.
 - 0.1.17: Reverted fix for SSL CERTIFICATE VERIFY FAILED issue & Added Troubleshooting Document.
 - 0.1.16: Fixed SSL CERTIFICATE VERIFY FAILED issue.
 - 0.1.15: Enhanced classes
