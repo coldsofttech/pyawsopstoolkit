@@ -1,12 +1,10 @@
 import unittest
 from datetime import datetime
 
-from pyawsopstoolkit import Credentials
+from pyawsopstoolkit.credentials import Credentials
 
 
 class TestCredentials(unittest.TestCase):
-    """Unit test cases for Credentials."""
-
     def setUp(self) -> None:
         self.maxDiff = None
         self.params = {

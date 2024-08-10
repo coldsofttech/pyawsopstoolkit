@@ -1,12 +1,10 @@
 import unittest
 
-from pyawsopstoolkit import Account
+from pyawsopstoolkit.account import Account
 from pyawsopstoolkit.exceptions import AssumeRoleError
 
 
 class TestAssumeRoleError(unittest.TestCase):
-    """Unit test cases for AssumeRoleError."""
-
     def setUp(self) -> None:
         self.account = Account('123456789012')
         self.role_arn = f'arn:aws:iam::{self.account.number}:role/test_role'

@@ -1,11 +1,9 @@
 import unittest
 
-from pyawsopstoolkit import Account
+from pyawsopstoolkit.account import Account
 
 
 class TestAccount(unittest.TestCase):
-    """Unit test cases for Account."""
-
     def setUp(self) -> None:
         self.maxDiff = None
         self.params = {

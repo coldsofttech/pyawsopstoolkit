@@ -2,16 +2,12 @@ import unittest
 from datetime import datetime
 from unittest.mock import patch, MagicMock
 
-import botocore.config
-from botocore.exceptions import ProfileNotFound, ClientError
-
-from pyawsopstoolkit import Credentials, Session
-from pyawsopstoolkit.exceptions import AssumeRoleError, ValidationError
+from pyawsopstoolkit.credentials import Credentials
+from pyawsopstoolkit.exceptions import AssumeRoleError
+from pyawsopstoolkit.session import Session
 
 
 class TestSession(unittest.TestCase):
-    """Unit test cases for Session."""
-
     def setUp(self) -> None:
         self.maxDiff = None
         self.params = {
@@ -57,6 +53,8 @@ class TestSession(unittest.TestCase):
         self.assertEqual(self.session_with_region_code.region_code, new_params['region_code'])
 
     def test_invalid_types(self):
+        from pyawsopstoolkit_validators.exceptions import ValidationError
+
         invalid_params = {
             'profile_name': 123,
             'credentials': 123,
@@ -108,6 +106,8 @@ class TestSession(unittest.TestCase):
 
     @patch('boto3.Session')
     def test_get_session_profile_not_found(self, mock_session):
+        from botocore.exceptions import ProfileNotFound
+
         session_instance = mock_session.return_value
         session_instance.client.side_effect = ProfileNotFound(profile=self.params['profile_name'])
 
@@ -116,6 +116,8 @@ class TestSession(unittest.TestCase):
 
     @patch('boto3.Session')
     def test_get_session_client_error(self, mock_session):
+        from botocore.exceptions import ClientError
+
         session_instance = mock_session.return_value
         session_instance.client.return_value.list_buckets.side_effect = ClientError(
             {'Error': {'Code': 'SomeErrorCode'}}, 'operation_name'
@@ -126,9 +128,11 @@ class TestSession(unittest.TestCase):
             session.get_session()
 
     def test_get_config(self):
+        import botocore
+
         self.assertEqual(type(self.session_with_profile.get_config()), botocore.config.Config)
 
-    @patch('pyawsopstoolkit.Session.get_session')
+    @patch('pyawsopstoolkit.session.Session.get_session')
     def test_get_account_success(self, mock_get_session):
         mock_client = MagicMock()
         mock_caller_identity = MagicMock()
@@ -138,8 +142,10 @@ class TestSession(unittest.TestCase):
 
         self.assertEqual(self.session_with_profile.get_account().number, '123456789012')
 
-    @patch('pyawsopstoolkit.Session.get_session')
+    @patch('pyawsopstoolkit.session.Session.get_session')
     def test_get_account_failure(self, mock_get_session):
+        from botocore.exceptions import ClientError
+
         mock_client = MagicMock()
         mock_client.get_caller_identity.side_effect = ClientError({}, 'operation_name')
         mock_get_session.return_value.client.return_value = mock_client
@@ -165,6 +171,8 @@ class TestSession(unittest.TestCase):
 
     @patch('boto3.Session')
     def test_get_credentials_for_profile_profile_not_found(self, mock_session):
+        from botocore.exceptions import ProfileNotFound
+
         mock_session_instance = mock_session.return_value
         mock_session_instance.get_credentials.side_effect = ProfileNotFound(profile=self.params['profile_name'])
 
@@ -173,6 +181,8 @@ class TestSession(unittest.TestCase):
 
     @patch('boto3.Session')
     def test_get_credentials_for_profile_client_error(self, mock_session):
+        from botocore.exceptions import ClientError
+
         mock_session_instance = mock_session.return_value
         mock_session_instance.get_credentials.side_effect = ClientError({}, 'operation_name')
 
@@ -183,7 +193,7 @@ class TestSession(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.session_with_creds.get_credentials_for_profile()
 
-    @patch('pyawsopstoolkit.Session.get_session')
+    @patch('pyawsopstoolkit.session.Session.get_session')
     def test_assume_role_basic(self, mock_get_session):
         mock_expiry = datetime.utcnow()
         mock_session = MagicMock()
@@ -221,7 +231,7 @@ class TestSession(unittest.TestCase):
         self.assertEqual(result.credentials.token, 'mock_token')
         self.assertEqual(result.credentials.expiry, mock_expiry)
 
-    @patch('pyawsopstoolkit.Session.get_session')
+    @patch('pyawsopstoolkit.session.Session.get_session')
     def test_assume_role_with_policy(self, mock_get_session):
         mock_expiry = datetime.utcnow()
         mock_session = MagicMock()
@@ -262,7 +272,7 @@ class TestSession(unittest.TestCase):
         self.assertEqual(result.credentials.token, 'mock_token')
         self.assertEqual(result.credentials.expiry, mock_expiry)
 
-    @patch('pyawsopstoolkit.Session.get_session')
+    @patch('pyawsopstoolkit.session.Session.get_session')
     def test_assume_role_with_tags(self, mock_get_session):
         mock_expiry = datetime.utcnow()
         mock_session = MagicMock()
@@ -303,8 +313,10 @@ class TestSession(unittest.TestCase):
         self.assertEqual(result.credentials.token, 'mock_token')
         self.assertEqual(result.credentials.expiry, mock_expiry)
 
-    @patch('pyawsopstoolkit.Session.get_session')
+    @patch('pyawsopstoolkit.session.Session.get_session')
     def test_assume_role_error_handling(self, mock_get_session):
+        from botocore.exceptions import ClientError
+
         mock_session = MagicMock()
         mock_get_session.return_value = mock_session
         mock_sts_client = MagicMock()

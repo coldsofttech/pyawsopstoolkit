@@ -12,15 +12,15 @@ setup(
     description=pyawsopstoolkit.__description__,
     requires_python=">=3.10",
     install_requires=[
-        "boto3",
-        "botocore"
+        "pyawsopstoolkit_validators==0.1.0",
+        "boto3==1.34.158",
+        "botocore==1.34.158"
     ],
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     keywords=[
-        "aws", "toolkit", "operations", "tools", "development", "python", "validation", "session-management",
-        "utilities", "enhancements", "integration", "amazon-web-services", "models", "search", "advance-search",
-        "filtering", "security-risks", "risks", "vulnerabilities", "insights", "hygiene"
+        "aws", "toolkit", "operations", "tools", "development", "python", "session-management", "utilities",
+        "enhancements", "integration", "amazon-web-services"
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
