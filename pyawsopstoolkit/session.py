@@ -18,6 +18,7 @@ class Session:
     profile_name: Optional[str] = None
     credentials: Optional[Credentials] = None
     region_code: Optional[str] = 'eu-west-1'
+    cert_path: Optional[str] = None
 
     def __post_init__(self):
         if (self.profile_name is not None) == (self.credentials is not None):
@@ -32,7 +33,7 @@ class Session:
         from pyawsopstoolkit_validators.region_validator import region
 
         field_value = getattr(self, field_name)
-        if field_name in ['profile_name']:
+        if field_name in ['profile_name', 'cert_path']:
             _validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
         elif field_name in ['region_code']:
             region(field_value, True)
@@ -72,7 +73,10 @@ class Session:
             else:
                 raise ValueError('At least profile_name or credentials is required.')
 
-            session.client('s3').list_buckets()
+            if self.cert_path:
+                session.client('s3', verify=self.cert_path).list_buckets()
+            else:
+                session.client('s3').list_buckets()
         except ProfileNotFound:
             raise ValueError(f'Profile "{self.profile_name}" not found.')
         except ClientError as e:
@@ -103,7 +107,10 @@ class Session:
 
         session = self.get_session()
         try:
-            account_id = session.client('sts').get_caller_identity().get('Account', '')
+            if self.cert_path:
+                account_id = session.client('sts', verify=self.cert_path).get_caller_identity().get('Account', None)
+            else:
+                account_id = session.client('sts').get_caller_identity().get('Account', None)
             if account_id:
                 return Account(account_id)
         except ClientError as e:
@@ -181,7 +188,10 @@ class Session:
 
         session = self.get_session()
         try:
-            sts_client = session.client('sts')
+            if self.cert_path:
+                sts_client = session.client('sts', verify=self.cert_path)
+            else:
+                sts_client = session.client('sts')
             params = {
                 "RoleArn": role_arn,
                 "RoleSessionName": role_session_name,

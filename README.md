@@ -131,7 +131,7 @@ Additionally, it provides the option to assume a session.
 
 #### Constructors
 
-- `Session(profile_name: Optional[str] = None, credentials: Optional[ICredentials] = None, region_code: Optional[str] = 'eu-west-1') -> None`:
+- `Session(profile_name: Optional[str] = None, credentials: Optional[ICredentials] = None, region_code: Optional[str] = 'eu-west-1', cert_path: Optional[str] = None) -> None`:
   Initializes a **Session** object for AWS with optional parameters for profile name, credentials, and region code.
 
 #### Methods
