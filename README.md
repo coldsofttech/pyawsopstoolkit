@@ -10,16 +10,20 @@ set of features and enhancements to streamline your AWS interactions.
   refined control over workflow dynamics.
 - **Assume Role Function**: Access a versatile function for assuming roles, augmenting security and flexibility within
   your AWS operations.
-- **Validator Functions**: Validate AWS ARNs, IAM policy formats, and more with ease, ensuring the correctness of
-  crucial parameters.
-- **Advance Search**: Harness advanced search capabilities to efficiently navigate and filter AWS resources,
-  streamlining resource discovery and management.
-- **Security Risks/Vulnerabilities**: Safeguard your AWS infrastructure by proactively identifying and addressing
-  security threats and vulnerabilities. Leverage dedicated tools to detect misconfigurations, insecure permissions, and
-  potential entry points for cyberattacks. Stay vigilant with continuous monitoring and auditing to maintain a robust
-  security posture and mitigate risks effectively.
-- **Insights**: Gain comprehensive insights into various aspects of your AWS infrastructure to maintain optimal hygiene
-  and clean up unused or obsolete resources.
+- **Subpackages**:
+    - **Validator Functions**: Validate AWS ARNs, IAM policy formats, and more with ease, ensuring the correctness of
+      crucial parameters.
+    - **Advance Search**: Harness advanced search capabilities to efficiently navigate and filter AWS resources,
+      streamlining resource discovery and management.
+    - **Security Risks/Vulnerabilities**: Safeguard your AWS infrastructure by proactively identifying and addressing
+      security threats and vulnerabilities. Leverage dedicated tools to detect misconfigurations, insecure permissions,
+      and
+      potential entry points for cyberattacks. Stay vigilant with continuous monitoring and auditing to maintain a
+      robust
+      security posture and mitigate risks effectively.
+    - **Insights**: Gain comprehensive insights into various aspects of your AWS infrastructure to maintain optimal
+      hygiene
+      and clean up unused or obsolete resources.
 
 ## What's Next?
 
@@ -67,17 +71,10 @@ optional expiry datetime.
 
 - `to_dict() -> dict`: Returns a dictionary representation of the **Credentials** object.
 
-#### Properties
-
-- `access_key`: The access key string.
-- `expiry`: The token expiry datetime.
-- `secret_access_key`: The secret access key string.
-- `token`: The token string.
-
 #### Usage
 
 ```python
-from pyawsopstoolkit import Credentials
+from pyawsopstoolkit.credentials import Credentials
 
 # Create a Credentials object
 creds = Credentials(access_key='access_key', secret_access_key='secret_access_key', token='token')
@@ -104,8 +101,8 @@ print(creds.to_dict())
 
 ### Account
 
-The **Account** class represents an AWS account with various attributes. This class implements the **IAccount**
-interface, providing basic functionality for managing an AWS account.
+The **Account** class represents an AWS account with various attributes. This class provides basic functionality for
+managing an AWS account.
 
 #### Constructors
 
@@ -113,16 +110,12 @@ interface, providing basic functionality for managing an AWS account.
 
 #### Methods
 
-- `to_dict(self) -> dict`: Returns a dictionary representation of the **Account** object.
-
-#### Properties
-
-- `number`: The AWS account number.
+- `to_dict() -> dict`: Returns a dictionary representation of the **Account** object.
 
 #### Usage
 
 ```python
-from pyawsopstoolkit import Account
+from pyawsopstoolkit.account import Account
 
 # Create an Account object
 account = Account('123456789012')
@@ -133,12 +126,12 @@ print(account.number)  # Output: 123456789012
 
 ### Session
 
-The **Session** class represents a boto3 Session with various attributes. It implements the **ISession** interface,
-offering functionality to manage sessions. Additionally, it provides the option to assume a session.
+The **Session** class represents a boto3 Session with various attributes, offering functionality to manage sessions.
+Additionally, it provides the option to assume a session.
 
 #### Constructors
 
-- `Session(profile_name: Optional[str] = None, credentials: Optional[ICredentials] = None, region_code: Optional[str] = 'eu-west-1', cert_path: Optional[str] = None) -> None`:
+- `Session(profile_name: Optional[str] = None, credentials: Optional[ICredentials] = None, region_code: Optional[str] = 'eu-west-1') -> None`:
   Initializes a **Session** object for AWS with optional parameters for profile name, credentials, and region code.
 
 #### Methods
@@ -155,19 +148,10 @@ offering functionality to manage sessions. Additionally, it provides the option 
 - `assume_role(role_arn: str, role_session_name: Optional[str] = 'AssumeSession', policy_arns: Optional[list] = None, policy: Optional[Union[str, dict]] = None, duration_seconds: Optional[int] = 3600, tags: Optional[list] = None) -> ISession`:
   Returns the **ISession** object for the assumed role based on the specified parameters.
 
-#### Properties
-
-- `credentials`: The object containing AWS credentials, including access key, secret access key, and optional token and
-  expiry.
-- `profile_name`: The name of the AWS profile to be used for authentication.
-- `region_code`: The code representing the AWS region to operate in, e.g., 'us-east-2'. Defaults to 'eu-west-1'.
-- 'cert_path': The certificate path to avoid SSL CERTIFICATE VERIFY FAILED error. For more information, refer
-  to https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-troubleshooting.html#tshoot-certificate-verify-failed.
-
 #### Usage
 
 ```python
-from pyawsopstoolkit import Session
+from pyawsopstoolkit.session import Session
 
 # Initialize a Session object with a profile name
 profile_name = 'default'
@@ -187,37 +171,14 @@ print(config)  # Output: <botocore.config.Config object at 0x0000022097630040>
 
 # Get credentials for profile
 creds = session.get_credentials_for_profile()
-print(creds)
-# Output: Credentials(access_key="access_key",secret_access_key="secret_access_key",token=None,expiry=None)
+print(
+    creds)  # Output: Credentials(access_key="access_key",secret_access_key="secret_access_key",token=None,expiry=None)
 ```
 
-## pyawsopstoolkit.advsearch
+## pyawsopstoolkit_validators
 
-For detailed information and usage examples, please refer to [ADVANCE_SEARCH](readme/advsearch/ADVANCE_SEARCH.md).
-
-## pyawsopstoolkit.exceptions
-
-For detailed information and usage examples, please refer to [EXCEPTIONS](readme/EXCEPTIONS.md).
-
-## pyawsopstoolkit.insights
-
-For detailed information and usage examples, please refer to [INSIGHTS](readme/insights/INSIGHTS.md).
-
-## pyawsopstoolkit.models
-
-For detailed information and usage examples, please refer to [MODELS](readme/models/MODELS.md).
-
-## pyawsopstoolkit.security
-
-For detailed information and usage examples, please refer to [SECURITY](readme/security/SECURITY.md).
-
-## pyawsopstoolkit.validators
-
-For detailed information and usage examples, please refer to [VALIDATORS](readme/VALIDATORS.md).
-
-## Troubleshooting Guide
-
-For detailed troubleshooting guide, please refer to [TROUBLESHOOTING](/readme/TROUBLESHOOTING.md).
+For detailed information and usage examples, please refer
+to [pyawsopstoolkit_validators](https://github.com/coldsofttech/pyawsopstoolkit-validators)
 
 # License
 

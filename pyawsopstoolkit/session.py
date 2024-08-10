@@ -2,95 +2,21 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional, Union
 
-from pyawsopstoolkit.__interfaces__ import ICredentials, IAccount, ISession
-from pyawsopstoolkit.__validations__ import Validation
+from pyawsopstoolkit.__validations__ import _validate_type
+from pyawsopstoolkit.account import Account
+from pyawsopstoolkit.credentials import Credentials
 from pyawsopstoolkit.exceptions import AssumeRoleError
-from pyawsopstoolkit.validators import ArnValidator, PolicyValidator, TagValidator, AccountValidator, Validator
 
 
 @dataclass
-class Credentials(ICredentials):
-    """
-    Represents a set of credentials including an access key, secret access key, token, and optional expiry datetime.
-    """
-    access_key: str
-    secret_access_key: str
-    token: Optional[str] = None
-    expiry: Optional[datetime] = None
-
-    def __post_init__(self):
-        for field_name, field_value in self.__dataclass_fields__.items():
-            self.__validate__(field_name)
-
-    def __validate__(self, field_name):
-        field_value = getattr(self, field_name)
-        if field_name in ['access_key', 'secret_access_key']:
-            Validation.validate_type(field_value, str, f'{field_name} should be a string.')
-        elif field_name in ['token']:
-            Validation.validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
-        elif field_name in ['expiry']:
-            Validation.validate_type(field_value, Union[datetime, None], f'{field_name} should be a datetime.')
-
-    def __setattr__(self, key, value):
-        super().__setattr__(key, value)
-        if key in self.__dataclass_fields__:
-            self.__validate__(key)
-
-    def to_dict(self) -> dict:
-        """
-        Convert Credentials object to dictionary.
-        :return: Dictionary representation of Credentials object.
-        :rtype: dict
-        """
-        return {
-            "access_key": self.access_key,
-            "secret_access_key": self.secret_access_key,
-            "token": self.token if self.token is not None else None,
-            "expiry": self.expiry.isoformat() if self.expiry is not None else None
-        }
-
-
-@dataclass
-class Account(IAccount):
-    """
-    Represents an AWS account with various attributes. This class implements the IAccount interface, providing basic
-    functionality for managing an AWS account.
-    """
-    number: str
-
-    def __post_init__(self):
-        for field_name, field_value in self.__dataclass_fields__.items():
-            self.__validate__(field_name)
-
-    def __validate__(self, field_name):
-        field_value = getattr(self, field_name)
-        if field_name in ['number']:
-            AccountValidator.number(field_value, True)
-
-    def __setattr__(self, key, value):
-        super().__setattr__(key, value)
-        if key in self.__dataclass_fields__:
-            self.__validate__(key)
-
-    def to_dict(self) -> dict:
-        """
-        Return a dictionary representation of the Account object.
-        :return: Dictionary representation of the Account object.
-        :rtype: dict
-        """
-        return {
-            "number": self.number
-        }
-
-
-@dataclass
-class Session(ISession):
+class Session:
     """
     This class represents a boto3 Session with various attributes. It implements the ISession interface, offering
     functionality to manage sessions. Additionally, it provides the option to assume a session.
     """
+
     profile_name: Optional[str] = None
-    credentials: Optional[ICredentials] = None
+    credentials: Optional[Credentials] = None
     region_code: Optional[str] = 'eu-west-1'
 
     def __post_init__(self):
@@ -103,14 +29,16 @@ class Session(ISession):
             self.__validate__(field_name)
 
     def __validate__(self, field_name):
+        from pyawsopstoolkit_validators.region_validator import region
+
         field_value = getattr(self, field_name)
         if field_name in ['profile_name']:
-            Validation.validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
+            _validate_type(field_value, Union[str, None], f'{field_name} should be a string.')
         elif field_name in ['region_code']:
-            Validator.region(field_value, True)
+            region(field_value, True)
         elif field_name in ['credentials']:
-            Validation.validate_type(
-                field_value, Union[ICredentials, None], f'{field_name} should be of ICredentials type.'
+            _validate_type(
+                field_value, Union[Credentials, None], f'{field_name} should be of Credentials type.'
             )
 
     def __setattr__(self, key, value):
@@ -120,9 +48,10 @@ class Session(ISession):
 
     def get_session(self):
         """
-        Returns the boto3.Session object based on the specified parameters within the class object.
-        Priority is given to profile_name, followed by credentials.
-        This method performs a quick S3 list buckets action to verify if the session is valid.
+        Returns the boto3.Session object based on the specified parameters within the class object. Priority is given
+        to profile_name, followed by credentials.  This method performs a quick S3 list buckets action to verify if the
+        session is valid.
+
         :return: The boto3 Session object based on the specified parameters within the class object.
         :rtype: boto3.Session
         """
@@ -155,6 +84,7 @@ class Session(ISession):
     def get_config(self):
         """
         Returns the botocore.config.Config based on the specified region code within the class object.
+
         :return: The botocore Config object based on the specified region code within the class object.
         :rtype: botocore.config.Config
         """
@@ -162,9 +92,10 @@ class Session(ISession):
 
         return Config(region_name=self.region_code)
 
-    def get_account(self) -> IAccount:
+    def get_account(self) -> Account:
         """
         Returns the AWS account number based on the get_session with specified parameters within the class object.
+
         :return: The AWS account number.
         :rtype: Account
         """
@@ -178,10 +109,11 @@ class Session(ISession):
         except ClientError as e:
             raise ValueError(f'Failed to retrieve AWS account number: {e}.')
 
-    def get_credentials_for_profile(self) -> ICredentials:
+    def get_credentials_for_profile(self) -> Credentials:
         """
         Returns the AWS credentials, i.e., access key, secret access key, and token based on the get_session with
         specified parameters within the class object.
+
         :return: The AWS credentials.
         :rtype: Credentials
         """
@@ -232,17 +164,20 @@ class Session(ISession):
         :rtype: ISession
         """
         from botocore.exceptions import ClientError
+        from pyawsopstoolkit_validators.arn_validator import arn
+        from pyawsopstoolkit_validators.policy_validator import policy as policy_val
+        from pyawsopstoolkit_validators.tag_validator import tag
 
-        ArnValidator.arn(role_arn)
-        Validation.validate_type(role_session_name, Union[str, None], 'role_session_name should be a string.')
-        Validation.validate_type(policy_arns, Union[list, None], 'policy_arns should be list of strings.')
+        arn(role_arn)
+        _validate_type(role_session_name, Union[str, None], 'role_session_name should be a string.')
+        _validate_type(policy_arns, Union[list, None], 'policy_arns should be list of strings.')
         if policy_arns:
-            ArnValidator.arn(policy_arns)
+            arn(policy_arns)
         if policy:
-            PolicyValidator.policy(policy)
-        Validation.validate_type(duration_seconds, Union[int, None], 'duration_seconds should be an integer.')
+            policy_val(policy)
+        _validate_type(duration_seconds, Union[int, None], 'duration_seconds should be an integer.')
         if tags:
-            TagValidator.tag(tags)
+            tag(tags)
 
         session = self.get_session()
         try:

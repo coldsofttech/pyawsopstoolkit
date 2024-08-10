@@ -1,3 +1,3 @@
-setuptools~=72.1.0
-boto3~=1.34.152
-botocore~=1.34.149
+pyawsopstoolkit_validators==0.1.0
+boto3==1.34.158
+botocore==1.34.158
